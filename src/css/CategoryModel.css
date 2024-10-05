@@ -1,0 +1,264 @@
+.category-model {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.category-model .category-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.category-model .category-form input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 200px;
+}
+
+.category-form input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.category-form .checkbox-label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.category-form button {
+  background-color: #62d666;
+  color: #000;
+  padding: 10px 15px;
+  border: none;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.category-form button:hover{
+  background-color: #05752a;
+  font-weight: 600;
+  color: #fff;
+  transition: all 0.3s ease-in-out;
+}
+
+
+.category-model .category-grid table {
+  width: 100%;
+  font-size: 12px;
+  border-collapse: collapse;
+}
+
+.category-grid th, .category-grid td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.category-grid th {
+  background-color: #f2f2f2;
+}
+
+.editing-row {
+  background-color: #fffae6;
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Hide the default checkbox */
+.checkbox-label input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #C8CCD4;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Add the checkmark inside the checkbox */
+.checkbox-label input[type="checkbox"]:checked::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background-color: #4285F4;
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+}
+
+/* Hover effect on the checkbox */
+.checkbox-label input[type="checkbox"]:hover {
+  border-color: #4285F4;
+}
+
+/* Style for the label next to the checkbox */
+.checkbox-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Add some spacing between the checkbox and label text */
+.checkbox-label input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Style for the label text */
+.checkbox-label span {
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+/* Hover effect for the label text */
+.checkbox-label:hover span {
+  color: #4285F4;
+}
+
+
+/* Style the store column text to be green */
+.store-column {
+  color: green;
+}
+
+/* Style the delete button text to be red */
+.button-td .delete-button {
+  background-color: #ee857b;
+  cursor: pointer;
+  border: 1px solid gray;
+  padding: 5px;
+  color: #000;
+  font-weight: 600;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+/* Style the edit button text to be yellow */
+.button-td .edit-button {
+  background-color: #eaf389;
+  cursor: pointer;
+  border: 1px solid gray;
+  padding: 5px;
+  color: #000;
+  font-weight: 600;
+  font-size: 12px;
+  margin-right: 10px;
+}
+
+.button-td .delete-button:hover{
+  background-color: rgb(133, 5, 5);
+  transition: all 0.3s ease-in-out;
+  color: #fff;
+}
+
+.button-td .edit-button:hover{
+  background-color: rgb(94, 94, 2);
+  transition: all 0.3s ease-in-out;
+  color: #fff;
+}
+
+.update-button{
+  
+  background-color: #00CCDD;
+  cursor: pointer;
+  border: 1px solid gray;
+  padding: 5px;
+  color: #000;
+  font-weight: 600;
+  font-size: 12px;
+  margin-right: 10px;
+}
+
+/* Checkbox container */
+.check-box {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  margin-left: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.check-box input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+
+/* Search box styling */
+.search-box {
+  display: flex;
+  justify-content: flex-end; /* Ensure the search box is aligned to the right */
+  position: relative;
+  width: 100%;
+}
+
+.search-box input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 250px;
+  box-sizing: border-box;
+}
+
+.search-icon {
+  position: absolute;
+  right: 20px; /* Adjust this value to ensure the icon appears within the input */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ccc;
+  pointer-events: none;
+  font-size: 16px;
+}
+
+/* Pagination styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  margin: 0 3px;
+  border: 1px solid #ddd;
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #4285f4;
+  color: white;
+}
+

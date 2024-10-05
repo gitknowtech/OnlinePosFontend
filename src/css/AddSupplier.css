@@ -1,0 +1,215 @@
+.supplier-model {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    align-items: center;
+    font-size: 12px;
+    justify-content: center;
+    max-width: 1500px;
+    margin-left: 30px;
+  }
+  
+  .supplier-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    justify-content: space-between; /* Evenly distribute form elements */
+  }
+  
+  .supplier-form label {
+    width: 100%;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .supplier-form input[type="text"],
+  .supplier-form input[type="email"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .supplier-form .form-group {
+    flex: 1 1 calc(33.333% - 20px); /* 3 columns layout with spacing */
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+  }
+  
+  .supplier-form input[type="radio"] {
+    margin-right: 8px;
+  }
+  
+  .supplier-form .status-section {
+    flex: 1 1 100%; /* Take full width for status */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+  }
+  
+  .supplier-form .status-section label {
+    font-size: 14px;
+  }
+  
+  .supplier-form .button-group {
+    flex: 1 1 100%; /* Take full width for button */
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .supplier-form button {
+    background-color: #3fb443;
+    color: #000;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 800;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .supplier-form button:hover {
+    background-color: #076b0c;
+    color: #fff;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  /* Checkbox container */
+  .check-box {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .check-box input[type="checkbox"] {
+    margin-right: 8px;
+  }
+  
+  .check-box label {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  /* Style the last added supplier section */
+  .last-added-supplier {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #e8f8e9;
+    border: 1px solid #c2e0c6;
+    border-radius: 8px;
+  }
+  
+  .last-added-supplier h3 {
+    margin-bottom: 10px;
+  }
+  
+  .last-added-supplier p {
+    margin: 5px 0;
+    font-weight: bold;
+  }
+
+  .supplier-form .status-section,
+.supplier-form .check-box {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Adjust the space between elements */
+  margin-bottom: 15px;
+}
+
+.supplier-form input[type="radio"],
+.supplier-form input[type="checkbox"] {
+  cursor: pointer; /* Set cursor to pointer for radio and checkbox */
+}
+
+/* Ensure the label is also clickable with pointer cursor */
+.supplier-form label {
+  cursor: pointer;
+}
+
+/* Container for aligning radio buttons and checkbox in one row */
+.status-checkbox-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 50px; /* Adjust the gap between radio buttons and checkbox */
+  margin-top: 15px;
+}
+
+/* For radio button labels */
+.supplier-form .status-section label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* For the checkbox container */
+.supplier-form .check-box label {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Adjust the spacing for the entire row when rendered */
+.supplier-form .status-checkbox-container input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;base64,..."); /* Add a custom arrow icon if needed */
+  background-position: right 10px top 50%;
+  background-repeat: no-repeat;
+  transition: border-color 0.3s ease;
+}
+
+.form-group select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.form-group select option {
+  padding: 10px;
+}
+
+.form-group select:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+
+
+
+  /* Responsive Design */
+  @media (min-width: 768px) {
+    .supplier-form {
+      gap: 20px;
+    }
+  
+    .supplier-form .form-group {
+      flex: 1 1 calc(33.333% - 20px); /* Keep 3 columns for larger screens */
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .supplier-form {
+      flex-direction: column;
+    }
+  
+    .supplier-form .form-group {
+      flex: 1 1 100%; /* Full-width for smaller screens */
+    }
+  }
+  

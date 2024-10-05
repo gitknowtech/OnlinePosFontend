@@ -1,0 +1,191 @@
+.add-product-model {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    max-width: 1500px;
+    font-size: 12px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-product-model .add-product-form {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 12px;
+    gap: 10px;
+  }
+  
+  .add-product-model .form-group {
+    flex: 2 2 25%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+  
+  .add-product-model .form-group label {
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .add-product-model .form-group input,
+  .add-product-model .form-group select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+    color: black; /* Ensure text color is black in input and select elements */
+  }
+  
+  .add-product-model .form-group select {
+    background-color: white;
+    color: black; /* Ensure select box text is black */
+    max-height: 80px; /* Set the max height to 80px */
+    overflow-y: auto; /* Enable vertical scrolling */
+    scrollbar-width: thin; /* For Firefox */
+  }
+  
+  .add-product-model .form-group select::-webkit-scrollbar {
+    width: 6px; /* For Chrome, Safari, and Opera */
+  }
+  
+  .add-product-model .form-group select::-webkit-scrollbar-thumb {
+    background-color: #007bff; /* Color for scrollbar */
+  }
+  
+  .add-product-model button {
+    background-color: #67a8ee;
+    color: #000;
+    border: none;
+    width: 100px;
+    display: flex;
+    margin-top: 16px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .add-product-model button:hover {
+    background-color: #0056b3;
+    transition: 0.3s ease-in-out;
+    color: #fff;
+  }
+  
+  .add-product-model h2 {
+    width: 100%;
+    font-size: 20px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
+    color: #007bff;
+  }
+  
+  .add-product-model .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .add-product-model .form-row .form-group {
+    flex: 1 1 calc(25% - 20px); /* 4 columns */
+  }
+
+  .add-product-model .button-group {
+    width: 120%;
+  }
+  
+  .add-product-model .button-group button {
+    background-color: #7fee99;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-product-model .button-group button:hover {
+    background-color: #175c26;
+    color: #fff;
+  }
+
+  .add-product-model .table-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .add-product-model .locked-stock-container {
+    flex: 1;
+  }
+  
+  .add-product-model .stores-table {
+    flex: 1;
+    margin-left: 20px;
+  }
+  
+  .add-product-model .stores-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .add-product-model .stores-table table th, .add-product-model .stores-table table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  .add-product-model .stores-table table th {
+    background-color: #f1f1f1;
+    font-weight: bold;
+  }
+  
+  .button-group {
+    margin-top: 20px;
+  }
+  
+  .dropdown-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+  
+  .dropdown-list li {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .dropdown-list li:hover {
+    background-color: #f1f1f1;
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  @media (max-width: 768px) {
+    .form-group {
+      flex: 1 1 100%;
+    }
+  
+    .button-group button {
+      width: 100%;
+    }
+  }
+  

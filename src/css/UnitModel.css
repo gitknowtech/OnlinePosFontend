@@ -1,0 +1,170 @@
+/* General styles for the unit model container */
+.unit-model {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: sans-serif;
+  }
+  
+  /* Unit form styles */
+  .unit-form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .unit-form input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 250px;
+  }
+  
+  .unit-form .check-box {
+    display: flex;
+    font-size: 14px;
+    align-items: center;
+  }
+  
+  .unit-form .check-box input[type="checkbox"] {
+    margin-right: 8px;
+    font-size: 14PX;
+  }
+  
+  .unit-form .button-group {
+    margin-left: auto;
+  }
+  
+  .unit-form .button-group button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .unit-form .button-group button:hover {
+    background-color: #45a049;
+  }
+  
+  /* Search box styling */
+  .search-box {
+    position: relative;
+    margin-left: auto;
+  }
+  
+  .search-box input {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 250px;
+  }
+  
+  .search-box .search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ccc;
+    pointer-events: none;
+    font-size: 16px;
+  }
+  
+  /* Unit grid table styles */
+  .unit-grid table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+  }
+  
+  .unit-grid th, .unit-grid td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .unit-grid th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .unit-grid td {
+    background-color: #fff;
+  }
+  
+/* Style the delete button text to be red */
+.delete-button {
+    background-color: #ee857b;
+      cursor: pointer;
+      border: 1px solid gray;
+      padding: 5px;
+      font-weight: 600;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    
+    /* Style the edit button text to be yellow */
+    .edit-button {
+      background-color: #e8f08f;
+      cursor: pointer;
+      border: 1px solid gray;
+      padding: 5px;
+      font-weight: 600;
+      font-size: 12px;
+      margin-right: 10px;
+    }
+    
+    .delete-button:hover{
+      background-color: red;
+    }
+    
+    .edit-button:hover{
+      background-color: yellow;
+    }
+  
+  /* Pagination styles */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagination button {
+    padding: 5px 10px;
+    margin: 0 3px;
+    border: 1px solid #ddd;
+    background-color: #f4f4f4;
+    cursor: pointer;
+  }
+  
+  .pagination button.active {
+    background-color: #4285f4;
+    color: white;
+  }
+  
+  .pagination button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .unit-form {
+      flex-direction: column;
+    }
+  
+    .search-box {
+      margin-left: 0;
+      width: 100%;
+    }
+  
+    .search-box input {
+      width: 100%;
+    }
+  }
+  
