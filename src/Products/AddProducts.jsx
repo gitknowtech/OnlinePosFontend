@@ -25,7 +25,6 @@ export default function AddProducts({ UserName, store }) {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [filteredUnitList, setFilteredUnitList] = useState([]);
   const [selectedUnit, setSelectedUnit] = useState("");
-  const [storeValues, setStoreValues] = useState({});
   const [discountPrice, setDiscountPrice] = useState("");
   const [discountPercentage, setDiscountPercentage] = useState("");
   const [wholesalePrice, setWholesalePrice] = useState("");
@@ -38,8 +37,8 @@ export default function AddProducts({ UserName, store }) {
   const [realWholesalePrice, setRealWholesalePrice] = useState(0);
   const [stockAlert, setStockAlert] = useState([]);
   const [unitList, setUnitList] = useState([]);
-  const [storeList, setStoreList] = useState([]);
-  const [saveStoreAsAll, setSaveStoreAsAll] = useState(false);
+  const [stockQuantity, setStockQuantity] = useState(0);
+  const [isActive, setIsActive] = useState(true);
 
   // Fetch supplier, category, and unit data when the component mounts
   useEffect(() => {
@@ -94,23 +93,6 @@ export default function AddProducts({ UserName, store }) {
       }
     };
 
-    const fetchStores = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/api/get_stores"
-        );
-        setStoreList(response.data);
-      } catch (error) {
-        console.error("Error fetching stores: ", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Failed to fetch stores. Please try again later.",
-        });
-      }
-    };
-
-    fetchStores();
     fetchSuppliers();
     fetchCategories();
     fetchUnits();
@@ -149,23 +131,12 @@ export default function AddProducts({ UserName, store }) {
     setSelectedUnit(e.target.value);
   };
 
-  // Handle store values change
-  const handleStoreValuesChange = (storeName, field, value) => {
-    setStoreValues((prev) => ({
-      ...prev,
-      [storeName]: {
-        ...prev[storeName],
-        [field]: value,
-      },
-    }));
-  };
-
-  //calculate profit pecentage and profit price
   const calculateProfit = () => {
     if (costPrice && mrpPrice) {
-      const profiAmount = Math.round(mrpPrice - costPrice);
-      const profitPercentage = Math.round((profiAmount / costPrice) * 100);
-      setProfitAmount(profiAmount);
+      const profitAmount = Math.round(mrpPrice - costPrice);
+      const profitPercentage = Math.round((profitAmount / costPrice) * 100);
+
+      setProfitAmount(profitAmount);
       setProfitPercentage(profitPercentage.toFixed(2));
     } else {
       setProfitAmount(0);
@@ -173,95 +144,149 @@ export default function AddProducts({ UserName, store }) {
     }
   };
 
-  //calculate discount pecentage and discount price
-  const calculateDiscountFromPercentage = () => {
-    if (mrpPrice && discountPercentage) {
-      const discountPrice = Math.round((mrpPrice * discountPercentage) / 100);
-      setDiscountPrice(discountPrice.toFixed(2)); //round to 2 decimal places
-      const realPrice = Math.round(mrpPrice - discountPrice);
-      setRealPrice(realPrice.toFixed(2)); //round to 2 decimal places
+  const checkCostGreaterThanMRP = (costPrice, mrpPrice) => {
+    if (isNaN(costPrice) || isNaN(mrpPrice)) {
+      console.error("Invalid input: costPrice and mrpPrice must be numbers.");
+      return;
     }
-  };
 
-  //calculate wholesale from price
-  const calculateWholesaleFromPrice = () => {
-    if (mrpPrice && wholesalePrice) {
-      const wholesalePercentage = Math.round((wholesalePrice / mrpPrice) * 100);
-      setWholesalePercentage(wholesalePercentage.toFixed(2)); //round to 2 decimal places
-      const realWholesalePrice = Math.round(mrpPrice - wholesalePrice);
-      setRealWholesalePrice(realWholesalePrice.toFixed(2)); //round to 2 decimal places
-    }
-  };
-
-  //calculate discount pecentage and discount price
-  const calculateWholesaleFromPercentage = () => {
-    if (mrpPrice && wholesalePercentage) {
-      const wholesalePrice = Math.round((mrpPrice * wholesalePercentage) / 100);
-      setWholesalePrice(wholesalePrice.toFixed(2)); //round to 2 decimal places
-      const realWholesalePrice = Math.round(mrpPrice - wholesalePrice);
-      setRealWholesalePrice(realWholesalePrice.toFixed(2)); //round to 2 decimal places
-    }
-  };
-
-  //calculate discount from price
-  const calculateDiscountFromPrice = () => {
-    if (mrpPrice && discountPrice) {
-      const discountPercentage = Math.round((discountPrice / mrpPrice) * 100);
-      setDiscountPercentage(discountPercentage.toFixed(2)); //round to 2 decimal places
-      const realPrice = Math.round(mrpPrice - discountPrice);
-      setRealPrice(realPrice.toFixed(2)); //round to 2 decimal places
-    }
-  };
-
-  const validatePrice = (field, value) => {
-    if (mrpPrice && value > mrpPrice) {
+    if (costPrice < 0 || mrpPrice < 0) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Discount Price cannot be greater than Market Price!",
+        text: "Prices cannot be negative!",
       });
+      setCostPrice(0);
+      setMrpPrice(0);
+      setProfitAmount(0);
+      setProfitPercentage(0);
+      return;
+    }
 
-      //reset the field value
-      if (field === "Cost Price") setCostPrice(0);
-      if (field === "Discount Price") setDiscountPrice(0);
-      if (field === "Wholesale Price") setWholesalePrice(0);
-      if (field === "Locked Price") setLockedPrice(0);
+    if (costPrice > mrpPrice) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Cost Price cannot be greater than Market Price!",
+      });
+      setCostPrice(0);
+      setMrpPrice(0);
+      setProfitAmount(0);
+      setProfitPercentage(0);
+      return;
+    }
+
+    calculateProfit();
+  };
+
+  const handcostChesking = () => {
+    checkCostGreaterThanMRP(parseFloat(costPrice), parseFloat(mrpPrice));
+  };
+
+  const calculateDiscountFromPercentage = () => {
+    if (mrpPrice && discountPercentage) {
+      const discountPrice = Math.round((mrpPrice * discountPercentage) / 100);
+      setDiscountPrice(discountPrice.toFixed(2));
+
+      const realPrice = Math.round(mrpPrice - discountPrice);
+      setRealPrice(realPrice.toFixed(2));
+
+      if (realPrice > mrpPrice || realPrice < 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Discounted Price cannot be greater or Negative than Market Price!",
+        });
+        setDiscountPrice(0);
+        setRealPrice(0);
+      }
+    }
+  };
+
+  const calculateWholesaleFromPercentage = () => {
+    if (mrpPrice && wholesalePercentage) {
+      const wholesalePrice = Math.round((mrpPrice * wholesalePercentage) / 100);
+      setWholesalePrice(wholesalePrice.toFixed(2));
+
+      const realWholesalePrice = Math.round(mrpPrice - wholesalePrice);
+      setRealWholesalePrice(realWholesalePrice.toFixed(2));
+
+      if (realWholesalePrice > mrpPrice || realWholesalePrice < 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Wholesale Price cannot be greater or negative than Market Price!",
+        });
+        setWholesalePrice(0);
+        setRealWholesalePrice(0);
+      }
+    }
+  };
+
+  const calculateDiscountFromPrice = () => {
+    if (mrpPrice && discountPrice) {
+      const discountPercentage = Math.round((discountPrice / mrpPrice) * 100);
+      setDiscountPercentage(discountPercentage.toFixed(2));
+
+      const realPrice = Math.round(mrpPrice - discountPrice);
+      setRealPrice(realPrice.toFixed(2));
+
+      if (realPrice > mrpPrice || realPrice < 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Discounted Price cannot be greater or Negative than Market Price!",
+        });
+        setDiscountPrice(0);
+        setRealPrice(0);
+      }
+    }
+  };
+
+  const calculateWholesaleFromPrice = () => {
+    if (mrpPrice && wholesalePrice) {
+      const wholesalePercentage = Math.round(
+        (wholesalePrice / mrpPrice) * 100
+      );
+      setWholesalePercentage(wholesalePercentage.toFixed(2));
+
+      const realWholesalePrice = Math.round(mrpPrice - wholesalePrice);
+      setRealWholesalePrice(realWholesalePrice.toFixed(2));
+
+      if (realWholesalePrice > mrpPrice || realWholesalePrice < 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Wholesale Price cannot be greater or Negative than Market Price!",
+        });
+        setWholesalePrice(0);
+        setRealWholesalePrice(0);
+      }
     }
   };
 
   const handleWholesaleBlur = () => {
-    calculateWholesaleFromPrice(); // This is your original calculation logic
-    validatePrice('Wholesale Price', wholesalePrice); 
-  }
+    calculateWholesaleFromPrice();
+  };
 
   const handleDiscountBlur = () => {
-    calculateDiscountFromPrice(); // This is your original calculation logic
-    validatePrice('Discount Price', discountPrice); 
-  }
+    calculateDiscountFromPrice();
+  };
 
-
-  // Auto-generate barcode with 5 digits
   const generateBarcode = () => {
     const newBarcode = `0000${Math.floor(Math.random() * 100000)}`.slice(-5);
     setBarcode(newBarcode);
   };
 
-  // Form validation
-  const validateFormData = () => {
-    if (productId.trim() === "" || productName.trim() === "") {
+  const handleSave = async () => {
+    if (!productId || !productName || !costPrice || !mrpPrice) {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Product ID and Product Name are required!",
+        title: "Error",
+        text: "Product ID, Product Name, Cost Price, and MRP Price are required fields.",
       });
-      return false;
+      return;
     }
-    return true;
-  };
-
-  // Handle form submission
-  const handleSave = async () => {
-    if (!validateFormData()) return;
 
     const productData = {
       productId,
@@ -284,8 +309,10 @@ export default function AddProducts({ UserName, store }) {
       wholesalePercentage,
       lockedPrice,
       availableStock,
+      stockQuantity,
       user: UserName,
-      store: saveStoreAsAll ? "all" : store,
+      store,
+      status: isActive ? "Active" : "Inactive",
     };
 
     try {
@@ -312,7 +339,6 @@ export default function AddProducts({ UserName, store }) {
     }
   };
 
-  // Reset form fields after submission
   const resetFormFields = () => {
     setProductId("");
     setProductName("");
@@ -334,20 +360,12 @@ export default function AddProducts({ UserName, store }) {
     setWholesalePercentage("");
     setLockedPrice("");
     setAvailableStock("");
-    setSaveStoreAsAll(false);
+    setStockQuantity(0);
   };
 
   return (
     <div className="add-product-model">
       <h2>Product Details</h2>
-      <div className="check-box">
-        <input
-          type="checkbox"
-          checked={saveStoreAsAll}
-          onChange={(e) => setSaveStoreAsAll(e.target.checked)}
-        />
-        <label>All Store</label>
-      </div>
       <div className="add-product-form">
         <div className="form-group">
           <label htmlFor="productId">Product ID</label>
@@ -387,22 +405,20 @@ export default function AddProducts({ UserName, store }) {
           <input type="text" id="barcode" value={barcode} readOnly />
         </div>
 
-
         <div className="form-group option">
           <button type="button" onClick={generateBarcode}>
             Auto Generate
           </button>
         </div>
 
-        
-
         <div className="form-group">
           <label htmlFor="cabinNumber">Cabin Number (Raakka)</label>
           <input
             type="text"
-            id="cabinNumber" value={cabinNumber}
+            id="cabinNumber"
+            value={cabinNumber}
             onChange={(e) => setCabinNumber(e.target.value)}
-            placeholder="Enter Cabin Numnber of The Product"
+            placeholder="Enter Cabin Number of The Product"
           />
         </div>
 
@@ -489,7 +505,6 @@ export default function AddProducts({ UserName, store }) {
               id="costPrice"
               value={costPrice}
               onChange={(e) => setCostPrice(e.target.value)}
-              onBlur={calculateProfit}
               placeholder="Enter Cost Price"
             />
           </div>
@@ -500,8 +515,8 @@ export default function AddProducts({ UserName, store }) {
               type="number"
               id="mrpPrice"
               value={mrpPrice}
-              onChange={(e) => setMrpPrice(e.target.value)} // Only set value on change
-              onBlur={calculateProfit} // Calculate when user leaves the field
+              onChange={(e) => setMrpPrice(e.target.value)}
+              onBlur={handcostChesking}
               placeholder="Enter MRP Price"
             />
           </div>
@@ -552,7 +567,6 @@ export default function AddProducts({ UserName, store }) {
               onBlur={handleDiscountBlur}
               placeholder="Enter Discount Price"
             />
-
             {discountPrice && realPrice && (
               <span> ({realPrice})</span> // Display real price in parentheses next to the discount price
             )}
@@ -581,11 +595,39 @@ export default function AddProducts({ UserName, store }) {
               placeholder="Enter Wholesale Price"
             />
             {wholesalePrice && realWholesalePrice && (
-              <span> ({realWholesalePrice})</span> // Display real price in parentheses next to the discount price
+              <span> ({realWholesalePrice})</span>
             )}
           </div>
         </div>
 
+        <div className="checkbox-group">
+          <label style={{ fontSize: "16px", textDecoration: "underline", fontWeight: "900", color: "red" }}>
+            Status
+          </label>
+          <div className="check-box">
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={() => {
+                setIsActive(true);
+              }}
+            />
+            <label>Active</label>
+          </div>
+
+          <div className="check-box">
+            <input
+              type="checkbox"
+              checked={!isActive}
+              onChange={() => {
+                setIsActive(false);
+              }}
+            />
+            <label>Inactive</label>
+          </div>
+        </div>
+
+        <h2>Stock Details</h2>
         <div className="form-group">
           <label htmlFor="lockedPrice">Locked Price</label>
           <input
@@ -593,8 +635,18 @@ export default function AddProducts({ UserName, store }) {
             id="lockedPrice"
             value={lockedPrice}
             onChange={(e) => setLockedPrice(e.target.value)}
-            onBlur={() => validatePrice("Locked Price", lockedPrice)} // Validate locked price on blur
             placeholder="Enter Locked Price"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="stockAmount">Stock Quantity</label>
+          <input
+            type="number"
+            id="stockAmount"
+            value={stockQuantity}
+            onChange={(e) => setStockQuantity(e.target.value)}
+            placeholder="Enter Stock Quantity"
           />
         </div>
 
@@ -607,49 +659,6 @@ export default function AddProducts({ UserName, store }) {
             onChange={(e) => setStockAlert(e.target.value)}
             placeholder="Enter Stock Alert Count"
           />
-        </div>
-
-        <h2>Stock Details</h2>
-        <div className="table-container">
-          <div className="locked-stock-container">
-            {storeList.map((store) => (
-              <div key={store.id} className="form-group">
-                <label>{store.storeName}</label>
-                <input
-                  type="number"
-                  value={storeValues[store.storeName]?.stockAlert || ""}
-                  onChange={(e) =>
-                    handleStoreValuesChange(
-                      store.storeName,
-                      "stockAlert",
-                      e.target.value
-                    )
-                  }
-                  placeholder="Stock Alert"
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className="locked-price-container">
-            {storeList.map((store) => (
-              <div key={store.id} className="form-group">
-                <label>{store.storeName}</label>
-                <input
-                  type="number"
-                  value={storeValues[store.storeName]?.lockedPrice || ""}
-                  onChange={(e) =>
-                    handleStoreValuesChange(
-                      store.storeName,
-                      "lockedPrice",
-                      e.target.value
-                    )
-                  }
-                  placeholder="Locked Price"
-                />
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 

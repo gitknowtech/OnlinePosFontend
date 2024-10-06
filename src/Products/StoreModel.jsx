@@ -1,30 +1,37 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Swal from "sweetalert2";
-import "../css/StoreModel.css"; // Assuming a CSS file for styling
+import Swal from "sweetalert2"; // Import SweetAlert2
+import "../css/StoreModel.css"; // Ensure to create a corresponding CSS file
 
 export default function StoreModel({ UserName, store }) {
   const [storeName, setStoreName] = useState("");
   const [stores, setStores] = useState([]);
-  const [loading, setLoading] = useState(false); // Disable buttons during API calls
+  const [editingStoreId, setEditingStoreId] = useState(null);
+  const [editedStoreName, setEditedStoreName] = useState("");
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [storesPerPage] = useState(8); // Number of stores per page
 
-  // Fetch stores when the component loads
+  // Fetch stores when the component mounts
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/get_stores"
-        );
+        const response = await axios.get("http://localhost:5000/api/get_stores");
         setStores(response.data);
-      } catch (error) {
-        console.error("Error fetching stores: ", error);
+      } catch (err) {
+        console.error("Error fetching stores:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error fetching stores",
+        });
       }
     };
     fetchStores();
   }, []);
 
-  // Add new store
   const handleSave = async () => {
     if (storeName.trim() === "") {
       Swal.fire({
@@ -35,7 +42,6 @@ export default function StoreModel({ UserName, store }) {
       return;
     }
 
-    // Check for duplicate store name
     const isDuplicate = stores.some(
       (existingStore) =>
         existingStore.storeName.toLowerCase() === storeName.toLowerCase()
@@ -51,15 +57,11 @@ export default function StoreModel({ UserName, store }) {
     }
 
     try {
-      setLoading(true); // Disable buttons during API calls
-      const response = await axios.post(
-        "http://localhost:5000/api/create_store",
-        {
-          storeName,
-          user: UserName,
-          store,
-        }
-      );
+      const response = await axios.post("http://localhost:5000/api/create_store", {
+        storeName,
+        user: UserName,
+        store,
+      });
 
       if (response.status === 201) {
         const newStore = {
@@ -68,11 +70,14 @@ export default function StoreModel({ UserName, store }) {
           user: UserName,
           store,
         };
+
         setStores([...stores, newStore]);
         setStoreName(""); // Clear the input
+        setError("");
+
         Swal.fire({
           icon: "success",
-          title: "Store Added",
+          title: "Store Saved",
           text: "Store has been added successfully!",
         });
       } else {
@@ -81,17 +86,48 @@ export default function StoreModel({ UserName, store }) {
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: `Error saving store: ${error.message}`,
+        title: "Error Saving Store",
+        text: error.response?.data?.message || "Error saving store",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
-  
+  const handleEditClick = (storeId, storeName) => {
+    setEditingStoreId(storeId);
+    setEditedStoreName(storeName);
+  };
 
-  // Delete store
+  const handleUpdateClick = async (storeId) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/update_store/${storeId}`,
+        { storeName: editedStoreName }
+      );
+
+      if (response.status === 200) {
+        setStores(
+          stores.map((store) =>
+            store.id === storeId ? { ...store, storeName: editedStoreName } : store
+          )
+        );
+        setEditingStoreId(null);
+        Swal.fire({
+          icon: "success",
+          title: "Store Updated",
+          text: "Store has been updated successfully!",
+        });
+      } else {
+        throw new Error("Failed to update store");
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `Error updating store: ${error.message}`,
+      });
+    }
+  };
+
   const handleDelete = async (storeId, storeName) => {
     Swal.fire({
       title: `Are you sure you want to delete store "${storeName}"?`,
@@ -103,17 +139,11 @@ export default function StoreModel({ UserName, store }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(
-            `http://localhost:5000/api/delete_store/${storeId}`
-          );
+          const response = await axios.delete(`http://localhost:5000/api/delete_store/${storeId}`);
 
           if (response.status === 200) {
             setStores(stores.filter((store) => store.id !== storeId));
-            Swal.fire(
-              "Deleted!",
-              `Store "${storeName}" has been deleted.`,
-              "success"
-            );
+            Swal.fire("Deleted!", `Store "${storeName}" has been deleted.`, "success");
           }
         } catch (error) {
           Swal.fire({
@@ -126,9 +156,19 @@ export default function StoreModel({ UserName, store }) {
     });
   };
 
+  const filteredStores = stores.filter((store) =>
+    store.storeName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const indexOfLastStore = currentPage * storesPerPage;
+  const indexOfFirstStore = indexOfLastStore - storesPerPage;
+  const currentStores = filteredStores.slice(indexOfFirstStore, indexOfLastStore);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
-    <div className="store-model">
-      <div className="store-form">
+    <div className="batch-model">
+      <div className="batch-form">
         <label htmlFor="storeName">Store Name</label>
         <input
           type="text"
@@ -137,15 +177,25 @@ export default function StoreModel({ UserName, store }) {
           onChange={(e) => setStoreName(e.target.value)}
           placeholder="Enter store name"
         />
+        {error && <p className="error-message">{error}</p>}
 
         <div className="button-group">
-          <button className="save-button" onClick={handleSave} disabled={loading}>
-            Save Store
+          <button className="saveButton" onClick={handleSave}>
+            Save
           </button>
+        </div>
+
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search store..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="store-list">
+      <div className="batch-grid">
         <table>
           <thead>
             <tr>
@@ -156,15 +206,40 @@ export default function StoreModel({ UserName, store }) {
             </tr>
           </thead>
           <tbody>
-            {stores.map((store, index) => (
+            {currentStores.map((store, index) => (
               <tr key={store.id}>
-                <td>{index + 1}</td>
-                <td>{store.storeName}</td> {/* Corrected this part */}
+                <td>{indexOfFirstStore + index + 1}</td>
+                <td>
+                  {editingStoreId === store.id ? (
+                    <input
+                      type="text"
+                      value={editedStoreName}
+                      onChange={(e) => setEditedStoreName(e.target.value)}
+                    />
+                  ) : (
+                    store.storeName
+                  )}
+                </td>
                 <td>{store.user}</td>
                 <td className="button-td">
-                  <button className="delete-button"
+                  {editingStoreId === store.id ? (
+                    <button
+                      className="update-button"
+                      onClick={() => handleUpdateClick(store.id)}
+                    >
+                      Update
+                    </button>
+                  ) : (
+                    <button
+                      className="edit-button"
+                      onClick={() => handleEditClick(store.id, store.storeName)}
+                    >
+                      Edit
+                    </button>
+                  )}
+                  <button
+                    className="delete-button"
                     onClick={() => handleDelete(store.id, store.storeName)}
-                    disabled={loading}
                   >
                     Delete
                   </button>
@@ -173,6 +248,19 @@ export default function StoreModel({ UserName, store }) {
             ))}
           </tbody>
         </table>
+
+        {/* Pagination */}
+        <div className="pagination">
+          {[...Array(Math.ceil(filteredStores.length / storesPerPage)).keys()].map((number) => (
+            <button
+              key={number + 1}
+              onClick={() => paginate(number + 1)}
+              className={currentPage === number + 1 ? "active" : ""}
+            >
+              {number + 1}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,149 @@
+.batch-model {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .batch-model .batch-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .batch-model .batch-form input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
+  }
+  
+  .batch-form button {
+    background-color: #62d666;
+    color: #000;
+    padding: 10px 15px;
+    border: none;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .batch-form button:hover {
+    background-color: #05752a;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .batch-model .batch-grid table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+  }
+  
+  .batch-grid th,
+  .batch-grid td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .batch-grid th {
+    background-color: #f2f2f2;
+  }
+  
+  .batch-grid .button-td {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .batch-grid .button-td .edit-button {
+    background-color: #eaf389;
+    border: 1px solid gray;
+    padding: 5px;
+    color: #000;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  
+  .batch-grid .button-td .delete-button {
+    background-color: #ee857b;
+    border: 1px solid gray;
+    padding: 5px;
+    color: #000;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  
+  .batch-grid .button-td .update-button {
+    background-color: #00CCDD;
+    border: 1px solid gray;
+    padding: 5px;
+    color: #000;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  
+  .batch-grid .button-td .delete-button:hover {
+    background-color: rgb(133, 5, 5);
+    transition: all 0.3s ease-in-out;
+    color: #fff;
+  }
+  
+  .batch-grid .button-td .edit-button:hover {
+    background-color: rgb(94, 94, 2);
+    transition: all 0.3s ease-in-out;
+    color: #fff;
+  }
+  
+  .batch-grid .button-td .update-button:hover {
+    background-color: #0099cc;
+    transition: all 0.3s ease-in-out;
+    color: #fff;
+  }
+  
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .pagination button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background-color: #f2f2f2;
+    cursor: pointer;
+  }
+  
+  .pagination button.active {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  /* Style the error message */
+  .error-message {
+    color: red;
+    font-size: 14px;
+  }
+  
+  /* Search box styling */
+  .search-box {
+    display: flex;
+    justify-content: flex-end; /* Ensure the search box is aligned to the right */
+    position: relative;
+    width: 100%;
+  }
+  
+  .search-box input {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 250px;
+    box-sizing: border-box;
+  }
+  

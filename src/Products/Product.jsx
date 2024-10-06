@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation } from "react-router-dom";
 import {
+  faBacteria,
   faCodeFork,
   faPlus,
   faShoppingBag,
@@ -14,6 +15,7 @@ import CategoryModel from "../Products/CategoryModel"; // Import the CategoryMod
 import UnitModel from "../Products/UnitModel";
 import AddProducts from "../Products/AddProducts"
 import ManageStore from "../Products/StoreModel"; 
+import ManageBatch from "../Products/BatchModel"
 
 
 const Product = () => {
@@ -56,6 +58,14 @@ const Product = () => {
     }
   }
 
+  const togglermanageBatch = () => {
+    if(activeContent === "manageBatch"){
+      setActiveContent(null);
+    }else{
+      setActiveContent("manageBatch");
+    }
+  }
+
   return (
     <div className="product-panel">
       <h2 className="panel-title">Manage Products</h2>
@@ -83,6 +93,10 @@ const Product = () => {
           <FontAwesomeIcon className="button-icon" icon={faShoppingBag} />
           Manage Stock
         </button>
+        <button onClick={togglermanageBatch}>
+          <FontAwesomeIcon className="button-icon" icon={faBacteria} />
+          Manage Batch
+        </button>
         <button onClick={togglerManagaeStore} > {/* open unit content on click */}
           <FontAwesomeIcon className="button-icon" icon={faStore} />
           Manage Store
@@ -107,6 +121,7 @@ const Product = () => {
         {activeContent === "unit" && <UnitModel UserName={UserName} store={Store}/>} {/*Load Unit Model Directly*/}
         {activeContent === "addProducts" && <AddProducts UserName={UserName} store={Store}/>}
         {activeContent === "manageStore" && <ManageStore UserName={UserName} store={Store}/>}
+        {activeContent === "manageBatch" && <ManageBatch UserName={UserName} store={Store}/>}
       </div>
     </div>
   );

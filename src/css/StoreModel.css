@@ -1,77 +1,88 @@
 .store-model {
-    padding: 20px;
-    background-color: #f4f4f4;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  
-  .store-form {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-  
-  .store-form input[type="text"] {
-    padding: 10px;
-    width: 75%;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-  }
-  
-  
-  .store-list table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .store-list th,
-  .store-list td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-  }
-  
-  .store-list th {
-    background-color: #f0f0f0;
-  }
-  
+  padding: 20px;
+  background-color: #f9f9f9; /* Changed to match BatchModel */
+  border-radius: 8px; /* Slightly reduced border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin: 0 auto;
+}
 
-  .button-group .save-button{
-    background-color: rgb(38, 236, 170);
-    font-weight: 700;
-  }
+.store-form {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Added gap for consistent spacing */
+  margin-bottom: 20px;
+}
 
-  .button-group .save-button:hover{
-    background-color: #2b691c;
-    color: #fff;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .button-td button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  
-  .button-td button.delete-button {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  
-  .button-td button.delete-button:hover {
-    background-color: #d32f2f;
-  }
-  
-  .button-td button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
+.store-form input[type="text"] {
+  padding: 10px;
+  width: 75%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.store-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.store-list th,
+.store-list td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.store-list th {
+  background-color: #f2f2f2; /* Match header color with BatchModel */
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+}
+
+.button-group .save-button {
+  background-color: #62d666; /* Match with BatchModel */
+  color: #000;
+  font-weight: 600;
+  padding: 10px 15px; /* Consistent padding */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.button-group .save-button:hover {
+  background-color: #05752a; /* Match hover effect with BatchModel */
+  color: #fff;
+}
+
+.button-td {
+  display: flex;
+  gap: 5px; /* Space between action buttons */
+}
+
+.button-td button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px; /* Adjusted font size for consistency */
+}
+
+.button-td button.delete-button {
+  background-color: #ee857b; /* Match delete button color with BatchModel */
+  color: white;
+}
+
+.button-td button.delete-button:hover {
+  background-color: #d32f2f; /* Darker shade on hover */
+}
+
+.button-td button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
