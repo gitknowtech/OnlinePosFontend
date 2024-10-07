@@ -660,13 +660,13 @@ export default function AddProducts({ UserName, store }) {
             placeholder="Enter Stock Alert Count"
           />
         </div>
-      </div>
 
-      {/* Submit Button */}
+         {/* Submit Button */}
       <div className="button-group">
         <button className="saveButton" onClick={handleSave}>
           Save Product
         </button>
+      </div>
       </div>
     </div>
   );

@@ -120,7 +120,7 @@ const Supplier = () => {
         {activeContent === "bank" && <BankModel UserName={UserName} store={Store} /> }
         {activeContent === "addSupplier" && <AddSupplier UserName={UserName} store={Store} />}
         {activeContent === "manageSupplier" && <ManageSupplier UserName={UserName} store={Store} />}
-        {activeContent === "manageSupplierDelete" && <ManageSupplierDelete UserName={UserName} store={Store}/>};
+        {activeContent === "manageSupplierDelete" && <ManageSupplierDelete UserName={UserName} store={Store}/>}
       </div>
     </div>
   );
