@@ -22,9 +22,11 @@ export default function AddProducts({ UserName, store }) {
   const [profitAmount, setProfitAmount] = useState("");
   const [filteredSupplierList, setFilteredSupplierList] = useState([]);
   const [filteredCategoryList, setFilteredCategoryList] = useState([]);
+  const [filteredBatchList, setFilteredBatchList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [filteredUnitList, setFilteredUnitList] = useState([]);
   const [selectedUnit, setSelectedUnit] = useState("");
+  const [selectedBatch, setselectedBatch] = useState("");
   const [discountPrice, setDiscountPrice] = useState("");
   const [discountPercentage, setDiscountPercentage] = useState("");
   const [wholesalePrice, setWholesalePrice] = useState("");
@@ -33,12 +35,19 @@ export default function AddProducts({ UserName, store }) {
   const [availableStock, setAvailableStock] = useState("");
   const [supplierList, setSupplierList] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
+  const [batchList, setBatchList] = useState([]);
   const [realPrice, setRealPrice] = useState(0);
   const [realWholesalePrice, setRealWholesalePrice] = useState(0);
   const [stockAlert, setStockAlert] = useState([]);
   const [unitList, setUnitList] = useState([]);
   const [stockQuantity, setStockQuantity] = useState(0);
   const [isActive, setIsActive] = useState(true);
+  const [isBatchDropDownVisible, setBatchDropDownVisible] = useState(false);
+  const [isSupplierDropDownVisible, setSupplierDropDownVisible] =
+    useState(false);
+  const [isCategoryDropDownVisible, setCategoryDropDownVisible] =
+    useState(false);
+  const [isUnitDropDownVisible, setUnitDropDownVisible] = useState(false);
 
   // Fetch supplier, category, and unit data when the component mounts
   useEffect(() => {
@@ -55,6 +64,23 @@ export default function AddProducts({ UserName, store }) {
           icon: "error",
           title: "Error",
           text: "Failed to fetch suppliers. Please try again later.",
+        });
+      }
+    };
+
+    const fetchBatches = async () => {
+      try {
+        const batchresponse = await axios.get(
+          "http://localhost:5000/api/get_batches"
+        );
+        console.log("Batch data:", batchresponse.data); // log fetched data
+        setBatchList(batchresponse.data);
+      } catch (error) {
+        console.error("Error fetching batch data:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to fetch batches. Please try again later.",
         });
       }
     };
@@ -93,6 +119,7 @@ export default function AddProducts({ UserName, store }) {
       }
     };
 
+    fetchBatches();
     fetchSuppliers();
     fetchCategories();
     fetchUnits();
@@ -107,6 +134,15 @@ export default function AddProducts({ UserName, store }) {
       )
     );
     setSelectedSupplier(e.target.value);
+  };
+
+  const handleBatchSearch = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    setFilteredBatchList(
+      batchList.filter((batch) =>
+        batch.batchName.toLowerCase().includes(searchTerm)
+      )
+    );
   };
 
   // Handle category search
@@ -133,16 +169,23 @@ export default function AddProducts({ UserName, store }) {
 
   const calculateProfit = () => {
     if (costPrice && mrpPrice) {
-      const profitAmount = Math.round(mrpPrice - costPrice);
-      const profitPercentage = Math.round((profitAmount / costPrice) * 100);
-
-      setProfitAmount(profitAmount);
+      // Parse values to ensure they are treated as floats
+      const parsedCostPrice = parseFloat(costPrice);
+      const parsedMrpPrice = parseFloat(mrpPrice);
+  
+      // Calculate profit amount and profit percentage with floating-point precision
+      const profitAmount = parsedMrpPrice - parsedCostPrice;
+      const profitPercentage = (profitAmount / parsedCostPrice) * 100;
+  
+      // Update state with values rounded to two decimal places
+      setProfitAmount(profitAmount.toFixed(2));
       setProfitPercentage(profitPercentage.toFixed(2));
     } else {
       setProfitAmount(0);
       setProfitPercentage(0);
     }
   };
+  
 
   const checkCostGreaterThanMRP = (costPrice, mrpPrice) => {
     if (isNaN(costPrice) || isNaN(mrpPrice)) {
@@ -245,9 +288,7 @@ export default function AddProducts({ UserName, store }) {
 
   const calculateWholesaleFromPrice = () => {
     if (mrpPrice && wholesalePrice) {
-      const wholesalePercentage = Math.round(
-        (wholesalePrice / mrpPrice) * 100
-      );
+      const wholesalePercentage = Math.round((wholesalePrice / mrpPrice) * 100);
       setWholesalePercentage(wholesalePercentage.toFixed(2));
 
       const realWholesalePrice = Math.round(mrpPrice - wholesalePrice);
@@ -287,7 +328,7 @@ export default function AddProducts({ UserName, store }) {
       });
       return;
     }
-
+  
     const productData = {
       productId,
       productName,
@@ -314,12 +355,9 @@ export default function AddProducts({ UserName, store }) {
       store,
       status: isActive ? "Active" : "Inactive",
     };
-
+  
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/create_product",
-        productData
-      );
+      const response = await axios.post('http://localhost:5000/api/create_product', productData);
       if (response.status === 201) {
         resetFormFields();
         Swal.fire({
@@ -328,7 +366,7 @@ export default function AddProducts({ UserName, store }) {
           text: "Product has been added successfully!",
         });
       } else {
-        throw new Error("Failed to save product");
+        throw new Error('Failed to save product');
       }
     } catch (error) {
       Swal.fire({
@@ -338,6 +376,7 @@ export default function AddProducts({ UserName, store }) {
       });
     }
   };
+  
 
   const resetFormFields = () => {
     setProductId("");
@@ -428,19 +467,33 @@ export default function AddProducts({ UserName, store }) {
           <input
             type="text"
             value={selectedSupplier}
-            onChange={handleSupplierSearch}
+            onChange={(e) => {
+              setSelectedSupplier(e.target.value); // Update input with user input
+              handleSupplierSearch(e); // Filter supplier list
+              setSupplierDropDownVisible(true); // Show dropdown while typing
+            }}
             placeholder="Type to search suppliers"
+            onBlur={() =>
+              setTimeout(() => setSupplierDropDownVisible(false), 200)
+            }
+            onFocus={() => setSupplierDropDownVisible(true)}
           />
-          <ul className="dropdown-list">
-            {filteredSupplierList.map((supplier) => (
-              <li
-                key={supplier.id}
-                onClick={() => setSelectedSupplier(supplier.Supname)}
-              >
-                {supplier.Supname}
-              </li>
-            ))}
-          </ul>
+
+          {isSupplierDropDownVisible && filteredSupplierList.length > 0 && (
+            <ul className="dropdown-list">
+              {filteredSupplierList.map((supplier) => (
+                <li
+                  key={supplier.id}
+                  onClick={() => {
+                    setSelectedSupplier(supplier.Supname);
+                    setSupplierDropDownVisible(false);
+                  }}
+                >
+                  {supplier.Supname}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="form-group">
@@ -448,19 +501,33 @@ export default function AddProducts({ UserName, store }) {
           <input
             type="text"
             value={selectedCategory}
-            onChange={handleCategorySearch}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value); // Update input field with user input
+              handleCategorySearch(e); // Filter category list
+              setCategoryDropDownVisible(true); // Show dropdown while typing
+            }}
             placeholder="Type to search categories"
+            onBlur={() =>
+              setTimeout(() => setCategoryDropDownVisible(false), 200)
+            }
+            onFocus={() => setCategoryDropDownVisible(true)}
           />
-          <ul className="dropdown-list">
-            {filteredCategoryList.map((category) => (
-              <li
-                key={category.id}
-                onClick={() => setSelectedCategory(category.catName)}
-              >
-                {category.catName}
-              </li>
-            ))}
-          </ul>
+
+          {isCategoryDropDownVisible && filteredCategoryList.length > 0 && (
+            <ul className="dropdown-list">
+              {filteredCategoryList.map((category) => (
+                <li
+                  key={category.id}
+                  onClick={() => {
+                    setSelectedCategory(category.catName);
+                    setCategoryDropDownVisible(false);
+                  }}
+                >
+                  {category.catName}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="form-group">
@@ -468,16 +535,63 @@ export default function AddProducts({ UserName, store }) {
           <input
             type="text"
             value={selectedUnit}
-            onChange={handleUnitSearch}
+            onChange={(e) => {
+              setSelectedUnit(e.target.value); // Update the input field with user input
+              handleUnitSearch(e); // Filter the unit list based on input
+              setUnitDropDownVisible(true); // Show the dropdown while typing
+            }}
             placeholder="Type to search units"
+            onBlur={() => setTimeout(() => setUnitDropDownVisible(false), 200)} // Hide the dropdown on blur with delay
+            onFocus={() => setUnitDropDownVisible(true)} // Show the dropdown when input is focused
           />
-          <ul className="dropdown-list">
-            {filteredUnitList.map((unit) => (
-              <li key={unit.id} onClick={() => setSelectedUnit(unit.unitName)}>
-                {unit.unitName}
-              </li>
-            ))}
-          </ul>
+
+          {isUnitDropDownVisible && filteredUnitList.length > 0 && (
+            <ul className="dropdown-list">
+              {filteredUnitList.map((unit) => (
+                <li
+                  key={unit.id}
+                  onClick={() => {
+                    setSelectedUnit(unit.unitName);
+                    setUnitDropDownVisible(false); // Hide dropdown after selection
+                  }}
+                >
+                  {unit.unitName}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="selectedBatch">Batch</label>
+          <input
+            type="text"
+            value={selectedBatch}
+            onChange={(e) => {
+              setselectedBatch(e.target.value); // Update input field with user input
+              handleBatchSearch(e); // Filter batch list
+              setBatchDropDownVisible(true); // Show dropdown while typing
+            }}
+            placeholder="Type to Search Batches"
+            onBlur={() => setTimeout(() => setBatchDropDownVisible(false), 200)}
+            onFocus={() => setBatchDropDownVisible(true)}
+          />
+
+          {isBatchDropDownVisible && filteredBatchList.length > 0 && (
+            <ul className="dropdown-list">
+              {filteredBatchList.map((batch) => (
+                <li
+                  key={batch.id}
+                  onClick={() => {
+                    setselectedBatch(batch.batchName);
+                    setBatchDropDownVisible(false); // Hide the dropdown after selecting a value
+                  }}
+                >
+                  {batch.batchName}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="form-group">
@@ -527,6 +641,7 @@ export default function AddProducts({ UserName, store }) {
               type="number"
               id="profitPercentage"
               value={profitPercentage}
+              readOnly="ture"
               onChange={(e) => setProfitPercentage(e.target.value)}
               placeholder="Enter Profit Percentage"
             />
@@ -538,6 +653,7 @@ export default function AddProducts({ UserName, store }) {
               type="number"
               id="profitAmount"
               value={profitAmount}
+              readOnly="true"
               onChange={(e) => setProfitAmount(e.target.value)}
               placeholder="Enter Profit Amount"
             />
@@ -601,7 +717,14 @@ export default function AddProducts({ UserName, store }) {
         </div>
 
         <div className="checkbox-group">
-          <label style={{ fontSize: "16px", textDecoration: "underline", fontWeight: "900", color: "red" }}>
+          <label
+            style={{
+              fontSize: "16px",
+              textDecoration: "underline",
+              fontWeight: "900",
+              color: "red",
+            }}
+          >
             Status
           </label>
           <div className="check-box">
@@ -661,12 +784,12 @@ export default function AddProducts({ UserName, store }) {
           />
         </div>
 
-         {/* Submit Button */}
-      <div className="button-group">
-        <button className="saveButton" onClick={handleSave}>
-          Save Product
-        </button>
-      </div>
+        {/* Submit Button */}
+        <div className="button-group">
+          <button className="saveButton" onClick={handleSave}>
+            Save Product
+          </button>
+        </div>
       </div>
     </div>
   );

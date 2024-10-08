@@ -1,13 +1,16 @@
-/* Supplier panel styling */
+/* Product panel styling */
 .supplier-panel {
-    background-color: #f4f4f9;
-    border-radius: 5px;
-    padding: 20px;
-    font-family: sans-serif-black;
-    height: 100%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 100%;
-  }
+  background-color: #f4f4f9;
+  border-radius: 5px;
+  padding: 20px;
+  font-family: sans-serif-black;
+  height: auto; /* Allow the panel to expand dynamically */
+  min-height: 800px; /* Set a minimum height to ensure visibility */
+  box-sizing: border-box;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  overflow-y: auto; /* Enable scrolling if content overflows */
+}
   
   .panel-title {
     font-size: 20px;
@@ -77,9 +80,5 @@
   
   .supplier-content::-webkit-scrollbar-thumb {
     border-radius: 4px;
-  }
-  
-  .supplier-content::-webkit-scrollbar-track {
-    background-color: #333; /* Scrollbar track color */
   }
   
