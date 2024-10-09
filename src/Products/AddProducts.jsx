@@ -32,7 +32,7 @@ export default function AddProducts({ UserName, store }) {
   const [wholesalePrice, setWholesalePrice] = useState("");
   const [wholesalePercentage, setWholesalePercentage] = useState("");
   const [lockedPrice, setLockedPrice] = useState("");
-  const [availableStock, setAvailableStock] = useState("");
+  const [openingBalance, setOpeningBalance] = useState(0);
   const [supplierList, setSupplierList] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
   const [batchList, setBatchList] = useState([]);
@@ -40,7 +40,6 @@ export default function AddProducts({ UserName, store }) {
   const [realWholesalePrice, setRealWholesalePrice] = useState(0);
   const [stockAlert, setStockAlert] = useState([]);
   const [unitList, setUnitList] = useState([]);
-  const [stockQuantity, setStockQuantity] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [isBatchDropDownVisible, setBatchDropDownVisible] = useState(false);
   const [isSupplierDropDownVisible, setSupplierDropDownVisible] =
@@ -349,8 +348,8 @@ export default function AddProducts({ UserName, store }) {
       wholesalePrice,
       wholesalePercentage,
       lockedPrice,
-      availableStock,
-      stockQuantity,
+      openingBalance,
+      stockAlert,
       user: UserName,
       store,
       status: isActive ? "Active" : "Inactive",
@@ -398,8 +397,8 @@ export default function AddProducts({ UserName, store }) {
     setWholesalePrice("");
     setWholesalePercentage("");
     setLockedPrice("");
-    setAvailableStock("");
-    setStockQuantity(0);
+    setOpeningBalance("");
+    setStockAlert("");
   };
 
   return (
@@ -763,13 +762,13 @@ export default function AddProducts({ UserName, store }) {
         </div>
 
         <div className="form-group">
-          <label htmlFor="stockAmount">Stock Quantity</label>
+          <label htmlFor="openingBalance">Stock Quantity</label>
           <input
             type="number"
-            id="stockAmount"
-            value={stockQuantity}
-            onChange={(e) => setStockQuantity(e.target.value)}
-            placeholder="Enter Stock Quantity"
+            id="openingBalance"
+            value={openingBalance}
+            onChange={(e) => setOpeningBalance(e.target.value)}
+            placeholder="Enter Stock Opening Balance"
           />
         </div>
 
