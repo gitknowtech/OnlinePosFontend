@@ -3,8 +3,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
+import { useRef } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import "../css/AddProducts.css"; // Assuming a separate CSS file for AddProducts
+import { icon } from "@fortawesome/fontawesome-svg-core";
 
 export default function AddProducts({ UserName, store }) {
   const [productId, setProductId] = useState("");
@@ -42,11 +44,12 @@ export default function AddProducts({ UserName, store }) {
   const [unitList, setUnitList] = useState([]);
   const [isActive, setIsActive] = useState(true);
   const [isBatchDropDownVisible, setBatchDropDownVisible] = useState(false);
-  const [isSupplierDropDownVisible, setSupplierDropDownVisible] =
-    useState(false);
-  const [isCategoryDropDownVisible, setCategoryDropDownVisible] =
-    useState(false);
+  const [isSupplierDropDownVisible, setSupplierDropDownVisible] = useState(false);
+  const [isCategoryDropDownVisible, setCategoryDropDownVisible] = useState(false);
   const [isUnitDropDownVisible, setUnitDropDownVisible] = useState(false);
+
+
+
 
   // Fetch supplier, category, and unit data when the component mounts
   useEffect(() => {
@@ -318,6 +321,28 @@ export default function AddProducts({ UserName, store }) {
     setBarcode(newBarcode);
   };
 
+
+  const productIdInputRef = useRef(null);
+
+  //add validations for the textboxes
+  const validateProductId = () => {
+    //regular expression to check if the product is exacly 5 digit
+    const productidRegx = /^\d{5}$/;
+    if(productidRegx.test(productId)){
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Product Id",
+        text: "Product id cannot be a 5-digit-number",
+      }).then(() => {
+        //set focus back to the Product id input field
+        if(productIdInputRef.current){
+          productIdInputRef.current.focus();
+        }
+      });
+    }
+  }
+
+
   const handleSave = async () => {
     if (!productId || !productName || !costPrice || !mrpPrice) {
       Swal.fire({
@@ -405,13 +430,17 @@ export default function AddProducts({ UserName, store }) {
     <div className="add-product-model">
       <h2>Product Details</h2>
       <div className="add-product-form">
+
+
         <div className="form-group">
           <label htmlFor="productId">Product ID</label>
           <input
             type="text"
             id="productId"
             value={productId}
+            ref={productIdInputRef}
             onChange={(e) => setProductId(e.target.value)}
+            onBlur={validateProductId}
             placeholder="Enter Product ID"
           />
         </div>
