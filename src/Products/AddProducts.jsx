@@ -22,7 +22,7 @@ export default function AddProducts({ UserName, store }) {
   const [profitPercentage, setProfitPercentage] = useState("");
   const [profitAmount, setProfitAmount] = useState("");
   const [filteredSupplierList, setFilteredSupplierList] = useState([]);
-  const [filteredCategoryList, setFilteredCategoryList] = useState([]);
+  const [filteredCategoryList, setFilteredCategoryList] = useState([]); 
   const [filteredBatchList, setFilteredBatchList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [filteredUnitList, setFilteredUnitList] = useState([]);
