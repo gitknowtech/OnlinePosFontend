@@ -342,6 +342,52 @@ export default function AddProducts({ UserName, store }) {
     }
   }
 
+  const checkProductId = async () => {
+    if (!productId) return; // Exit if Product ID is empty
+  
+    try {
+      const response = await axios.get(`http://localhost:5000/api/check_product_id/${productId}`);
+  
+      if (response.data.exists) {
+        // If the Product ID exists, show an error
+        Swal.fire({
+          icon: 'error',
+          title: 'Duplicate Product ID',
+          text: 'This Product ID already exists. Please choose a different one.',
+        }).then(() => {
+          // Clear the input field
+          setProductId(''); // Clear the productId state to reset the input field
+          // Optionally refocus the input field after clearing
+          productIdInputRef.current.focus();
+        });
+      }
+    } catch (error) {
+      // Handle error if the API call fails
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Error checking Product ID: ${error.message}`,
+      });
+    }
+  };
+  
+  
+  
+
+  
+  const handleOnBlur = async () => {
+    // Perform validation first
+    const isValid = validateProductId(); // Will show alert if validation fails
+  
+    // Always check for duplicate Product ID, regardless of validation
+    await checkProductId();
+  
+    // Optionally, you can take action based on validation result, if needed
+    if (!isValid) {
+      console.log("Validation failed, but duplicate check is still done.");
+    }
+  };
+  
 
   const handleSave = async () => {
     if (!productId || !productName || !costPrice || !mrpPrice) {
@@ -432,18 +478,18 @@ export default function AddProducts({ UserName, store }) {
       <div className="add-product-form">
 
 
-        <div className="form-group">
-          <label htmlFor="productId">Product ID</label>
-          <input
-            type="text"
-            id="productId"
-            value={productId}
-            ref={productIdInputRef}
-            onChange={(e) => setProductId(e.target.value)}
-            onBlur={validateProductId}
-            placeholder="Enter Product ID"
-          />
-        </div>
+      <div className="form-group">
+      <label htmlFor="productId">Product ID</label>
+      <input
+        type="text"
+        id="productId"
+        value={productId}
+        ref={productIdInputRef}
+        onChange={(e) => setProductId(e.target.value)}
+        onBlur={handleOnBlur} // Call the combined handleOnBlur function
+        placeholder="Enter Product ID"
+      />
+    </div>
 
         <div className="form-group">
           <label htmlFor="productName">Product Name</label>
