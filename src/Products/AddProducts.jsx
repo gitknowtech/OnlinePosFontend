@@ -6,7 +6,6 @@ import DatePicker from "react-datepicker";
 import { useRef } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import "../css/AddProducts.css"; // Assuming a separate CSS file for AddProducts
-import { icon } from "@fortawesome/fontawesome-svg-core";
 
 export default function AddProducts({ UserName, store }) {
   const [productId, setProductId] = useState("");
@@ -23,7 +22,7 @@ export default function AddProducts({ UserName, store }) {
   const [profitPercentage, setProfitPercentage] = useState("");
   const [profitAmount, setProfitAmount] = useState("");
   const [filteredSupplierList, setFilteredSupplierList] = useState([]);
-  const [filteredCategoryList, setFilteredCategoryList] = useState([]);
+  const [filteredCategoryList, setFilteredCategoryList] = useState([]); 
   const [filteredBatchList, setFilteredBatchList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [filteredUnitList, setFilteredUnitList] = useState([]);
