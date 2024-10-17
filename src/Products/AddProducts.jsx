@@ -345,7 +345,7 @@ export default function AddProducts({ UserName, store }) {
     if (!productId) return; // Exit if Product ID is empty
   
     try {
-      const response = await axios.get(`http://localhost:5000/api/check_product_id/${productId}`);
+      const response = await axios.get(`http://localhost:5000/api/products/check_product_id/${productId}`);
   
       if (response.data.exists) {
         // If the Product ID exists, show an error
@@ -426,7 +426,7 @@ export default function AddProducts({ UserName, store }) {
     };
   
     try {
-      const response = await axios.post('http://localhost:5000/api/create_product', productData);
+      const response = await axios.post('http://localhost:5000/api/products/create_product', productData);
       if (response.status === 201) {
         resetFormFields();
         Swal.fire({

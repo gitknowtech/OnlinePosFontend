@@ -58,7 +58,6 @@ export default function ManageSupplier({ store }) {
     setBankDetails(null); // Clear bank details when modal is closed
   };
 
-  // Function to handle the deletion of a supplier
   const handleDelete = async (supId) => {
     Swal.fire({
       title: `Are you sure you want to delete supplier "${supId}"?`,
@@ -96,6 +95,7 @@ export default function ManageSupplier({ store }) {
       }
     });
   };
+  
 
   // Filter suppliers based on the search term, store, or show all if store is 'all'
   const filteredSuppliers = suppliers.filter((supplier) => {
