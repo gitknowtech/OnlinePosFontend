@@ -72,7 +72,7 @@ export default function AddProducts({ UserName, store }) {
     const fetchBatches = async () => {
       try {
         const batchresponse = await axios.get(
-          "http://localhost:5000/api/get_batches"
+          "http://localhost:5000/api/batches/get_batches"
         );
         console.log("Batch data:", batchresponse.data); // log fetched data
         setBatchList(batchresponse.data);

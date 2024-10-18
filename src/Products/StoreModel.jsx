@@ -18,7 +18,7 @@ export default function StoreModel({ UserName, store }) {
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/get_stores");
+        const response = await axios.get("http://localhost:5000/api/stores/get_stores");
         setStores(response.data);
       } catch (err) {
         console.error("Error fetching stores:", err);
@@ -57,7 +57,7 @@ export default function StoreModel({ UserName, store }) {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/create_store", {
+      const response = await axios.post("http://localhost:5000/api/stores/create_store", {
         storeName,
         user: UserName,
         store,
@@ -100,7 +100,7 @@ export default function StoreModel({ UserName, store }) {
   const handleUpdateClick = async (storeId) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/update_store/${storeId}`,
+        `http://localhost:5000/api/stores/update_store/${storeId}`,
         { storeName: editedStoreName }
       );
 
@@ -139,7 +139,7 @@ export default function StoreModel({ UserName, store }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`http://localhost:5000/api/delete_store/${storeId}`);
+          const response = await axios.delete(`http://localhost:5000/api/stores/delete_store/${storeId}`);
 
           if (response.status === 200) {
             setStores(stores.filter((store) => store.id !== storeId));

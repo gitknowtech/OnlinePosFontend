@@ -215,8 +215,6 @@ export default function BankModel({ UserName, store }) {
                 <td>{bank.store}</td>
                 <td>{bank.saveTime}</td>
                 <td className="button-td">
-                  {/* Action buttons placeholder */}
-                  <button className="edit-button">Edit</button>
                   <button
                     className="delete-button"
                     onClick={() => handleDelete(bank.bankName)}
