@@ -20,7 +20,7 @@ export default function CategoryModel({ UserName, store }) {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/get_categories"
+          "http://localhost:5000/api/categories/get_categories"
         );
         setCategories(response.data);
       } catch (err) {
@@ -72,7 +72,7 @@ export default function CategoryModel({ UserName, store }) {
       const storeValue = saveStoreAsAll ? "all" : store; // If checkbox is checked, store as "all"
 
       const response = await axios.post(
-        "http://localhost:5000/api/create_categories",
+        "http://localhost:5000/api/categories/create_categories",
         {
           catName: categoryName,
           user: UserName,
@@ -128,7 +128,7 @@ export default function CategoryModel({ UserName, store }) {
   const handleUpdateClick = async (categoryId) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/update_category/${categoryId}`,
+        `http://localhost:5000/api/categories/update_category/${categoryId}`,
         {
           catName: editedCategoryName,
         }
@@ -174,7 +174,7 @@ export default function CategoryModel({ UserName, store }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            "http://localhost:5000/api/delete_category",
+            "http://localhost:5000/api/categories/delete_category",
             {
               data: { catName }, // Send category name in the body of the delete request
             }

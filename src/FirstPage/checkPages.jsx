@@ -11,7 +11,7 @@ const CheckPages = () => {
     const checkTables = async () => {
       try {
         // Step 1: Check the companies table
-        const companiesResponse = await axios.get('http://localhost:5000/check-companies');
+        const companiesResponse = await axios.get('http://localhost:5000/api/companies/check-companies');
         const { hasData: hasCompanies } = companiesResponse.data;
 
         if (!hasCompanies) {

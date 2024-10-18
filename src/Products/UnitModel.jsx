@@ -20,7 +20,7 @@ export default function UnitModel({ UserName, store }) {
   useEffect(() => {
     const fetchUnits = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/get_units");
+        const response = await axios.get("http://localhost:5000/api/units/get_units");
         setUnits(response.data);
       } catch (err) {
         console.error("Error fetching units:", err);
@@ -70,7 +70,7 @@ export default function UnitModel({ UserName, store }) {
       const storeValue = saveStoreAsAll ? "all" : store; // If checkbox is checked, store as "all"
 
       const response = await axios.post(
-        "http://localhost:5000/api/create_units",
+        "http://localhost:5000/api/units/create_units",
         {
           unitName: unitName,
           user: UserName,
@@ -127,7 +127,7 @@ export default function UnitModel({ UserName, store }) {
   const handleUpdateClick = async (unitId) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/update_unit/${unitId}`,
+        `http://localhost:5000/api/units/update_unit/${unitId}`,
         {
           unitName: editedUnitName,
         }
@@ -171,7 +171,7 @@ export default function UnitModel({ UserName, store }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            "http://localhost:5000/api/delete_unit",
+            "http://localhost:5000/api/units/delete_unit",
             {
               data: { unitName }, // Send unit name in the body of the delete request
             }

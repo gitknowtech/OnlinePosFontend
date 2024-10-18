@@ -89,7 +89,7 @@ export default function AddProducts({ UserName, store }) {
     const fetchCategories = async () => {
       try {
         const categoryResponse = await axios.get(
-          "http://localhost:5000/api/get_categories"
+          "http://localhost:5000/api/categories/get_categories"
         );
         console.log("Categories data:", categoryResponse.data); // Log fetched data
         setCategoryList(categoryResponse.data);
@@ -106,7 +106,7 @@ export default function AddProducts({ UserName, store }) {
     const fetchUnits = async () => {
       try {
         const unitResponse = await axios.get(
-          "http://localhost:5000/api/get_units"
+          "http://localhost:5000/api/units/get_units"
         );
         console.log("Units data:", unitResponse.data); // Log fetched data
         setUnitList(unitResponse.data);
