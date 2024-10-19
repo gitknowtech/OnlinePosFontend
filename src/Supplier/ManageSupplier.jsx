@@ -69,9 +69,13 @@ export default function ManageSupplier({ store }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          // Log the supplier ID being passed to the delete function for debugging
+          console.log('Deleting supplier with ID:', supId);
+          
           const response = await axios.delete(
             `http://localhost:5000/api/delete_supplier/${supId}`
           );
+          
           if (response.status === 200) {
             // Remove the deleted supplier from the state to update the UI
             setSuppliers(
@@ -84,6 +88,8 @@ export default function ManageSupplier({ store }) {
             );
           }
         } catch (err) {
+          // Handle error and show an alert if deletion fails
+          console.error("Error deleting supplier:", err); // Add logging for debugging
           Swal.fire({
             icon: "error",
             title: "Error",

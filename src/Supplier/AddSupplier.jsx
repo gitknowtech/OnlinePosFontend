@@ -80,7 +80,7 @@ export default function AddSupplier({ UserName, store }) {
   const checkForDuplicates = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/check_duplicate",
+        "http://localhost:5000/api/supplier_check_duplicate",
         {
           Supid,
           Supname,
