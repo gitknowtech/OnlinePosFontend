@@ -11,6 +11,7 @@ export default function AddProducts({ UserName, store }) {
   const [productId, setProductId] = useState("");
   const [productName, setProductName] = useState("");
   const [productNameSinhala, setProductNameSinhala] = useState("");
+  const [imageLink, setImageLink] = useState("");
   const [cabinNumber, setCabinNumber] = useState("");
   const [barcode, setBarcode] = useState("");
   const [batchNumber, setBatchNumber] = useState("");
@@ -22,7 +23,7 @@ export default function AddProducts({ UserName, store }) {
   const [profitPercentage, setProfitPercentage] = useState("");
   const [profitAmount, setProfitAmount] = useState("");
   const [filteredSupplierList, setFilteredSupplierList] = useState([]);
-  const [filteredCategoryList, setFilteredCategoryList] = useState([]); 
+  const [filteredCategoryList, setFilteredCategoryList] = useState([]);
   const [filteredBatchList, setFilteredBatchList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [filteredUnitList, setFilteredUnitList] = useState([]);
@@ -43,12 +44,11 @@ export default function AddProducts({ UserName, store }) {
   const [unitList, setUnitList] = useState([]);
   const [isActive, setIsActive] = useState(true);
   const [isBatchDropDownVisible, setBatchDropDownVisible] = useState(false);
-  const [isSupplierDropDownVisible, setSupplierDropDownVisible] = useState(false);
-  const [isCategoryDropDownVisible, setCategoryDropDownVisible] = useState(false);
+  const [isSupplierDropDownVisible, setSupplierDropDownVisible] =
+    useState(false);
+  const [isCategoryDropDownVisible, setCategoryDropDownVisible] =
+    useState(false);
   const [isUnitDropDownVisible, setUnitDropDownVisible] = useState(false);
-
-
-
 
   // Fetch supplier, category, and unit data when the component mounts
   useEffect(() => {
@@ -173,11 +173,11 @@ export default function AddProducts({ UserName, store }) {
       // Parse values to ensure they are treated as floats
       const parsedCostPrice = parseFloat(costPrice);
       const parsedMrpPrice = parseFloat(mrpPrice);
-  
+
       // Calculate profit amount and profit percentage with floating-point precision
       const profitAmount = parsedMrpPrice - parsedCostPrice;
       const profitPercentage = (profitAmount / parsedCostPrice) * 100;
-  
+
       // Update state with values rounded to two decimal places
       setProfitAmount(profitAmount.toFixed(2));
       setProfitPercentage(profitPercentage.toFixed(2));
@@ -186,7 +186,6 @@ export default function AddProducts({ UserName, store }) {
       setProfitPercentage(0);
     }
   };
-  
 
   const checkCostGreaterThanMRP = (costPrice, mrpPrice) => {
     if (isNaN(costPrice) || isNaN(mrpPrice)) {
@@ -320,42 +319,43 @@ export default function AddProducts({ UserName, store }) {
     setBarcode(newBarcode);
   };
 
-
   const productIdInputRef = useRef(null);
 
   //add validations for the textboxes
   const validateProductId = () => {
     //regular expression to check if the product is exacly 5 digit
     const productidRegx = /^\d{5}$/;
-    if(productidRegx.test(productId)){
+    if (productidRegx.test(productId)) {
       Swal.fire({
         icon: "error",
         title: "Invalid Product Id",
         text: "Product id cannot be a 5-digit-number",
       }).then(() => {
         //set focus back to the Product id input field
-        if(productIdInputRef.current){
+        if (productIdInputRef.current) {
           productIdInputRef.current.focus();
         }
       });
     }
-  }
+  };
 
   const checkProductId = async () => {
     if (!productId) return; // Exit if Product ID is empty
-  
+
     try {
-      const response = await axios.get(`http://localhost:5000/api/products/check_product_id/${productId}`);
-  
+      const response = await axios.get(
+        `http://localhost:5000/api/products/check_product_id/${productId}`
+      );
+
       if (response.data.exists) {
         // If the Product ID exists, show an error
         Swal.fire({
-          icon: 'error',
-          title: 'Duplicate Product ID',
-          text: 'This Product ID already exists. Please choose a different one.',
+          icon: "error",
+          title: "Duplicate Product ID",
+          text: "This Product ID already exists. Please choose a different one.",
         }).then(() => {
           // Clear the input field
-          setProductId(''); // Clear the productId state to reset the input field
+          setProductId(""); // Clear the productId state to reset the input field
           // Optionally refocus the input field after clearing
           productIdInputRef.current.focus();
         });
@@ -363,30 +363,25 @@ export default function AddProducts({ UserName, store }) {
     } catch (error) {
       // Handle error if the API call fails
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
+        icon: "error",
+        title: "Error",
         text: `Error checking Product ID: ${error.message}`,
       });
     }
   };
-  
-  
-  
 
-  
   const handleOnBlur = async () => {
     // Perform validation first
     const isValid = validateProductId(); // Will show alert if validation fails
-  
+
     // Always check for duplicate Product ID, regardless of validation
     await checkProductId();
-  
+
     // Optionally, you can take action based on validation result, if needed
     if (!isValid) {
       console.log("Validation failed, but duplicate check is still done.");
     }
   };
-  
 
   const handleSave = async () => {
     if (!productId || !productName || !costPrice || !mrpPrice) {
@@ -397,7 +392,7 @@ export default function AddProducts({ UserName, store }) {
       });
       return;
     }
-  
+
     const productData = {
       productId,
       productName,
@@ -422,11 +417,15 @@ export default function AddProducts({ UserName, store }) {
       stockAlert,
       user: UserName,
       store,
+      imageLink,
       status: isActive ? "Active" : "Inactive",
     };
-  
+
     try {
-      const response = await axios.post('http://localhost:5000/api/products/create_product', productData);
+      const response = await axios.post(
+        "http://localhost:5000/api/products/create_product",
+        productData
+      );
       if (response.status === 201) {
         resetFormFields();
         Swal.fire({
@@ -435,7 +434,7 @@ export default function AddProducts({ UserName, store }) {
           text: "Product has been added successfully!",
         });
       } else {
-        throw new Error('Failed to save product');
+        throw new Error("Failed to save product");
       }
     } catch (error) {
       Swal.fire({
@@ -445,7 +444,6 @@ export default function AddProducts({ UserName, store }) {
       });
     }
   };
-  
 
   const resetFormFields = () => {
     setProductId("");
@@ -469,26 +467,25 @@ export default function AddProducts({ UserName, store }) {
     setLockedPrice("");
     setOpeningBalance("");
     setStockAlert("");
+    setImageLink("");
   };
 
   return (
     <div className="add-product-model">
       <h2>Product Details</h2>
       <div className="add-product-form">
-
-
-      <div className="form-group">
-      <label htmlFor="productId">Product ID</label>
-      <input
-        type="text"
-        id="productId"
-        value={productId}
-        ref={productIdInputRef}
-        onChange={(e) => setProductId(e.target.value)}
-        onBlur={handleOnBlur} // Call the combined handleOnBlur function
-        placeholder="Enter Product ID"
-      />
-    </div>
+        <div className="form-group">
+          <label htmlFor="productId">Product ID</label>
+          <input
+            type="text"
+            id="productId"
+            value={productId}
+            ref={productIdInputRef}
+            onChange={(e) => setProductId(e.target.value)}
+            onBlur={handleOnBlur} // Call the combined handleOnBlur function
+            placeholder="Enter Product ID"
+          />
+        </div>
 
         <div className="form-group">
           <label htmlFor="productName">Product Name</label>
@@ -656,7 +653,8 @@ export default function AddProducts({ UserName, store }) {
                 <li
                   key={batch.id}
                   onClick={() => {
-                    setselectedBatch(batch.batchName);
+                    setBatchNumber(batch.batchName); // Set batchNumber to batchName when selected
+                    setselectedBatch(batch.batchName); // Also update selectedBatch for display
                     setBatchDropDownVisible(false); // Hide the dropdown after selecting a value
                   }}
                 >
@@ -855,6 +853,20 @@ export default function AddProducts({ UserName, store }) {
             onChange={(e) => setStockAlert(e.target.value)}
             placeholder="Enter Stock Alert Count"
           />
+        </div>
+
+        <h2>Product Image Details</h2>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="imageLink">Image Link</label>
+            <input
+              type="text"
+              id="imageLink"
+              value={imageLink}
+              onChange={(e) => setImageLink(e.target.value)}
+              placeholder="Enter Image Link"
+            />
+          </div>
         </div>
 
         {/* Submit Button */}
