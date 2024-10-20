@@ -15,6 +15,10 @@ export default function ManageSupplier({ store }) {
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
   const [bankDetails, setBankDetails] = useState(null); // Bank details state
 
+  const indexOfLastBatch = currentPage * batchesPerPage;
+  const indexOfFirstBatch = indexOfLastBatch - batchesPerPage;
+  const currentBatches = filteredBatches.slice(indexOfFirstBatch, indexOfLastBatch);
+
   // Fetch supplier data from the database
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -58,9 +62,11 @@ export default function ManageSupplier({ store }) {
     setBankDetails(null); // Clear bank details when modal is closed
   };
 
+
   const handleDelete = async (supId) => {
+    // Confirmation dialog using SweetAlert2
     Swal.fire({
-      title: `Are you sure you want to delete supplier "${supId}"?`,
+      title: `Are you sure you want to delete supplier with ID "${supId}"?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -71,36 +77,49 @@ export default function ManageSupplier({ store }) {
         try {
           // Log the supplier ID being passed to the delete function for debugging
           console.log('Deleting supplier with ID:', supId);
-          
+  
+          // Send DELETE request to the API to delete supplier by ID
           const response = await axios.delete(
             `http://localhost:5000/api/delete_supplier/${supId}`
           );
-          
+  
+          // Check if deletion was successful (status 200)
           if (response.status === 200) {
-            // Remove the deleted supplier from the state to update the UI
+            // Update the state to remove the deleted supplier from the list
             setSuppliers(
               suppliers.filter((supplier) => supplier.Supid !== supId)
             );
+  
+            // Show success message
             Swal.fire(
               "Deleted!",
-              `Supplier "${supId}" has been deleted.`,
+              `Supplier with ID "${supId}" has been deleted successfully.`,
               "success"
             );
           }
         } catch (err) {
-          // Handle error and show an alert if deletion fails
-          console.error("Error deleting supplier:", err); // Add logging for debugging
+          // Log the error for debugging purposes
+          console.error("Error deleting supplier:", err);
+  
+          // Extract error details from the response or the error object
+          let errorMessage = err.response?.data?.message || err.message;
+  
+          // If the error response contains additional details, include them
+          if (err.response?.data?.errors) {
+            errorMessage += `\nDetails: ${err.response.data.errors.join(', ')}`;
+          }
+  
+          // Show detailed error alert if the deletion failed
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: `Failed to delete supplier: ${
-              err.response?.data?.message || err.message
-            }`,
+            text: `Failed to delete supplier: ${errorMessage}`,
           });
         }
       }
     });
   };
+  
   
 
   // Filter suppliers based on the search term, store, or show all if store is 'all'
@@ -143,7 +162,7 @@ export default function ManageSupplier({ store }) {
         <table>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>SUP ID</th>
               <th>Name</th>
               <th>Address</th>
               <th>Email</th>
@@ -157,6 +176,7 @@ export default function ManageSupplier({ store }) {
           <tbody>
             {currentSuppliers.map((supplier) => (
               <tr key={supplier.Supid}>
+                <td>{indexOfFirstBatch + index + 1}</td>
                 <td>{supplier.Supid}</td>
                 <td>{supplier.Supname}</td>
                 <td>{supplier.address1}</td>
