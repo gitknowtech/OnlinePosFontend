@@ -15,7 +15,8 @@ import CategoryModel from "../Products/CategoryModel"; // Import the CategoryMod
 import UnitModel from "../Products/UnitModel";
 import AddProducts from "../Products/AddProducts"
 import ManageStore from "../Products/StoreModel"; 
-import ManageBatch from "../Products/BatchModel"
+import ManageBatch from "../Products/BatchModel";
+import ManageProducts from "../Products/ManageProducts";
 
 
 const Product = () => {
@@ -66,6 +67,14 @@ const Product = () => {
     }
   }
 
+  const togglermanageProducts = () => {
+    if(activeContent === "ManageProducts"){
+      setActiveContent(null);
+    }else{
+      setActiveContent("ManageProducts");
+    }
+  }
+
   return (
     <div className="product-panel">
       <h2 className="panel-title">Manage Products</h2>
@@ -81,7 +90,7 @@ const Product = () => {
       </div>
 
       <div className="button-list">
-        <button>
+        <button onClick={togglermanageProducts}>
           <FontAwesomeIcon className="button-icon" icon={faCodeFork} />
           Active Product List
         </button>
@@ -122,6 +131,7 @@ const Product = () => {
         {activeContent === "addProducts" && <AddProducts UserName={UserName} store={Store}/>}
         {activeContent === "manageStore" && <ManageStore UserName={UserName} store={Store}/>}
         {activeContent === "manageBatch" && <ManageBatch UserName={UserName} store={Store}/>}
+        {activeContent === "ManageProducts" && <ManageProducts UserName={UserName} store={Store}/>}
       </div>
     </div>
   );
