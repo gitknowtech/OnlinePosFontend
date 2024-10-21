@@ -76,6 +76,8 @@ export default function AddSupplier({ UserName, store }) {
     return true;
   };
 
+
+
   // Function to check if Supplier ID or Name is already taken
   const checkForDuplicates = async () => {
     try {
@@ -93,6 +95,8 @@ export default function AddSupplier({ UserName, store }) {
     }
   };
 
+
+  
    // Function to save the supplier details
    const handleSave = async () => {
     if (!validateFormData()) return;
