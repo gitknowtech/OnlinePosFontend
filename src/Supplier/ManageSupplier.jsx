@@ -15,6 +15,8 @@ export default function ManageSupplier({ store }) {
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
   const [bankDetails, setBankDetails] = useState(null); // Bank details state
 
+
+  
   // Fetch supplier data from the database
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -32,6 +34,8 @@ export default function ManageSupplier({ store }) {
     };
     fetchSuppliers();
   }, []);
+
+
 
   // Function to fetch and display bank details in the modal
   const handleViewBankDetails = async (supId) => {
