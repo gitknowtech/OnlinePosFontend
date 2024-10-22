@@ -55,7 +55,7 @@ export default function AddProducts({ UserName, store }) {
     const fetchSuppliers = async () => {
       try {
         const supplierResponse = await axios.get(
-          "http://localhost:5000/api/get_suppliers"
+          "http://localhost:5000/api/suppliers/get_suppliers"
         );
         console.log("Suppliers data:", supplierResponse.data); // Log fetched data
         setSupplierList(supplierResponse.data);

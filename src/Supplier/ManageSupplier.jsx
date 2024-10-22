@@ -4,8 +4,8 @@ import Swal from "sweetalert2"; // For delete confirmation and alerts
 import PropTypes from "prop-types";
 import Modal from "react-modal"; // Modal component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faBank } from "@fortawesome/free-solid-svg-icons"; // Imported faEye icon
 import "../css/ManageSupplier.css"; // Assuming a separate CSS file for table design
-import { faBank } from "@fortawesome/free-solid-svg-icons";
 
 export default function ManageSupplier({ store }) {
   const [suppliers, setSuppliers] = useState([]);
@@ -13,15 +13,16 @@ export default function ManageSupplier({ store }) {
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
   const [suppliersPerPage, setSuppliersPerPage] = useState(10); // Default number of suppliers per page
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
-  const [bankDetails, setBankDetails] = useState(null); // Bank details state
+  const [modalContent, setModalContent] = useState(null); // Content to display in the modal
+  const [modalTitle, setModalTitle] = useState(""); // Title for the modal
 
-
-  
   // Fetch supplier data from the database
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/suppliers/get_suppliers");
+        // Log the response data to ensure it includes all fields
+        console.log('Fetched Suppliers:', response.data);
         setSuppliers(response.data);
       } catch (error) {
         console.error("Error fetching suppliers:", error.response?.data?.message || error.message);
@@ -34,15 +35,23 @@ export default function ManageSupplier({ store }) {
     };
     fetchSuppliers();
   }, []);
-  
-
-
 
   // Function to fetch and display bank details in the modal
   const handleViewBankDetails = async (supId) => {
     try {
       const response = await axios.get(`http://localhost:5000/api/suppliers/get_supplier_bank_details/${supId}`);
-      setBankDetails(response.data); // Store bank details in state
+      const bankDetails = response.data;
+      setModalTitle("Bank Details");
+      setModalContent(
+        <div>
+          <p>
+            <strong>Bank Name:</strong> {bankDetails.supBank}
+          </p>
+          <p>
+            <strong>Account Number:</strong> {bankDetails.supBankNo}
+          </p>
+        </div>
+      );
       setModalIsOpen(true); // Open modal
     } catch (error) {
       console.error("Error fetching bank details:", error);
@@ -57,7 +66,8 @@ export default function ManageSupplier({ store }) {
   // Function to close the modal
   const closeModal = () => {
     setModalIsOpen(false);
-    setBankDetails(null); // Clear bank details when modal is closed
+    setModalContent(null);
+    setModalTitle("");
   };
 
   const handleDelete = async (supId) => {
@@ -141,6 +151,61 @@ export default function ManageSupplier({ store }) {
     }
   };
 
+  // Functions to handle eye icon clicks
+  const handleAddressClick = (supplier) => {
+    console.log('Supplier Data in handleAddressClick:', supplier);
+    setModalTitle("Address Details");
+    setModalContent(
+      <div>
+        <p>
+          <strong>Address 1:</strong> {supplier.address1 || 'N/A'}
+        </p>
+        <p>
+          <strong>Address 2:</strong> {supplier.address2 || 'N/A'}
+        </p>
+        <p>
+          <strong>Address 3:</strong> {supplier.address3 || 'N/A'}
+        </p>
+      </div>
+    );
+    setModalIsOpen(true);
+  };
+
+  const handleMobileClick = (supplier) => {
+    console.log('Supplier Data in handleMobileClick:', supplier);
+    setModalTitle("Mobile Details");
+    setModalContent(
+      <div>
+        <p>
+          <strong>Mobile 1:</strong> {supplier.mobile1 || 'N/A'}
+        </p>
+        <p>
+          <strong>Mobile 2:</strong> {supplier.mobile2 || 'N/A'}
+        </p>
+        <p>
+          <strong>Mobile 3:</strong> {supplier.mobile3 || 'N/A'}
+        </p>
+      </div>
+    );
+    setModalIsOpen(true);
+  };
+
+  const handleEmailClick = (supplier) => {
+    console.log('Supplier Data in handleEmailClick:', supplier);
+    setModalTitle("Contact Details");
+    setModalContent(
+      <div>
+        <p>
+          <strong>Email:</strong> {supplier.email || 'N/A'}
+        </p>
+        <p>
+          <strong>Website:</strong> {supplier.website || 'N/A'}
+        </p>
+      </div>
+    );
+    setModalIsOpen(true);
+  };
+
   return (
     <div className="manage-supplier">
       {/* Search box */}
@@ -188,9 +253,39 @@ export default function ManageSupplier({ store }) {
                 <td>{indexOfFirstSupplier + index + 1}</td>
                 <td>{supplier.Supid}</td>
                 <td>{supplier.Supname}</td>
-                <td>{supplier.address1}</td>
-                <td>{supplier.email}</td>
-                <td>{supplier.mobile1}</td>
+                {/* Address column with eye icon */}
+                <td>
+                  {supplier.address1}
+                  <button
+                    className="icon-button"
+                    onClick={() => handleAddressClick(supplier)}
+                    title="View Address Details"
+                  >
+                    <FontAwesomeIcon icon={faEye} />
+                  </button>
+                </td>
+                {/* Email column with eye icon */}
+                <td>
+                  {supplier.email}
+                  <button
+                    className="icon-button"
+                    onClick={() => handleEmailClick(supplier)}
+                    title="View Contact Details"
+                  >
+                    <FontAwesomeIcon icon={faEye} />
+                  </button>
+                </td>
+                {/* Mobile column with eye icon */}
+                <td>
+                  {supplier.mobile1}
+                  <button
+                    className="icon-button"
+                    onClick={() => handleMobileClick(supplier)}
+                    title="View Mobile Details"
+                  >
+                    <FontAwesomeIcon icon={faEye} />
+                  </button>
+                </td>
                 <td>{supplier.company}</td>
                 <td
                   onDoubleClick={() => handleStatusToggle(supplier.Supid, supplier.status)}
@@ -207,7 +302,10 @@ export default function ManageSupplier({ store }) {
                     Delete
                   </button>
                   <button className="action-button stock-button">Stock</button>
-                  <button onClick={() => handleViewBankDetails(supplier.Supid)} className="action-button bank-button">
+                  <button
+                    onClick={() => handleViewBankDetails(supplier.Supid)}
+                    className="action-button bank-button"
+                  >
                     <FontAwesomeIcon className="nav-icon" icon={faBank} />
                   </button>
                 </td>
@@ -238,27 +336,17 @@ export default function ManageSupplier({ store }) {
         </button>
       </div>
 
+      {/* Modal for displaying details */}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
-        contentLabel="Bank Details"
+        contentLabel={modalTitle}
         className="modal-content"
         overlayClassName="modal-overlay"
         ariaHideApp={false}
       >
-        <h2>Bank Details</h2>
-        {bankDetails ? (
-          <div>
-            <p>
-              <strong>Bank Name:</strong> {bankDetails.supBank}
-            </p>
-            <p>
-              <strong>Account Number:</strong> {bankDetails.supBankNo}
-            </p>
-          </div>
-        ) : (
-          <p>No bank details available.</p>
-        )}
+        <h2>{modalTitle}</h2>
+        {modalContent ? modalContent : <p>No details available.</p>}
         <button onClick={closeModal}>Close</button>
       </Modal>
     </div>

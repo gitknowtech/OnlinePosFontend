@@ -157,46 +157,62 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-/* Modal content styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Dark background */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Aligns modal at the top */
+}
+
 .modal-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  padding: 20px 30px;
-  max-width: 500px;
-  width: 90%;
+  background-color: white;
+  padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  margin-top: 500px; /* Changed margin-top to 500px */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-
-.modal-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
+/* Heading */
+.modal-content h2 {
+  margin-top: 0;
+  font-size: 1.5em;
+  text-align: center;
 }
 
+/* Bank details styles */
 .modal-content p {
+  font-size: 1.1em;
   margin-bottom: 10px;
-  font-size: 16px;
 }
 
+/* Close button styles */
 .modal-content button {
-  margin-top: 20px;
-  padding: 8px 16px;
-  background-color: #4CAF50;
+  background-color: #d33; /* Red color */
   color: white;
   border: none;
-  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 1em;
   cursor: pointer;
-  font-size: 16px;
+  border-radius: 5px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
 }
 
 .modal-content button:hover {
-  background-color: #45a049;
+  background-color: #b22; /* Darker red on hover */
 }
+
+
+
 
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
@@ -232,14 +248,20 @@
   }
 
   .modal-content {
-    padding: 15px 20px;
+    width: 95%;
+    padding: 15px;
+  }
+
+  .modal-content h2 {
+    font-size: 1.3em;
   }
 
   .modal-content p {
-    font-size: 14px;
+    font-size: 1em;
   }
 
   .modal-content button {
-    font-size: 14px;
+    padding: 8px 16px;
+    font-size: 0.9em;
   }
 }

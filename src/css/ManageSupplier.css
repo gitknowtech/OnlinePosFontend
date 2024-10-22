@@ -132,6 +132,7 @@
 
 
 /* Modal styles */
+/* Modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -141,7 +142,7 @@
   background-color: rgba(0, 0, 0, 0.5); /* Dark background */
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* Changed from center */
 }
 
 .modal-content {
@@ -151,6 +152,7 @@
   width: 90%;
   max-width: 500px;
   position: relative;
+  margin-top: 300px; /* Added margin-top */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
