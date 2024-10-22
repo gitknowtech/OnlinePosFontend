@@ -5,7 +5,7 @@
   padding: 20px;
   font-family: sans-serif-black;
   height: auto; /* Allow the panel to expand dynamically */
-  min-height: 800px; /* Set a minimum height to ensure visibility */
+  min-height: 1000px; /* Set a minimum height to ensure visibility */
   box-sizing: border-box;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 100%;
@@ -64,21 +64,22 @@
     background-color: rgb(110, 6, 6);
   }
   
-  /* Supplier content styling */
-  .supplier-content {
-    width: 100%; /* Full width */
-    min-height: 300px; /* Ensure a minimum height */
-    max-height: 650px; /* Limit the maximum height */
-    border-radius: 10px;
-    box-sizing: border-box;
-    overflow-y: auto; /* Enable vertical scrolling if content overflows */
-  }
-  
-  .supplier-content::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .supplier-content::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-  }
+/* Product content styling */
+.supplier-content {
+  width: 100%; /* Full width */
+  min-height: 300px; /* Ensure a minimum height */
+  border-radius: 10px;
+  box-sizing: border-box;
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
+  transition: height 0.3s ease; /* Smooth transition for height changes */
+}
+
+/* Add a custom scrollbar style (optional) */
+.supplier-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.supplier-content::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+}
   

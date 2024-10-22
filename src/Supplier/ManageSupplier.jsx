@@ -11,7 +11,7 @@ export default function ManageSupplier({ store }) {
   const [suppliers, setSuppliers] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // Search state
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
-  const [suppliersPerPage] = useState(7); // Number of suppliers per page
+  const [suppliersPerPage, setSuppliersPerPage] = useState(10); // Default number of suppliers per page
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
   const [bankDetails, setBankDetails] = useState(null); // Bank details state
 
@@ -19,7 +19,7 @@ export default function ManageSupplier({ store }) {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/get_suppliers");
+        const response = await axios.get("http://localhost:5000/api/suppliers/get_suppliers");
         setSuppliers(response.data);
       } catch (error) {
         console.error("Error fetching suppliers: ", error);
@@ -36,10 +36,11 @@ export default function ManageSupplier({ store }) {
   // Function to fetch and display bank details in the modal
   const handleViewBankDetails = async (supId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/get_bank_details/${supId}`);
+      const response = await axios.get(`http://localhost:5000/api/suppliers/get_bank_details/${supId}`);
       setBankDetails(response.data); // Store bank details in state
       setModalIsOpen(true); // Open modal
-    } catch {
+    } catch (error) {
+      console.error("Error fetching bank details:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -65,17 +66,17 @@ export default function ManageSupplier({ store }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`http://localhost:5000/api/delete_supplier/${supId}`);
+          const response = await axios.delete(`http://localhost:5000/api/suppliers/delete_supplier/${supId}`);
           if (response.status === 200) {
             setSuppliers(suppliers.filter((supplier) => supplier.Supid !== supId));
             Swal.fire("Deleted!", `Supplier "${supId}" has been deleted.`, "success");
           }
-        } catch (err) {
-          console.error("Error deleting supplier:", err);
+        } catch (error) {
+          console.error("Error deleting supplier:", error);
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: `Failed to delete supplier: ${err.response?.data?.message || err.message}`,
+            text: `Failed to delete supplier: ${error.response?.data?.message || error.message}`,
           });
         }
       }
@@ -95,13 +96,48 @@ export default function ManageSupplier({ store }) {
   const indexOfFirstSupplier = indexOfLastSupplier - suppliersPerPage;
   const currentSuppliers = filteredSuppliers.slice(indexOfFirstSupplier, indexOfLastSupplier);
 
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(filteredSuppliers.length / suppliersPerPage);
+
   // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  // Handle changing the number of suppliers displayed per page
+  const handleSuppliersPerPageChange = (event) => {
+    setSuppliersPerPage(Number(event.target.value));
+    setCurrentPage(1); // Reset to page 1 when rows per page changes
+  };
+
+  const handleStatusToggle = async (supid, currentStatus) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+    try {
+      const response = await axios.put(`http://localhost:5000/api/suppliers/update_status/${supid}`, {
+        status: newStatus,
+      });
+      if (response.status === 200) {
+        setSuppliers((prevSuppliers) =>
+          prevSuppliers.map((supplier) =>
+            supplier.Supid === supid ? { ...supplier, status: newStatus } : supplier
+          )
+        );
+        Swal.fire("Status Updated", `Supplier status changed to ${newStatus}`, "success");
+      }
+    } catch (error) {
+      console.error("Error updating supplier status:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `Failed to update supplier status: ${error.response?.data?.message || error.message}`,
+      });
+    }
+  };
 
   return (
     <div className="manage-supplier">
-      <h2>Manage Suppliers</h2>
-
       {/* Search box */}
       <div className="search-box">
         <input
@@ -110,6 +146,17 @@ export default function ManageSupplier({ store }) {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+      </div>
+
+      {/* Suppliers per page combo box */}
+      <div className="rows-per-page">
+        <label>Show: </label>
+        <select value={suppliersPerPage} onChange={handleSuppliersPerPageChange}>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
       </div>
 
       {/* Supplier table */}
@@ -140,7 +187,10 @@ export default function ManageSupplier({ store }) {
                 <td>{supplier.email}</td>
                 <td>{supplier.mobile1}</td>
                 <td>{supplier.company}</td>
-                <td>
+                <td
+                  onDoubleClick={() => handleStatusToggle(supplier.Supid, supplier.status)}
+                  style={{ cursor: "pointer" }}
+                >
                   <span className={supplier.status === "active" ? "status-active" : "status-inactive"}>
                     {supplier.status}
                   </span>
@@ -164,15 +214,23 @@ export default function ManageSupplier({ store }) {
 
       {/* Pagination */}
       <div className="pagination">
-        {[...Array(Math.ceil(filteredSuppliers.length / suppliersPerPage)).keys()].map((number) => (
-          <button
-            key={number + 1}
-            onClick={() => paginate(number + 1)}
-            className={currentPage === number + 1 ? "active" : ""}
-          >
-            {number + 1}
-          </button>
-        ))}
+        <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
+          Previous
+        </button>
+
+        {currentPage - 1 > 1 && <button onClick={() => paginate(1)}>1</button>}
+        {currentPage - 1 > 2 && <span>...</span>}
+
+        {currentPage - 1 > 0 && <button onClick={() => paginate(currentPage - 1)}>{currentPage - 1}</button>}
+        <button className="active">{currentPage}</button>
+        {currentPage + 1 <= totalPages && <button onClick={() => paginate(currentPage + 1)}>{currentPage + 1}</button>}
+
+        {currentPage + 1 < totalPages && <span>...</span>}
+        {currentPage + 1 < totalPages && <button onClick={() => paginate(totalPages)}>{totalPages}</button>}
+
+        <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>
+          Next
+        </button>
       </div>
 
       <Modal

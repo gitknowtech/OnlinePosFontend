@@ -1,4 +1,46 @@
-/* Base styles for larger screens */
+/* Container for the ManageProducts component */
+.manage-products {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+}
+
+/* Search box styling */
+.search-box {
+  margin-bottom: 20px;
+}
+
+.search-box input {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+/* Rows-per-page combo box styling */
+.rows-per-page {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.rows-per-page label {
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.rows-per-page select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Product table styling */
 .product-table table {
   width: 100%;
   border-collapse: collapse;
@@ -6,17 +48,33 @@
 
 .product-table th,
 .product-table td {
-  padding: 10px;
+  padding: 12px 15px;
   border: 1px solid #ddd;
   text-align: left;
+  vertical-align: middle;
+}
+
+.product-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.product-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.product-table tr:hover {
+  background-color: #f1f1f1;
 }
 
 .product-image {
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   object-fit: cover;
+  border-radius: 4px;
 }
 
+/* Status indicators */
 .status-active {
   color: green;
   font-weight: bold;
@@ -27,86 +85,162 @@
   font-weight: bold;
 }
 
-.pagination button.active {
-  background-color: #007bff;
+/* Action buttons styling */
+.action-button button {
+  margin-right: 5px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.edit-button {
+  background-color: #4CAF50;
   color: white;
 }
 
+.delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #45a049;
+}
+
+.delete-button:hover {
+  background-color: #e53935;
+}
+
+/* Pagination styling */
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .pagination button {
-  margin: 0 5px;
-  padding: 5px 10px;
-}
-
-/* Style the delete button */
-.action-button .delete-button {
-  background-color: #ee857b;
+  margin: 0 3px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background-color: white;
   cursor: pointer;
-  color: #000;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-/* Style the edit button */
-.action-button .edit-button {
-  background-color: #eaf389;
+.pagination button.active {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+.pagination button:hover:not(.active) {
+  background-color: #ddd;
+}
+
+.pagination button:disabled {
+  background-color: #f1f1f1;
+  cursor: not-allowed;
+}
+
+/* Modal overlay styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal content styling */
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 20px 30px;
+  max-width: 500px;
+  width: 90%;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.modal-content p {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.modal-content button {
+  margin-top: 20px;
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  color: #000;
+  font-size: 16px;
 }
 
-.action-button .delete-button:hover {
-  background-color: rgb(133, 5, 5);
-  transition: all 0.3s ease-in-out;
-  color: #fff;
+.modal-content button:hover {
+  background-color: #45a049;
 }
 
-.action-button .edit-button:hover {
-  background-color: rgb(94, 94, 2);
-  transition: all 0.3s ease-in-out;
-  color: #fff;
-}
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .rows-per-page {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-/* Media query for screens with max width of 1366px and height of 768px */
-@media only screen and (max-width: 1366px) and (max-height: 768px) {
+  .rows-per-page label {
+    margin-bottom: 5px;
+  }
+
+  .search-box input,
+  .rows-per-page select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .product-table table,
   .product-table th,
   .product-table td {
-    padding: 8px;
     font-size: 14px;
   }
 
-  .pagination button {
-    padding: 4px 8px;
-    font-size: 12px;
-  }
-
-  .product-image {
-    width: 80px;
-    height: 80px;
-  }
-
-  .action-button .edit-button,
-  .action-button .delete-button {
-    font-size: 12px;
+  .action-button button {
     padding: 6px 10px;
+    font-size: 12px;
   }
 
-  /* Adjust for mobile or smaller screens */
-  .product-table table {
+  .pagination button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .modal-content {
+    padding: 15px 20px;
+  }
+
+  .modal-content p {
     font-size: 14px;
   }
 
-  .product-table th,
-  .product-table td {
-    word-wrap: break-word;
-    font-size: 12px;
-  }
-
-  /* Adjust buttons */
-  .pagination button {
-    padding: 5px;
-    margin: 3px;
-    font-size: 12px;
-  }
-
-  .action-button .edit-button,
-  .action-button .delete-button {
-    font-size: 12px;
+  .modal-content button {
+    font-size: 14px;
   }
 }

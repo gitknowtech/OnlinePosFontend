@@ -11,7 +11,7 @@ export default function ManageProducts({ store }) {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // Search state
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
-  const [productsPerPage] = useState(7); // Number of products per page
+  const [productsPerPage, setProductsPerPage] = useState(10); // Number of products per page with combo box
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
   const [selectedProduct, setSelectedProduct] = useState(null); // Product details state for the modal
   const [modalType, setModalType] = useState(""); // Modal type state for different modals
@@ -35,30 +35,35 @@ export default function ManageProducts({ store }) {
     fetchProducts();
   }, []);
 
-  // Function to handle status toggle on double-click
-  const handleStatusToggle = async (productId, currentStatus) => {
+
+
+  const handleStatusToggle = async (supid, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
+    console.log("Updating supplier with supid:", supid, "to status:", newStatus); // <-- Add this
     try {
-      const response = await axios.put(`http://localhost:5000/api/products/update_status/${productId}`, {
+      const response = await axios.put(`http://localhost:5000/api/suppliers/update_status/${supid}`, {
         status: newStatus,
       });
       if (response.status === 200) {
-        setProducts((prevProducts) =>
-          prevProducts.map((product) =>
-            product.productId === productId ? { ...product, status: newStatus } : product
+        setSuppliers((prevSuppliers) =>
+          prevSuppliers.map((supplier) =>
+            supplier.Supid === supid ? { ...supplier, status: newStatus } : supplier
           )
         );
-        Swal.fire("Status Updated", `Product status changed to ${newStatus}`, "success");
+        Swal.fire("Status Updated", `Supplier status changed to ${newStatus}`, "success");
       }
     } catch (error) {
-      console.error("Error updating product status:", error);
+      console.error("Error updating supplier status:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: `Failed to update product status: ${error.response?.data?.message || error.message}`,
+        text: `Failed to update supplier status: ${error.response?.data?.message || error.message}`,
       });
     }
   };
+  
+
+  
 
   // Function to display Product Name (Sinhala) in the modal
   const handleViewProductNameSinhala = (productId) => {
@@ -151,8 +156,35 @@ export default function ManageProducts({ store }) {
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-  // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  // Handle pagination next and previous
+  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+
+  // Pagination numbers logic (only show 3 middle numbers)
+  const getPaginationNumbers = () => {
+    const pages = [];
+    if (totalPages <= 3) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage === 1) {
+        pages.push(1, 2, 3);
+      } else if (currentPage === totalPages) {
+        pages.push(totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(currentPage - 1, currentPage, currentPage + 1);
+      }
+    }
+    return pages;
+  };
+
+  // Handle changing the number of products displayed per page
+  const handleProductsPerPageChange = (event) => {
+    setProductsPerPage(Number(event.target.value));
+    setCurrentPage(1); // Reset to page 1 when rows per page changes
+  };
 
   return (
     <div className="manage-products">
@@ -165,6 +197,17 @@ export default function ManageProducts({ store }) {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+      </div>
+
+      {/* Products per page combo box */}
+      <div className="rows-per-page">
+        <label>Show: </label>
+        <select value={productsPerPage} onChange={handleProductsPerPageChange}>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
       </div>
 
       {/* Product table */}
@@ -261,15 +304,17 @@ export default function ManageProducts({ store }) {
 
       {/* Pagination */}
       <div className="pagination">
-        {[...Array(Math.ceil(filteredProducts.length / productsPerPage)).keys()].map((number) => (
+        <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+        {getPaginationNumbers().map((number) => (
           <button
-            key={number + 1}
-            onClick={() => paginate(number + 1)}
-            className={currentPage === number + 1 ? "active" : ""}
+            key={number}
+            onClick={() => setCurrentPage(number)}
+            className={currentPage === number ? "active" : ""}
           >
-            {number + 1}
+            {number}
           </button>
         ))}
+        <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
       </div>
 
       {/* Modals */}
@@ -281,6 +326,7 @@ export default function ManageProducts({ store }) {
         overlayClassName="modal-overlay"
         ariaHideApp={false}
       >
+        {/* Modal content depending on selected product and modal type */}
         {selectedProduct && modalType === "productNameSinhala" ? (
           <div>
             <p>
