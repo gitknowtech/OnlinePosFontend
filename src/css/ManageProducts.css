@@ -162,8 +162,6 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  right: auto;
-  bottom: auto;
   transform: translate(-50%, -50%);
   background: #fff;
   padding: 20px 30px;
@@ -172,6 +170,7 @@
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
+
 
 .modal-content img {
   max-width: 100%;

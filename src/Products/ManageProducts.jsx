@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import Modal from "react-modal"; // Modal component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../css/ManageProducts.css"; // Assuming a separate CSS file for table design
-import { faEdit, faTrashAlt, faWarehouse, faEye, faEyeSlash, faBell } from "@fortawesome/free-solid-svg-icons"; // Icons
+import { faEye, faEyeSlash, faBell } from "@fortawesome/free-solid-svg-icons"; // Icons
 
 export default function ManageProducts({ store }) {
   const [products, setProducts] = useState([]);
@@ -37,27 +37,27 @@ export default function ManageProducts({ store }) {
 
 
 
-  const handleStatusToggle = async (supid, currentStatus) => {
+  // Function to handle status toggle on double-click
+  const handleStatusToggle = async (productId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
-    console.log("Updating supplier with supid:", supid, "to status:", newStatus); // <-- Add this
     try {
-      const response = await axios.put(`http://localhost:5000/api/suppliers/update_status/${supid}`, {
+      const response = await axios.put(`http://localhost:5000/api/products/update_status/${productId}`, {
         status: newStatus,
       });
       if (response.status === 200) {
-        setSuppliers((prevSuppliers) =>
-          prevSuppliers.map((supplier) =>
-            supplier.Supid === supid ? { ...supplier, status: newStatus } : supplier
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.productId === productId ? { ...product, status: newStatus } : product
           )
         );
-        Swal.fire("Status Updated", `Supplier status changed to ${newStatus}`, "success");
+        Swal.fire("Status Updated", `Product status changed to ${newStatus}`, "success");
       }
     } catch (error) {
-      console.error("Error updating supplier status:", error);
+      console.error("Error updating product status:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: `Failed to update supplier status: ${error.response?.data?.message || error.message}`,
+        text: `Failed to update product status: ${error.response?.data?.message || error.message}`,
       });
     }
   };
@@ -285,7 +285,6 @@ export default function ManageProducts({ store }) {
                 <td className="action-button">
                   <button
                     className="edit-button"
-                    onClick={() => handleViewProductDetails(product.productId)}
                   >
                     Edit
                   </button>
