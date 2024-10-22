@@ -22,7 +22,7 @@ export default function ManageSupplier({ store }) {
         const response = await axios.get("http://localhost:5000/api/suppliers/get_suppliers");
         setSuppliers(response.data);
       } catch (error) {
-        console.error("Error fetching suppliers: ", error);
+        console.error("Error fetching suppliers:", error.response?.data?.message || error.message);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -32,11 +32,12 @@ export default function ManageSupplier({ store }) {
     };
     fetchSuppliers();
   }, []);
+  
 
   // Function to fetch and display bank details in the modal
   const handleViewBankDetails = async (supId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/suppliers/get_bank_details/${supId}`);
+      const response = await axios.get(`http://localhost:5000/api/suppliers/get_supplier_bank_details/${supId}`);
       setBankDetails(response.data); // Store bank details in state
       setModalIsOpen(true); // Open modal
     } catch (error) {

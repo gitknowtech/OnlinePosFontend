@@ -30,7 +30,7 @@ export default function AddSupplier({ UserName, store }) {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/get_banks");
+        const response = await axios.get("http://localhost:5000/api/suppliers/get_banks");
         setBankList(response.data);
       } catch (error) {
         console.error("Error fetching banks: ", error);
@@ -82,7 +82,7 @@ export default function AddSupplier({ UserName, store }) {
   const checkForDuplicates = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/supplier_check_duplicate",
+        "http://localhost:5000/api/suppliers/supplier_check_duplicate",
         {
           Supid,
           Supname,
@@ -135,7 +135,7 @@ export default function AddSupplier({ UserName, store }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/create_supplier",
+        "http://localhost:5000/api/suppliers/create_supplier",
         supplierData
       );
 
