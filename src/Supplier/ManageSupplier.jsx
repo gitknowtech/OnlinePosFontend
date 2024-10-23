@@ -4,7 +4,7 @@ import Swal from "sweetalert2"; // For delete confirmation and alerts
 import PropTypes from "prop-types";
 import Modal from "react-modal"; // Modal component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faBank } from "@fortawesome/free-solid-svg-icons"; // Imported faEye icon
+import { faEye, faBank, faAddressBook, faMedal, faVoicemail, faWebAwesome, faMobile } from "@fortawesome/free-solid-svg-icons"; // Imported faEye icon
 import "../css/ManageSupplier.css"; // Assuming a separate CSS file for table design
 
 export default function ManageSupplier({ store }) {
@@ -14,7 +14,11 @@ export default function ManageSupplier({ store }) {
   const [suppliersPerPage, setSuppliersPerPage] = useState(10); // Default number of suppliers per page
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
   const [modalContent, setModalContent] = useState(null); // Content to display in the modal
-  const [modalTitle, setModalTitle] = useState(""); // Title for the modal
+  const [modalTitle, setModalTitle] = useState(""); // Title for the modalconst [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
+  const [selectedSupplier, setSelectedSupplier] = useState(null); // Selected supplier state
+  const [modalType, setModalType] = useState(""); // Modal type state
+  const [largeImage, setLargeImage] = useState(null); // Large image state for image viewing
+  
 
   // Fetch supplier data from the database
   useEffect(() => {
@@ -35,6 +39,92 @@ export default function ManageSupplier({ store }) {
     };
     fetchSuppliers();
   }, []);
+
+
+
+  const handleAddressClick = async (Supid) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/suppliers/get_supplier_address_details/${Supid}`);
+      const selectedSupplier = response.data;
+      setModalContent(
+        <div>
+          <p>
+            <strong>Address 1:</strong> {selectedSupplier.address1 || "N/A"}
+          </p>
+          <p>
+            <strong>Address 2:</strong> {selectedSupplier.address2 || "N/A"}
+          </p>
+          <p>
+            <strong>Address 3:</strong> {selectedSupplier.address3 || "N/A"}
+          </p>
+        </div>
+      );
+      setModalIsOpen(true); // Open modal
+    } catch (error) {
+      console.error("Error fetching address details:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Could not fetch address details.",
+      });
+    }
+  };
+
+  const handleEmailClick = async (Supid) => {
+    try{
+      const response = await axios.get(`http://localhost:5000/api/suppliers/get_supplier_website_details/${Supid}`)
+      const selectedSupplier = response.data;
+      setModalContent(
+        <div>
+          <p>
+            <strong>Email Address : </strong> {selectedSupplier.email || "N/A"}
+          </p>
+          <p>
+            <strong>Web Address : </strong> {selectedSupplier.website || "N/A"}
+          </p>
+        </div>
+      );
+      setModalIsOpen(true); //open modal
+    }catch(error){
+      console.error("Error Fecthing website data details : ", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Could not fecth website details"
+      });
+    }
+  }
+
+
+  const handleMobileClick = async (Supid) => {
+    try{
+      const response = await axios.get(`http://localhost:5000/api/suppliers/get_supplier_mobile_details/${Supid}`)
+      const selectedSupplier = response.data;
+      setModalContent(
+        <div>
+          <p>
+            <strong>Mobile Number 1 : </strong> {selectedSupplier.mobile1 || "N/A" }
+          </p>
+          <p>
+            <strong>Mobile Number 2 : </strong> {selectedSupplier.mobile2 || "N/A" }
+          </p>
+          <p>
+            <strong>Mobile Number 3 : </strong> {selectedSupplier.mobile3 || "N/A" }
+          </p>
+        </div>
+      );
+      setModalIsOpen(true);
+    }catch(error){
+      console.error("Error Fecthing mobile data details : ", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Could not fecth mobile details"
+      });
+    }
+  };
+  
+
 
   // Function to fetch and display bank details in the modal
   const handleViewBankDetails = async (supId) => {
@@ -151,60 +241,7 @@ export default function ManageSupplier({ store }) {
     }
   };
 
-  // Functions to handle eye icon clicks
-  const handleAddressClick = (supplier) => {
-    console.log('Supplier Data in handleAddressClick:', supplier);
-    setModalTitle("Address Details");
-    setModalContent(
-      <div>
-        <p>
-          <strong>Address 1:</strong> {supplier.address1 || 'N/A'}
-        </p>
-        <p>
-          <strong>Address 2:</strong> {supplier.address2 || 'N/A'}
-        </p>
-        <p>
-          <strong>Address 3:</strong> {supplier.address3 || 'N/A'}
-        </p>
-      </div>
-    );
-    setModalIsOpen(true);
-  };
 
-  const handleMobileClick = (supplier) => {
-    console.log('Supplier Data in handleMobileClick:', supplier);
-    setModalTitle("Mobile Details");
-    setModalContent(
-      <div>
-        <p>
-          <strong>Mobile 1:</strong> {supplier.mobile1 || 'N/A'}
-        </p>
-        <p>
-          <strong>Mobile 2:</strong> {supplier.mobile2 || 'N/A'}
-        </p>
-        <p>
-          <strong>Mobile 3:</strong> {supplier.mobile3 || 'N/A'}
-        </p>
-      </div>
-    );
-    setModalIsOpen(true);
-  };
-
-  const handleEmailClick = (supplier) => {
-    console.log('Supplier Data in handleEmailClick:', supplier);
-    setModalTitle("Contact Details");
-    setModalContent(
-      <div>
-        <p>
-          <strong>Email:</strong> {supplier.email || 'N/A'}
-        </p>
-        <p>
-          <strong>Website:</strong> {supplier.website || 'N/A'}
-        </p>
-      </div>
-    );
-    setModalIsOpen(true);
-  };
 
   return (
     <div className="manage-supplier">
@@ -255,36 +292,32 @@ export default function ManageSupplier({ store }) {
                 <td>{supplier.Supname}</td>
                 {/* Address column with eye icon */}
                 <td>
-                  {supplier.address1}
-                  <button
-                    className="icon-button"
-                    onClick={() => handleAddressClick(supplier)}
-                    title="View Address Details"
-                  >
-                    <FontAwesomeIcon icon={faEye} />
-                  </button>
+                  <FontAwesomeIcon
+                    icon={faAddressBook}
+                    style={{cursor: "pointer"}}
+                    onClick={() => handleAddressClick(supplier.Supid)}
+                    />{" - "}
+                    {supplier.address1}
                 </td>
                 {/* Email column with eye icon */}
                 <td>
-                  {supplier.email}
-                  <button
-                    className="icon-button"
-                    onClick={() => handleEmailClick(supplier)}
-                    title="View Contact Details"
-                  >
-                    <FontAwesomeIcon icon={faEye} />
-                  </button>
+                  <FontAwesomeIcon
+                    icon={faWebAwesome}
+                    style={{cursor : "pointer"}}
+                    onClick={() => handleEmailClick(supplier.Supid)}
+                    />
+                    {" - "}
+                    {supplier.email}
                 </td>
                 {/* Mobile column with eye icon */}
                 <td>
-                  {supplier.mobile1}
-                  <button
-                    className="icon-button"
-                    onClick={() => handleMobileClick(supplier)}
-                    title="View Mobile Details"
-                  >
-                    <FontAwesomeIcon icon={faEye} />
-                  </button>
+                  <FontAwesomeIcon
+                    icon={faMobile}
+                    style={{cursor : "pointer"}}
+                    onClick={ () => handleMobileClick(supplier.Supid)}
+                    />
+                    {" - "}
+                    {supplier.mobile1}
                 </td>
                 <td>{supplier.company}</td>
                 <td
@@ -349,6 +382,7 @@ export default function ManageSupplier({ store }) {
         {modalContent ? modalContent : <p>No details available.</p>}
         <button onClick={closeModal}>Close</button>
       </Modal>
+
     </div>
   );
 }

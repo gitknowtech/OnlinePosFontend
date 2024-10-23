@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import Modal from "react-modal"; // Modal component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../css/ManageProducts.css"; // Assuming a separate CSS file for table design
-import { faEye, faEyeSlash, faBell } from "@fortawesome/free-solid-svg-icons"; // Icons
+import { faEye, faEyeSlash, faBell, faCog, faPlus, faPlusCircle } from "@fortawesome/free-solid-svg-icons"; // Icons
 
 export default function ManageProducts({ store }) {
   const [products, setProducts] = useState([]);
@@ -234,39 +234,39 @@ export default function ManageProducts({ store }) {
                 {/* No column to display continuous numbering */}
                 <td>{indexOfFirstProduct + index + 1}</td>
                 <td>
-                  {product.productName}{" "}
                   <FontAwesomeIcon
-                    icon={faEyeSlash}
+                    icon={faPlusCircle}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewProductNameSinhala(product.productId)}
-                  />
+                  />{" - "}
+                  {product.productName}
                 </td>
                 <td>{product.selectedSupplier}</td>
                 <td>{product.selectedCategory}</td>
                 <td>{product.selectedUnit}</td>
                 <td>
-                  {product.costPrice}{" "}
                   <FontAwesomeIcon
-                    icon={faEye}
+                    icon={faPlusCircle}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewProfitDetails(product.productId)}
-                  />
+                  />{" - "}
+                  {product.costPrice}
                 </td>
                 <td>
-                  {product.mrpPrice}{" "}
                   <FontAwesomeIcon
-                    icon={faEye}
+                    icon={faPlusCircle}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewMRPDetails(product.productId)}
-                  />
+                  />{" - "}
+                  {product.mrpPrice}
                 </td>
                 <td>
-                  {product.stockQuantity}{" "}
                   <FontAwesomeIcon
                     icon={faBell}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewStockAlert(product.productId)}
-                  />
+                  />{" - "}
+                  {product.stockQuantity}
                 </td>
                 <td
                   onDoubleClick={() => handleViewLargeImage(product.imageLink)} // Double-click to view large image
