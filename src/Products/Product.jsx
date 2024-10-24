@@ -92,7 +92,7 @@ const Product = () => {
       <div className="button-list">
         <button onClick={togglermanageProducts}>
           <FontAwesomeIcon className="button-icon" icon={faCodeFork} />
-          Active Product List
+          Product List
         </button>
         <button onClick={togglerAddProductsContent}>
           <FontAwesomeIcon className="button-icon" icon={faPlus} />

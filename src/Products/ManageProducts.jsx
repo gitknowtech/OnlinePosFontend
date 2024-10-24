@@ -144,6 +144,9 @@ export default function ManageProducts({ store }) {
     });
   };
 
+
+
+
   // Filter products based on the search term, store, or show all if store is 'all'
   const filteredProducts = products.filter((product) => {
     const isStoreMatch = store === "all" || product.store === store || product.store === "all";
@@ -238,7 +241,7 @@ export default function ManageProducts({ store }) {
                     icon={faPlusCircle}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewProductNameSinhala(product.productId)}
-                  />{" - "}
+                  />{"  "}
                   {product.productName}
                 </td>
                 <td>{product.selectedSupplier}</td>
@@ -249,7 +252,7 @@ export default function ManageProducts({ store }) {
                     icon={faPlusCircle}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewProfitDetails(product.productId)}
-                  />{" - "}
+                  />{"  "}
                   {product.costPrice}
                 </td>
                 <td>
@@ -257,7 +260,7 @@ export default function ManageProducts({ store }) {
                     icon={faPlusCircle}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewMRPDetails(product.productId)}
-                  />{" - "}
+                  />{"  "}
                   {product.mrpPrice}
                 </td>
                 <td>
@@ -265,7 +268,7 @@ export default function ManageProducts({ store }) {
                     icon={faBell}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewStockAlert(product.productId)}
-                  />{" - "}
+                  />{"  "}
                   {product.stockQuantity}
                 </td>
                 <td
