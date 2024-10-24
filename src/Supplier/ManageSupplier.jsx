@@ -15,9 +15,6 @@ export default function ManageSupplier({ store }) {
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
   const [modalContent, setModalContent] = useState(null); // Content to display in the modal
   const [modalTitle, setModalTitle] = useState(""); // Title for the modalconst [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
-  const [selectedSupplier, setSelectedSupplier] = useState(null); // Selected supplier state
-  const [modalType, setModalType] = useState(""); // Modal type state
-  const [largeImage, setLargeImage] = useState(null); // Large image state for image viewing
   
 
   // Fetch supplier data from the database

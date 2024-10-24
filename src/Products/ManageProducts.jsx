@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import Modal from "react-modal"; // Modal component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../css/ManageProducts.css"; // Assuming a separate CSS file for table design
-import { faEye, faEyeSlash, faBell, faCog, faPlus, faPlusCircle } from "@fortawesome/free-solid-svg-icons"; // Icons
+import { faBell, faPlusCircle } from "@fortawesome/free-solid-svg-icons"; // Icons
 
 export default function ManageProducts({ store }) {
   const [products, setProducts] = useState([]);
@@ -116,6 +116,8 @@ export default function ManageProducts({ store }) {
     setModalType(""); // Reset modal type
   };
 
+
+  //delete products 
   const handleDelete = async (productId) => {
     Swal.fire({
       title: `Are you sure you want to delete product "${productId}"?`,
@@ -166,6 +168,12 @@ export default function ManageProducts({ store }) {
   const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
+  // Handle changing the number of products displayed per page
+  const handleProductsPerPageChange = (event) => {
+    setProductsPerPage(Number(event.target.value));
+    setCurrentPage(1); // Reset to page 1 when rows per page changes
+  };
+
   // Pagination numbers logic (only show 3 middle numbers)
   const getPaginationNumbers = () => {
     const pages = [];
@@ -183,35 +191,33 @@ export default function ManageProducts({ store }) {
     return pages;
   };
 
-  // Handle changing the number of products displayed per page
-  const handleProductsPerPageChange = (event) => {
-    setProductsPerPage(Number(event.target.value));
-    setCurrentPage(1); // Reset to page 1 when rows per page changes
-  };
 
   return (
     <div className="manage-products">
 
-      {/* Search box */}
-      <div className="search-box">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+<div className="controls-container">
+  {/* Search box */}
+  <div className="search-box">
+    <input
+      type="text"
+      placeholder="Search products..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+  </div>
 
-      {/* Products per page combo box */}
-      <div className="rows-per-page">
-        <label>Show: </label>
-        <select value={productsPerPage} onChange={handleProductsPerPageChange}>
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-      </div>
+  {/* Products per page combo box */}
+  <div className="rows-per-page">
+    <label>Show: </label>
+    <select value={productsPerPage} onChange={handleProductsPerPageChange}>
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+</div>
+
 
       {/* Product table */}
       <div className="product-table">
@@ -304,8 +310,8 @@ export default function ManageProducts({ store }) {
         </table>
       </div>
 
-      {/* Pagination */}
-      <div className="pagination">
+       {/* Pagination */}
+       <div className="pagination">
         <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
         {getPaginationNumbers().map((number) => (
           <button

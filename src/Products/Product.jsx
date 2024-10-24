@@ -17,6 +17,7 @@ import AddProducts from "../Products/AddProducts"
 import ManageStore from "../Products/StoreModel"; 
 import ManageBatch from "../Products/BatchModel";
 import ManageProducts from "../Products/ManageProducts";
+import ManageProductsRemoved from "../Products/ManageProductsRemoved"
 
 
 const Product = () => {
@@ -33,6 +34,14 @@ const Product = () => {
       setActiveContent("category"); // Show category and hide unit
     }
   };
+
+  const toggleRemovedProducts = () => {
+    if(activeContent === "ManageProductsRemoved"){
+        setActiveContent(null)
+    }else{
+      setActiveContent("ManageProductsRemoved");
+    }
+  }
 
   // Function to toggle the unit content
   const toggleUnitContent = () => {
@@ -77,7 +86,6 @@ const Product = () => {
 
   return (
     <div className="product-panel">
-      <h2 className="panel-title">Manage Products</h2>
 
       {/* Display user info */}
       <div className="user-info-panel">
@@ -118,7 +126,7 @@ const Product = () => {
           <FontAwesomeIcon className="button-icon" icon={faSnowflake} />
           Manage Category
         </button>
-        <button id="removed-button">
+        <button onClick={toggleRemovedProducts}>
           <FontAwesomeIcon className="button-icon" icon={faTrash} />
           Removed Products
         </button>
@@ -132,6 +140,7 @@ const Product = () => {
         {activeContent === "manageStore" && <ManageStore UserName={UserName} store={Store}/>}
         {activeContent === "manageBatch" && <ManageBatch UserName={UserName} store={Store}/>}
         {activeContent === "ManageProducts" && <ManageProducts UserName={UserName} store={Store}/>}
+        {activeContent === "ManageProductsRemoved" && <ManageProductsRemoved UserName={UserName} store={Store}/>}
       </div>
     </div>
   );

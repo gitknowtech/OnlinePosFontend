@@ -72,7 +72,6 @@ const Supplier = () => {
 
   return (
     <div className="supplier-panel">
-      <h2 className="panel-title">Manage Suppliers</h2>
 
       {/* Display user info */}
       <div className="user-info-panel">
