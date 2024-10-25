@@ -1,0 +1,113 @@
+/* Stock container layout */
+.stock-container {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    padding: 20px;
+}
+
+/* Left panel (stock update form) */
+.stock-left-panel {
+    flex: 1;
+    background-color: #b3ecb8;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+
+.input-field{
+    padding: 5px 10px;
+    width: 100%;
+    font-size: 12px;
+}
+
+
+.details p{
+    line-height: 1.5;
+    margin-top: 10px;
+}
+
+
+
+/* Adjust dropdown container to align directly under the search box */
+.dropdown {
+    position: absolute; /* Keep it absolute but relative to the parent */
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #ddd;
+    max-height: 250px;
+    overflow-y: auto;
+    border-radius: 10px;
+    width: 35%; /* Make the dropdown as wide as the input box */
+    z-index: 1000; /* Ensure it's always above other content */
+    top: 43%; /* Position the dropdown just below the input box */
+    left: 20%; /* Align it with the input field */
+}
+
+/* Each item in the dropdown */
+.dropdown-item {
+    padding: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+
+
+/* Right panel (stock history and badge-wise quantity) */
+.stock-right-panel {
+    flex: 1;
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Table styling */
+.summary-table, .badge-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.summary-table th, .badge-table th, 
+.summary-table td, .badge-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.summary-table th, .badge-table th {
+    background-color: #f2f2f2;
+}
+
+h2, h3 {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+#store-label{
+    font-size: 14px;
+    margin-right: 20px;
+}
+
+#update_input{
+    font-size: 12px;
+    width: 60%;
+    padding:6px 12px;
+    margin-right: 20px;
+}
+
+#update-button{
+    margin: auto;
+    padding:6px 12px;
+    font-weight: 600;
+    border: 1px solid #000;
+    background-color: rgb(110, 243, 243);
+}
+
+#update-button:hover{
+    background-color: #045d6d;
+    color: #fff;
+    transition: 0.3s ease-in-out;
+}
