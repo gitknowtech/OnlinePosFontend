@@ -168,7 +168,7 @@ export default function BankModel({ UserName, store }) {
         {error && <p className="error-message">{error}</p>}
 
         {/* Checkbox to save store as "all" */}
-        <div className="check-box">
+        <div className="check-box" style={{display:"none"}}>
           <input
             type="checkbox"
             id="allowStore"
@@ -179,12 +179,11 @@ export default function BankModel({ UserName, store }) {
         </div>
 
         <div className="button-group">
-          <button onClick={handleSave}>Save</button>
+          <button className='save-button' onClick={handleSave}>Save</button>
         </div>
 
         {/* Search box with FontAwesome icon */}
         <div className="search-box">
-          <FontAwesomeIcon icon={faSearch} className="search-icon" />
           <input
             type="text"
             placeholder="Search bank..."
@@ -226,6 +225,7 @@ export default function BankModel({ UserName, store }) {
             ))}
           </tbody>
         </table>
+
 
         {/* Pagination */}
         <div className="pagination">

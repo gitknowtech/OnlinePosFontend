@@ -181,7 +181,8 @@ export default function AddSupplier({ UserName, store }) {
 
   return (
     <div className="supplier-model">
-      <div className="check-box">
+      <h2>Supplier Details</h2>
+      <div className="check-box" style={{display:"none"}}>
         <input
           type="checkbox"
           checked={saveStoreAsAll}
@@ -212,6 +213,8 @@ export default function AddSupplier({ UserName, store }) {
           />
         </div>
 
+
+        <h2>Supplier Location Details</h2>
         <div className="form-group">
           <label htmlFor="address1">Address 1</label>
           <input
@@ -245,28 +248,7 @@ export default function AddSupplier({ UserName, store }) {
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter Email"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="idno">ID Number</label>
-          <input
-            type="text"
-            id="idno"
-            value={idno}
-            onChange={(e) => setIdno(e.target.value)}
-            placeholder="Enter ID Number"
-          />
-        </div>
-
+        <h2>Supplier Contact Details</h2>
         <div className="form-group">
           <label htmlFor="mobile1">Mobile 1</label>
           <input
@@ -300,6 +282,42 @@ export default function AddSupplier({ UserName, store }) {
           />
         </div>
 
+
+        <h2>Supplier Webite Details</h2>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter Email"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="website">Website</label>
+          <input
+            type="text"
+            id="website"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            placeholder="Enter Website"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="idno">ID Number</label>
+          <input
+            type="text"
+            id="idno"
+            value={idno}
+            onChange={(e) => setIdno(e.target.value)}
+            placeholder="Enter ID Number"
+          />
+        </div>
+
+
         <div className="form-group">
           <label htmlFor="company">Company</label>
           <input
@@ -322,17 +340,7 @@ export default function AddSupplier({ UserName, store }) {
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="website">Website</label>
-          <input
-            type="text"
-            id="website"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-            placeholder="Enter Website"
-          />
-        </div>
-
+        <h2>Supplier Bank Details Details</h2>
         <div className="form-group">
           <label htmlFor="bank">Bank Name</label>
           <select 
@@ -388,7 +396,7 @@ export default function AddSupplier({ UserName, store }) {
         </div>
 
         <div className="button-group">
-          <button className="saveButton" onClick={handleSave}>Save Supplier</button>
+          <button className="saveButton" onClick={handleSave}>Save</button>
         </div>
       </div>
     </div>

@@ -126,7 +126,7 @@ const Product = () => {
           <FontAwesomeIcon className="button-icon" icon={faSnowflake} />
           Manage Category
         </button>
-        <button onClick={toggleRemovedProducts}>
+        <button  id="removed-button" onClick={toggleRemovedProducts}>
           <FontAwesomeIcon className="button-icon" icon={faTrash} />
           Removed Products
         </button>

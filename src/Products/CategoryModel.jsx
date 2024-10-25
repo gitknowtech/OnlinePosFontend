@@ -235,7 +235,7 @@ export default function CategoryModel({ UserName, store }) {
         {error && <p className="error-message">{error}</p>}
 
         {/* Checkbox to save store as "all" */}
-        <div className="check-box">
+        <div className="check-box" style={{display:"none"}}>
           <input
             type="checkbox"
             id="allowStore"
