@@ -295,7 +295,6 @@ export default function StockTransfer({ store }) {
             </div>
 
             <div className="stock-right-panel-transfer-plus">
-            <h3>Last 50 Record Stock Summary</h3>
                 <div className="scrollable-table-container-transfer-plus">
                 <table className="summary-table-transfer-plus">
                     <thead>

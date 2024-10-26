@@ -275,7 +275,6 @@ export default function StockOut({ store }) {
             </div>
 
             <div className="stock-right-panel-minus">
-                <h3>Last 50 Record Stock Summary</h3>
                 <div className="scrollable-table-container-minus">
                     <table className="summary-table-minus">
                         <thead>

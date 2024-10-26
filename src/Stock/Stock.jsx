@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import StockInModel from "../Stock/StockIn";
 import StockOutModel from "../Stock/StockOut";
 import StockTransfer from "../Stock/StockTransfer";
+import StockTransferMinus from "../Stock/StockTransferMinus";
 
 
 
@@ -38,6 +39,14 @@ const Stock = () => {
         }
     }
 
+    const toggleStockTransferminus = () => {
+        if(activeContent === "StockTransferMinus"){
+            setActiveContent(null);
+        }else{
+            setActiveContent("StockTransferMinus")
+        }
+    }
+
     return (
         <div className="stock-panel">
             {/* Display User Info */}
@@ -54,7 +63,10 @@ const Stock = () => {
                     Stock Out
                 </button>
                 <button onClick={toggleStocktransferModel}>
-                    Stock Transfer
+                    Get Stock from Other
+                </button>
+                <button onClick={toggleStockTransferminus}>
+                    Transfer Stock for Other
                 </button>
                 <button>
                     Stock by Category
@@ -68,6 +80,7 @@ const Stock = () => {
                 {activeContent === "stockin" && <StockInModel store={Store} />}
                 {activeContent === "stockout" && <StockOutModel store={Store}/>}
                 {activeContent === "stocktransfer" && <StockTransfer store={Store}/>}
+                {activeContent === "StockTransferMinus" && <StockTransferMinus store={Store}/>}
             </div>
         </div>
     );

@@ -73,8 +73,8 @@
 }
 
 /* Scrollable table container */
-.scrollable-table-container {
-    max-height: 300px; /* Set max height for scroll */
+.scrollable-table-container-minus {
+    max-height: 400px; /* Set max height for scroll */
     overflow-y: auto;
     margin-top: 15px;
     border-radius: 8px;

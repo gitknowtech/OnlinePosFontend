@@ -74,7 +74,7 @@
 
 /* Scrollable table container */
 .scrollable-table-container-transfer-plus {
-    max-height: 300px; /* Set max height for scroll */
+    max-height: 400px; /* Set max height for scroll */
     overflow-y: auto;
     margin-top: 15px;
     border-radius: 8px;
