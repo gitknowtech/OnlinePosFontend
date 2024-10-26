@@ -1,15 +1,15 @@
-import "../css1/StockIn.css";
+import "../css1/StockOut.css";
 import PropTypes from "prop-types";
-import { useState, useRef , useEffect} from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
 
-export default function StockIn({ store }) {
+export default function StockOut({ store }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
-    const [quantity, setQuantity] = useState(""); // Ensure quantity state is used here
-    const [last50Records, setLast50Records] = useState([]); // Add this state
+    const [quantity, setQuantity] = useState("");
+    const [last50Records, setLast50Records] = useState([]);
     const [productDetails, setProductDetails] = useState({
         barcode: "N/A",
         productId: "N/A",
@@ -21,12 +21,11 @@ export default function StockIn({ store }) {
 
     const inputRef = useRef(null);
 
-
-     // Fetch the last 50 stock records on component mount
-     useEffect(() => {
+    // Fetch the last 50 stock-out records on component mount
+    useEffect(() => {
         const fetchLast50Records = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/stock/get_last_50_stock_records");
+                const response = await axios.get("http://localhost:5000/api/stock/get_last_50_stockout_records");
                 setLast50Records(response.data);
             } catch (err) {
                 console.error("Error fetching last 50 records:", err);
@@ -35,7 +34,7 @@ export default function StockIn({ store }) {
         fetchLast50Records();
     }, []);
 
-
+    // Function to fetch product details by search query
     const handleFetchProductDetails = async () => {
         try {
             const response = await axios.get("http://localhost:5000/api/stock/fetch_products_barcode", {
@@ -51,21 +50,18 @@ export default function StockIn({ store }) {
                     barcode: product.barcode || "N/A",
                     productId: product.productId || "N/A",
                     productName: product.productName || "N/A",
-                    totalIn: product.totalIn || "N/A",
+                    totalOut: product.totalOut || "N/A",
                     stockQuantity: product.stockQuantity || "N/A",
                 });
 
-                // Fetch related last 50 records for this product
-                const relatedRecordsResponse = await axios.get("http://localhost:5000/api/stock/get_last_50_records_by_product", {
-                    params: {
-                        productId: product.productId,
-                    },
+                const relatedRecordsResponse = await axios.get("http://localhost:5000/api/stock/get_last_50_records_by_product_out", {
+                    params: { productId: product.productId },
                 });
                 setLast50Records(relatedRecordsResponse.data.records);
                 setProductDetails((prevDetails) => ({
-                ...prevDetails,
-                totalIn: relatedRecordsResponse.data.totalIn, // Set the fetched totalIn
-            }));
+                    ...prevDetails,
+                    totalOut: relatedRecordsResponse.data.totalOut, // Set the fetched totalOut
+                }));
 
                 Swal.fire({
                     icon: 'success',
@@ -111,9 +107,9 @@ export default function StockIn({ store }) {
 
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
-            handleFetchProductDetails(); // Trigger fetch when Enter is pressed
+            handleFetchProductDetails();
         }
-    }
+    };
 
     const handleUpdateStock = async () => {
         const { productId, productName, barcode } = productDetails;
@@ -128,7 +124,7 @@ export default function StockIn({ store }) {
             return;
         }
 
-        const parsedQuantity = parseFloat(parseFloat(quantity).toFixed(4)); // Ensure valid number
+        const parsedQuantity = parseFloat(parseFloat(quantity).toFixed(4));
 
         if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
             Swal.fire({
@@ -141,11 +137,11 @@ export default function StockIn({ store }) {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/stock/update_stock", {
+            const response = await axios.post("http://localhost:5000/api/stock/update_stock_out", {
                 productId,
                 productName,
                 barcode,
-                quantity: parsedQuantity,
+                quantity: parsedQuantity, // Directly passing parsedQuantity as the backend handles deduction
             });
 
             Swal.fire({
@@ -169,7 +165,7 @@ export default function StockIn({ store }) {
 
     const handleLiveSearch = async (query) => {
         if (!query) {
-            setSearchResults([]); // Clear results if query is empty
+            setSearchResults([]);
             return;
         }
 
@@ -220,10 +216,10 @@ export default function StockIn({ store }) {
     };
 
     return (
-        <div className="stock-container">
-            <div className="stock-left-panel">
-                <h2>Update Stock<hr /></h2>
-                <div className="stock-form">
+        <div className="stock-container-minus">
+            <div className="stock-left-panel-minus">
+                <h2>Update Stock Out<hr /></h2>
+                <div className="stock-form-minus">
                     <input
                         type="text"
                         ref={inputRef}
@@ -235,11 +231,11 @@ export default function StockIn({ store }) {
                     />
 
                     {searchResults.length > 0 && (
-                        <div className="dropdown">
+                        <div className="dropdown-minus">
                             {searchResults.map((product) => (
                                 <div
                                     key={product.productId}
-                                    className="dropdown-item"
+                                    className="dropdown-item-minus"
                                     onClick={() => handleSelectProduct(product)}
                                 >
                                     <strong>{product.productId}</strong> - {product.productName} - {product.barcode}
@@ -248,7 +244,7 @@ export default function StockIn({ store }) {
                         </div>
                     )}
 
-                    <div className="details">
+                    <div className="details-minus">
                         <br />
                         <p><strong>Product ID   : </strong> {productDetails.productId} </p>
                         <p><strong>Product Name : </strong> {productDetails.productName} </p>
@@ -256,34 +252,34 @@ export default function StockIn({ store }) {
                         <br />
                         <hr />
                         <br />
-                        <p><strong>Total In : </strong> {productDetails.totalIn}</p>
+                        <p><strong>Total Out    : </strong> {productDetails.totalOut} </p>
                         <p><strong>Balance QTY  : </strong> {productDetails.stockQuantity}</p>
                         <br />
                         <hr />
                     </div>
                     <br/>
-                    <div className="update-controls">
-                        <div className="store-display">
-                            <label id="store-label"><strong>Store: </strong>{store}</label>
+                    <div className="update-controls-minus">
+                        <div className="store-display-minus">
+                            <label id="store-label-minus"><strong>Store: </strong>{store}</label>
                             <input
-                                id="update_input"
+                                id="update_input-minus"
                                 type="text"
                                 placeholder="Qty"
                                 value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)} // Update quantity state on input change
+                                onChange={(e) => setQuantity(e.target.value)}
                             />
-                            <button id="update-button" onClick={handleUpdateStock}>Update</button>
+                            <button id="update-button-minus" onClick={handleUpdateStock}>Update</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="stock-right-panel">
-            <h3>Last 50 Record Stock Summary</h3>
-                <div className="scrollable-table-container">
-                    <table className="summary-table">
+            <div className="stock-right-panel-minus">
+                <h3>Last 50 Record Stock Summary</h3>
+                <div className="scrollable-table-container-minus">
+                    <table className="summary-table-minus">
                         <thead>
-                            <tr>
+                            <tr >
                                 <th style={{ alignItems:"center", textAlign: "center"}}>Info</th>
                                 <th style={{ alignItems:"center", textAlign: "center"}}>Qty</th>
                                 <th style={{ alignItems:"center", textAlign: "center"}}>Type</th>
@@ -292,49 +288,22 @@ export default function StockIn({ store }) {
                         </thead>
                         <tbody>
                             {last50Records.map((record, index) => (
-                                <tr key={index} >
+                                <tr key={index}>
                                     <td>{record.productId} - {record.productName}</td>
-                                    <td className="quantity-cell" style={{color: "darkgreen", fontWeight: "1000",alignItems:"center", textAlign: "center" }}>{record.quantity}</td>
-                                    <td className="type-cell" style={{color: "darkgreen" , padding:"5px", fontWeight:"1000", alignItems:"center", textAlign: "center"}}>{record.type}</td>
+                                    <td className="quantity-cell-minus" style={{ color: "darkred", fontWeight: "1000", alignItems:"center", textAlign: "center"}}>{record.quantity}</td>
+                                    <td className="type-cell-minus" style={{ color: "darkred", fontWeight: "1000", alignItems:"center", textAlign: "center"}}>{record.type}</td>
                                     <td>{new Date(record.date).toLocaleString()}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
-
-                <br/>
-                {/*<h3>Badge Wise Available Qty</h3>
-                <table className="badge-table">
-                    <thead>
-                        <tr>
-                            <th>Badge</th>
-                            <th>Create Time</th>
-                            <th>MRP</th>
-                            <th>Qty</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Badge001</td>
-                            <td>2023-10-20</td>
-                            <td>$10</td>
-                            <td>50</td>
-                        </tr>
-                        <tr>
-                            <td>Badge002</td>
-                            <td>2023-10-21</td>
-                            <td>$15</td>
-                            <td>30</td>
-                        </tr>
-                    </tbody>
-                </table>*/}
             </div>
         </div>
     );
 }
 
 // Validate props with PropTypes
-StockIn.propTypes = {
+StockOut.propTypes = {
     store: PropTypes.string.isRequired,
 };

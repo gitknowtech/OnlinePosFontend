@@ -1,5 +1,5 @@
 /* General container layout */
-.stock-container {
+.stock-container-minus {
     display: flex;
     gap: 20px;
     font-size: 14px;
@@ -8,20 +8,20 @@
 }
 
 /* Left panel (stock update form) */
-.stock-left-panel {
+.stock-left-panel-minus {
     flex: 1;
-    background-color:  #9fe7c3;
+    background-color:  #f5b6b6;
     padding: 20px;
     border-radius: 8px;
 }
 
-.input-field {
+.input-field-minus {
     padding: 5px 10px;
     width: 100%;
     font-size: 12px;
 }
 
-.details p {
+.details-minus p {
     line-height: 1.5;
     display: flex;
     align-items: center;
@@ -29,21 +29,21 @@
     font-weight: 600;
 }
 
-.details p strong {
+.details-minus p strong {
     width: 150px;
     display: inline-block;
 }
 
-.details p span {
+.details-minus p span {
     flex: 1;
     font-weight: 600;
 }
 
 /* Dropdown container aligned under the search box */
-.dropdown {
+.dropdown-minus {
     position: absolute;
-    background-color: rgb(255, 255, 255);
-    border: 1px solid #dddddd;
+    background-color: rgb(255, 228, 228);
+    border: 1px solid #ffecec;
     max-height: 250px;
     overflow-y: auto;
     border-radius: 10px;
@@ -53,18 +53,18 @@
     left: 50%;
 }
 
-.dropdown-item {
+.dropdown-item-minus {
     padding: 8px;
     font-weight: 600;
     cursor: pointer;
 }
 
-.dropdown-item:hover {
-    background-color: #f0f0f0;
+.dropdown-item-minus:hover {
+    background-color: #fadfdf;
 }
 
 /* Right panel (stock history and badge-wise quantity) */
-.stock-right-panel {
+.stock-right-panel-minus {
     flex: 1;
     background-color: #ffffff; /* Softer background color */
     padding: 20px;
@@ -82,47 +82,48 @@
 }
 
 /* Table styling */
-.summary-table, .badge-table {
+.summary-table-minus, .badge-table-minus {
     width: 100%;
     border-collapse: collapse;
+    border-radius: 10px;
 }
 
-.summary-table th, .badge-table th,
-.summary-table td, .badge-table td {
-    border: 1px solid #9fe7c3;
+.summary-table-minus th, .badge-table-minus th,
+.summary-table-minus td, .badge-table-minus td {
+    border: 1px solid #f5b6b6;
     padding: 10px;
     text-align: left;
     font-size: 13px;
 }
 
-.summary-table th, .badge-table th {
-    background-color: #d9f2e6;
+.summary-table-minus th, .badge-table-minus th {
+    background-color: #f2d9d9;
     color: #333;
     font-weight: bold;
 }
 
 /* Alternate row background for readability */
-.summary-table tbody tr:nth-child(odd), .badge-table tbody tr:nth-child(odd) {
-    background-color: #f7fdfc;
+.summary-table-minus tbody tr:nth-child(odd), .badge-table-minus tbody tr:nth-child(odd) {
+    background-color: #fdf7f7;
 }
 
-.summary-table tbody tr:nth-child(even), .badge-table tbody tr:nth-child(even) {
+.summary-table-minus tbody tr:nth-child(even), .badge-table-minus tbody tr:nth-child(even) {
     background-color: #ffffff;
 }
 
 /* Optional: Styling for scroll bar */
-.scrollable-table-container::-webkit-scrollbar {
+.scrollable-table-container-minus::-webkit-scrollbar {
     width: 8px;
 }
 
-.scrollable-table-container::-webkit-scrollbar-thumb {
-    background-color: #b2d8c6;
+.scrollable-table-container-minus::-webkit-scrollbar-thumb {
+    background-color: #d8b2b2;
     border-radius: 4px;
 }
 
 
 /* Table header font and shadow */
-.summary-table th, .badge-table th {
+.summary-table-minus th, .badge-table-minus th {
     box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -133,12 +134,12 @@ h2, h3 {
     font-size: 16px;
 }
 
-#store-label {
+#store-label-minus {
     font-size: 14px;
     margin-right: 20px;
 }
 
-#update_input {
+#update_input-minus {
     font-size: 12px;
     width: 60%;
     padding: 6px 12px;
@@ -146,34 +147,37 @@ h2, h3 {
 }
 
 /* Update button default styles */
-#update-button {
+#update-button-minus {
     margin: auto;
     padding: 6px 12px;
     font-weight: 600;
     font-size: 14px;
     border: 1px solid #000;
-    background-color: rgb(110, 243, 243);
+    background-color: rgb(110, 239, 243);
     cursor: pointer;
     transition: 0.3s ease-in-out;
 }
 
-#update-button:hover {
-    background-color: #045d6d;
+#update-button-minus:hover {
+    background-color: #046d64;
     color: #fff;
 }
 
 /* Responsive styles */
 @media (max-width: 768px) {
-    .stock-container {
+    .stock-container-minus {
         flex-direction: column;
         gap: 10px;
         padding: 10px;
     }
 
-    .stock-left-panel, .stock-right-panel {
+    .stock-left-panel-minus, .stock-right-panel-minus {
         padding: 15px;
+        border-radius: 10px;
     }
-    #update-button {
+
+
+    #update-button-minus {
         width: 100%;          /* Full width on medium screens */
         padding: 8px 0;       /* Increase padding for better touch experience */
         font-size: 13px;      /* Slightly smaller font for medium screens */
@@ -184,31 +188,31 @@ h2, h3 {
         margin-bottom: 10px;
     }
 
-    .input-field, #update_input {
+    .input-field-minus, #update_input {
         font-size: 12px;
         padding: 5px 8px;
     }
 
-    .details p strong {
+    .details-minus p strong {
         width: 120px;
     }
 
-    #store-label, #update-button {
+    #store-label-minus, #update-button-minus {
         font-size: 12px;
     }
 
-    .dropdown {
+    .dropdown-minus {
         width: 90%;
         left: 5%;
     }
 }
 
 @media (max-width: 480px) {
-    .stock-container {
+    .stock-container-minus {
         padding: 5px;
     }
 
-    .stock-left-panel, .stock-right-panel {
+    .stock-left-panel-minus, .stock-right-panel-minus {
         padding: 10px;
     }
 
@@ -216,32 +220,32 @@ h2, h3 {
         font-size: 13px;
     }
 
-    .input-field, #update_input {
+    .input-field-minus, #update_input-minus {
         font-size: 10px;
         padding: 5px;
     }
-    #update-button {
+    #update-button-minus {
         width: 100%;          /* Full width on small screens */
         padding: 10px 0;      /* Increase padding for mobile usability */
         font-size: 12px;      /* Smaller font for compact screens */
     }
 
-    .details p strong {
+    .details-minus p strong {
         width: 100px;
     }
 
-    .summary-table th, .summary-table td, 
-    .badge-table th, .badge-table td {
+    .summary-table-minus th, .summary-table-minus td, 
+    .badge-table-minus th, .badge-table-minus td {
         font-size: 10px;
         padding: 5px;
     }
 
-    .dropdown {
+    .dropdown-minus {
         width: 100%;
         left: 0;
     }
 
-    #update-button {
+    #update-button-minus {
         width: 100%;
         padding: 5px;
         font-size: 10px;

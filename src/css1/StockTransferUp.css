@@ -1,5 +1,5 @@
 /* General container layout */
-.stock-container {
+.stock-container-transfer-plus {
     display: flex;
     gap: 20px;
     font-size: 14px;
@@ -8,20 +8,20 @@
 }
 
 /* Left panel (stock update form) */
-.stock-left-panel {
+.stock-left-panel-transfer-plus {
     flex: 1;
-    background-color:  #9fe7c3;
+    background-color:  #ebe091;
     padding: 20px;
     border-radius: 8px;
 }
 
-.input-field {
+.input-field-transfer-plus {
     padding: 5px 10px;
     width: 100%;
     font-size: 12px;
 }
 
-.details p {
+.details-transfer-plus p {
     line-height: 1.5;
     display: flex;
     align-items: center;
@@ -29,18 +29,18 @@
     font-weight: 600;
 }
 
-.details p strong {
+.details-transfer-plus p strong {
     width: 150px;
     display: inline-block;
 }
 
-.details p span {
+.details-transfer-plus p span {
     flex: 1;
     font-weight: 600;
 }
 
 /* Dropdown container aligned under the search box */
-.dropdown {
+.dropdown-transfer-plus {
     position: absolute;
     background-color: rgb(255, 255, 255);
     border: 1px solid #dddddd;
@@ -53,18 +53,18 @@
     left: 50%;
 }
 
-.dropdown-item {
+.dropdown-item-transfer-plus {
     padding: 8px;
     font-weight: 600;
     cursor: pointer;
 }
 
-.dropdown-item:hover {
+.dropdown-item-transfer-plus:hover {
     background-color: #f0f0f0;
 }
 
 /* Right panel (stock history and badge-wise quantity) */
-.stock-right-panel {
+.stock-right-panel-transfer-plus {
     flex: 1;
     background-color: #ffffff; /* Softer background color */
     padding: 20px;
@@ -73,7 +73,7 @@
 }
 
 /* Scrollable table container */
-.scrollable-table-container {
+.scrollable-table-container-transfer-plus {
     max-height: 300px; /* Set max height for scroll */
     overflow-y: auto;
     margin-top: 15px;
@@ -82,47 +82,47 @@
 }
 
 /* Table styling */
-.summary-table, .badge-table {
+.summary-table-transfer-plus, .badge-table-transfer-plus {
     width: 100%;
     border-collapse: collapse;
 }
 
-.summary-table th, .badge-table th,
-.summary-table td, .badge-table td {
-    border: 1px solid #9fe7c3;
+.summary-table-transfer-plus th, .badge-table-transfer-plus th,
+.summary-table-transfer-plus td, .badge-table-transfer-plus td {
+    border: 1px solid #eeeea1;
     padding: 10px;
     text-align: left;
     font-size: 13px;
 }
 
-.summary-table th, .badge-table th {
-    background-color: #d9f2e6;
+.summary-table-transfer-plus th, .badge-table-transfer-plus th {
+    background-color: #eeeea1;
     color: #333;
     font-weight: bold;
 }
 
 /* Alternate row background for readability */
-.summary-table tbody tr:nth-child(odd), .badge-table tbody tr:nth-child(odd) {
-    background-color: #f7fdfc;
+.summary-table-transfer-plus tbody tr:nth-child(odd), .badge-table-transfer-plus tbody tr:nth-child(odd) {
+    background-color: #fdfcf7;
 }
 
-.summary-table tbody tr:nth-child(even), .badge-table tbody tr:nth-child(even) {
+.summary-table-transfer-plus tbody tr:nth-child(even), .badge-table-transfer-plus tbody tr:nth-child(even) {
     background-color: #ffffff;
 }
 
 /* Optional: Styling for scroll bar */
-.scrollable-table-container::-webkit-scrollbar {
+.scrollable-table-container-transfer-plus::-webkit-scrollbar {
     width: 8px;
 }
 
-.scrollable-table-container::-webkit-scrollbar-thumb {
-    background-color: #b2d8c6;
+.scrollable-table-container-transfer-plus::-webkit-scrollbar-thumb {
+    background-color: #dbd488;
     border-radius: 4px;
 }
 
 
 /* Table header font and shadow */
-.summary-table th, .badge-table th {
+.summary-table-transfer-plus th, .badge-table-transfer-plus th {
     box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -133,20 +133,29 @@ h2, h3 {
     font-size: 16px;
 }
 
-#store-label {
+#store-label-transfer-plus {
     font-size: 14px;
     margin-right: 20px;
 }
 
-#update_input {
+#update_input-transfer-plus {
     font-size: 12px;
-    width: 60%;
+    width: 20%;
+    border-radius: 8px;
     padding: 6px 12px;
     margin-right: 20px;
 }
 
+#update_store-transfer-plus{
+    font-size: 12px;
+    width: 40%;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-right: 20px;
+}
+
 /* Update button default styles */
-#update-button {
+#update-button-transfer-plus {
     margin: auto;
     padding: 6px 12px;
     font-weight: 600;
@@ -157,23 +166,23 @@ h2, h3 {
     transition: 0.3s ease-in-out;
 }
 
-#update-button:hover {
+#update-button-transfer-plus:hover {
     background-color: #045d6d;
-    color: #fff;
+    color: #ffffff;
 }
 
 /* Responsive styles */
 @media (max-width: 768px) {
-    .stock-container {
+    .stock-container-transfer-plus {
         flex-direction: column;
         gap: 10px;
         padding: 10px;
     }
 
-    .stock-left-panel, .stock-right-panel {
+    .stock-left-panel-transfer-plus, .stock-right-panel-transfer-plus{
         padding: 15px;
     }
-    #update-button {
+    #update-button-transfer-plus {
         width: 100%;          /* Full width on medium screens */
         padding: 8px 0;       /* Increase padding for better touch experience */
         font-size: 13px;      /* Slightly smaller font for medium screens */
@@ -184,31 +193,31 @@ h2, h3 {
         margin-bottom: 10px;
     }
 
-    .input-field, #update_input {
+    .input-field-transfer-plus, #update_input-transfer-plus {
         font-size: 12px;
         padding: 5px 8px;
     }
 
-    .details p strong {
+    .details-transfer-plus p strong {
         width: 120px;
     }
 
-    #store-label, #update-button {
+    #store-label-transfer-plus, #update-button-transfer-plus {
         font-size: 12px;
     }
 
-    .dropdown {
+    .dropdown-transfer-plus {
         width: 90%;
         left: 5%;
     }
 }
 
 @media (max-width: 480px) {
-    .stock-container {
+    .stock-container-transfer-plus {
         padding: 5px;
     }
 
-    .stock-left-panel, .stock-right-panel {
+    .stock-left-panel-transfer-plus, .stock-right-panel-transfer-plus {
         padding: 10px;
     }
 
@@ -216,32 +225,32 @@ h2, h3 {
         font-size: 13px;
     }
 
-    .input-field, #update_input {
+    .input-field-transfer-plus, #update_input-transfer-plus {
         font-size: 10px;
         padding: 5px;
     }
-    #update-button {
+    #update-button-transfer-plus {
         width: 100%;          /* Full width on small screens */
         padding: 10px 0;      /* Increase padding for mobile usability */
         font-size: 12px;      /* Smaller font for compact screens */
     }
 
-    .details p strong {
+    .details-transfer-plus p strong {
         width: 100px;
     }
 
-    .summary-table th, .summary-table td, 
-    .badge-table th, .badge-table td {
+    .summary-table-transfer-plus th, .summary-table-transfer-plus td, 
+    .badge-table-transfer-plus th, .badge-table-transfer-plus td {
         font-size: 10px;
         padding: 5px;
     }
 
-    .dropdown {
+    .dropdown-transfer-plus {
         width: 100%;
         left: 0;
     }
 
-    #update-button {
+    #update-button-transfer-plus {
         width: 100%;
         padding: 5px;
         font-size: 10px;
