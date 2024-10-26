@@ -1,49 +1,58 @@
-/* Stock container layout */
+/* General container layout */
 .stock-container {
     display: flex;
     gap: 20px;
     font-size: 14px;
     padding: 20px;
+    flex-direction: row;
 }
 
 /* Left panel (stock update form) */
 .stock-left-panel {
     flex: 1;
-    background-color: #b3ecb8;
+    background-color:  #d4eee1;
     padding: 20px;
     border-radius: 8px;
 }
 
-
-.input-field{
+.input-field {
     padding: 5px 10px;
     width: 100%;
     font-size: 12px;
 }
 
-
-.details p{
+.details p {
     line-height: 1.5;
+    display: flex;
+    align-items: center;
     margin-top: 10px;
+    font-weight: 600;
 }
 
+.details p strong {
+    width: 150px;
+    display: inline-block;
+}
 
+.details p span {
+    flex: 1;
+    font-weight: 600;
+}
 
-/* Adjust dropdown container to align directly under the search box */
+/* Dropdown container aligned under the search box */
 .dropdown {
-    position: absolute; /* Keep it absolute but relative to the parent */
+    position: absolute;
     background-color: rgb(255, 255, 255);
     border: 1px solid #ddd;
     max-height: 250px;
     overflow-y: auto;
     border-radius: 10px;
-    width: 35%; /* Make the dropdown as wide as the input box */
-    z-index: 1000; /* Ensure it's always above other content */
-    top: 43%; /* Position the dropdown just below the input box */
-    left: 20%; /* Align it with the input field */
+    width: 30%;
+    z-index: 1000;
+    top: 43%;
+    left: 50%;
 }
 
-/* Each item in the dropdown */
 .dropdown-item {
     padding: 8px;
     font-weight: 600;
@@ -54,31 +63,69 @@
     background-color: #f0f0f0;
 }
 
-
 /* Right panel (stock history and badge-wise quantity) */
 .stock-right-panel {
     flex: 1;
-    background-color: #f0f0f0;
+    background-color: #ffffff; /* Softer background color */
     padding: 20px;
     border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+/* Scrollable table container */
+.scrollable-table-container {
+    max-height: 300px; /* Set max height for scroll */
+    overflow-y: auto;
+    margin-top: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Table styling */
 .summary-table, .badge-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
 }
 
-.summary-table th, .badge-table th, 
+.summary-table th, .badge-table th,
 .summary-table td, .badge-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    border: 1px solid #ccc;
+    padding: 10px;
     text-align: left;
+    font-size: 13px;
 }
 
 .summary-table th, .badge-table th {
-    background-color: #f2f2f2;
+    background-color: #d9f2e6;
+    color: #333;
+    font-weight: bold;
+}
+
+/* Alternate row background for readability */
+.summary-table tbody tr:nth-child(odd), .badge-table tbody tr:nth-child(odd) {
+    background-color: #f7fdfc;
+}
+
+.summary-table tbody tr:nth-child(even), .badge-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+/* Optional: Styling for scroll bar */
+.scrollable-table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollable-table-container::-webkit-scrollbar-thumb {
+    background-color: #b2d8c6;
+    border-radius: 4px;
+}
+
+
+/* Table header font and shadow */
+.summary-table th, .badge-table th {
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 h2, h3 {
@@ -86,28 +133,117 @@ h2, h3 {
     font-size: 16px;
 }
 
-#store-label{
+#store-label {
     font-size: 14px;
     margin-right: 20px;
 }
 
-#update_input{
+#update_input {
     font-size: 12px;
     width: 60%;
-    padding:6px 12px;
+    padding: 6px 12px;
     margin-right: 20px;
 }
 
-#update-button{
+/* Update button default styles */
+#update-button {
     margin: auto;
-    padding:6px 12px;
+    padding: 6px 12px;
     font-weight: 600;
+    font-size: 14px;
     border: 1px solid #000;
     background-color: rgb(110, 243, 243);
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
 }
 
-#update-button:hover{
+#update-button:hover {
     background-color: #045d6d;
     color: #fff;
-    transition: 0.3s ease-in-out;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .stock-container {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .stock-left-panel, .stock-right-panel {
+        padding: 15px;
+    }
+    #update-button {
+        width: 100%;          /* Full width on medium screens */
+        padding: 8px 0;       /* Increase padding for better touch experience */
+        font-size: 13px;      /* Slightly smaller font for medium screens */
+    }
+
+    h2, h3 {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .input-field, #update_input {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+
+    .details p strong {
+        width: 120px;
+    }
+
+    #store-label, #update-button {
+        font-size: 12px;
+    }
+
+    .dropdown {
+        width: 90%;
+        left: 5%;
+    }
+}
+
+@media (max-width: 480px) {
+    .stock-container {
+        padding: 5px;
+    }
+
+    .stock-left-panel, .stock-right-panel {
+        padding: 10px;
+    }
+
+    h2, h3 {
+        font-size: 13px;
+    }
+
+    .input-field, #update_input {
+        font-size: 10px;
+        padding: 5px;
+    }
+    #update-button {
+        width: 100%;          /* Full width on small screens */
+        padding: 10px 0;      /* Increase padding for mobile usability */
+        font-size: 12px;      /* Smaller font for compact screens */
+    }
+
+    .details p strong {
+        width: 100px;
+    }
+
+    .summary-table th, .summary-table td, 
+    .badge-table th, .badge-table td {
+        font-size: 10px;
+        padding: 5px;
+    }
+
+    .dropdown {
+        width: 100%;
+        left: 0;
+    }
+
+    #update-button {
+        width: 100%;
+        padding: 5px;
+        font-size: 10px;
+    }
 }

@@ -1,6 +1,6 @@
 import "../css1/StockIn.css";
 import PropTypes from "prop-types";
-import { useState, useRef } from "react";
+import { useState, useRef , useEffect} from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
 
@@ -8,23 +8,39 @@ export default function StockIn({ store }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
-    const [quanity , setQuantity] = useState("");
+    const [quantity, setQuantity] = useState(""); // Ensure quantity state is used here
+    const [last50Records, setLast50Records] = useState([]); // Add this state
     const [productDetails, setProductDetails] = useState({
         barcode: "N/A",
         productId: "N/A",
-        productName: "N/A",  // Correct case for `productName`
+        productName: "N/A",
         totalIn: "N/A",
         totalOut: "N/A",
-        balanceQty: "N/A",
+        stockQuantity: "N/A",
     });
 
     const inputRef = useRef(null);
 
+
+     // Fetch the last 50 stock records on component mount
+     useEffect(() => {
+        const fetchLast50Records = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/api/stock/get_last_50_stock_records");
+                setLast50Records(response.data);
+            } catch (err) {
+                console.error("Error fetching last 50 records:", err);
+            }
+        };
+        fetchLast50Records();
+    }, []);
+
+
     const handleFetchProductDetails = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/products/fetch_products_barcode", {
+            const response = await axios.get("http://localhost:5000/api/stock/fetch_products_barcode", {
                 params: {
-                    searchTerm: searchQuery, // Searching using the barcode entered
+                    searchTerm: searchQuery,
                     store: store,
                 },
             });
@@ -34,11 +50,23 @@ export default function StockIn({ store }) {
                 setProductDetails({
                     barcode: product.barcode || "N/A",
                     productId: product.productId || "N/A",
-                    productName: product.productName || "N/A",  // Use correct field name `productName`
+                    productName: product.productName || "N/A",
                     totalIn: product.totalIn || "N/A",
-                    totalOut: product.totalOut || "N/A",  // Correct casing for `totalOut`
-                    balanceQty: product.balanceQty || "N/A",
+                    totalOut: product.totalOut || "N/A",
+                    stockQuantity: product.stockQuantity || "N/A",
                 });
+
+                // Fetch related last 50 records for this product
+                const relatedRecordsResponse = await axios.get("http://localhost:5000/api/stock/get_last_50_records_by_product", {
+                    params: {
+                        productId: product.productId,
+                    },
+                });
+                setLast50Records(relatedRecordsResponse.data.records);
+                setProductDetails((prevDetails) => ({
+                ...prevDetails,
+                totalIn: relatedRecordsResponse.data.totalIn, // Set the fetched totalIn
+            }));
 
                 Swal.fire({
                     icon: 'success',
@@ -48,7 +76,6 @@ export default function StockIn({ store }) {
                     showConfirmButton: true,
                 });
             } else {
-                // No product found with the entered barcode
                 Swal.fire({
                     icon: 'error',
                     title: 'Product Not Found',
@@ -61,7 +88,7 @@ export default function StockIn({ store }) {
                     productName: "N/A",
                     totalIn: "N/A",
                     totalOut: "N/A",
-                    balanceQty: "N/A",
+                    stockQuantity: "N/A",
                 });
             }
         } catch (err) {
@@ -70,16 +97,15 @@ export default function StockIn({ store }) {
                 icon: 'error',
                 title: 'Error Fetching Product',
                 text: 'There was an error fetching the product details. Please try again later.',
-                showcloseButton: true ,
+                showCloseButton: true,
             });
-            // Reset to default on error
             setProductDetails({
                 barcode: "N/A",
                 productId: "N/A",
                 productName: "N/A",
                 totalIn: "N/A",
                 totalOut: "N/A",
-                balanceQty: "N/A",
+                stockQuantity: "N/A",
             });
         }
     };
@@ -92,7 +118,7 @@ export default function StockIn({ store }) {
 
     const handleUpdateStock = async () => {
         const { productId, productName, barcode } = productDetails;
-    
+
         if (!productId || productId === "N/A") {
             Swal.fire({
                 icon: 'error',
@@ -102,10 +128,10 @@ export default function StockIn({ store }) {
             });
             return;
         }
-    
-        const parsedQuantity = parseFloat(quanity).toFixed(4); // Convert to 4 decimal places
-    
-        if (!parsedQuantity || isNaN(parsedQuantity) || parsedQuantity <= 0) {
+
+        const parsedQuantity = parseFloat(parseFloat(quantity).toFixed(4)); // Ensure valid number
+
+        if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Quantity',
@@ -114,26 +140,24 @@ export default function StockIn({ store }) {
             });
             return;
         }
-    
+
         try {
-            const response = await axios.post("http://localhost:5000/api/products/update_stock", {
+            const response = await axios.post("http://localhost:5000/api/stock/update_stock", {
                 productId,
                 productName,
                 barcode,
-                quantity: parsedQuantity, // Send parsed decimal quantity
+                quantity: parsedQuantity,
             });
-    
+
             Swal.fire({
                 icon: 'success',
                 title: 'Stock Updated',
                 text: response.data.message,
                 showConfirmButton: true,
             });
-    
-            // Reset quantity input
-            setQuantity("");
-            // Refresh product details to show updated quantity if necessary
-            handleFetchProductDetails();
+
+            setQuantity(""); // Reset quantity input
+            handleFetchProductDetails(); // Refresh product details
         } catch (err) {
             Swal.fire({
                 icon: 'error',
@@ -143,10 +167,7 @@ export default function StockIn({ store }) {
             console.error("Error updating stock:", err);
         }
     };
-    
 
-  
-    // Function to handle live search when typing
     const handleLiveSearch = async (query) => {
         if (!query) {
             setSearchResults([]); // Clear results if query is empty
@@ -154,59 +175,53 @@ export default function StockIn({ store }) {
         }
 
         try {
-            const response = await axios.get("http://localhost:5000/api/products/fetch_products", {
+            const response = await axios.get("http://localhost:5000/api/stock/fetch_products", {
                 params: {
                     searchTerm: query,
-                    store: store, // Pass the store in the query if needed
+                    store: store,
                 },
             });
 
             if (response.data.length > 0) {
-                setSearchResults(response.data); // Display all results
+                setSearchResults(response.data);
             } else {
-                setSearchResults([]); // No products found
+                setSearchResults([]);
             }
         } catch (err) {
             console.error("Error fetching products:", err);
         }
     };
 
-    // Debounced search on input change
     const handleSearchInputChange = (e) => {
         const query = e.target.value;
         setSearchQuery(query);
 
-        // Clear previous debounce timeout
         if (debounceTimeout) {
             clearTimeout(debounceTimeout);
         }
 
-        // Set a new debounce timeout
         setDebounceTimeout(
             setTimeout(() => {
-                handleLiveSearch(query); // Call the live search function after 500ms
-            }, 300) // Delay the API call by 300ms for a responsive search
+                handleLiveSearch(query);
+            }, 300)
         );
     };
 
-    // When user clicks on an item from the dropdown
     const handleSelectProduct = (product) => {
-        setSearchQuery(product.barcode); // Set the searchQuery to the product's barcode
-        setSearchResults([]); // Clear the search results once a selection is made
+        setSearchQuery(product.barcode);
+        setSearchResults([]);
 
-        // Focus on the input field into barcode
         if (inputRef.current) {
             inputRef.current.focus();
             inputRef.current.setSelectionRange(
-                product.barcode.length, // Start of the selection
-                product.barcode.length // End of the selection
+                product.barcode.length,
+                product.barcode.length
             );
         }
     };
 
     return (
         <div className="stock-container">
-            {/* Left Side: Stock Update Form */}
             <div className="stock-left-panel">
                 <h2>Update Stock<hr /></h2>
                 <div className="stock-form">
@@ -216,11 +231,10 @@ export default function StockIn({ store }) {
                         placeholder="Scan Barcode or Enter Product Code, Name"
                         className="input-field"
                         value={searchQuery}
-                        onChange={handleSearchInputChange} // Live search on input change
-                        onKeyDown={handleKeyDown} // Detect the enter key press
+                        onChange={handleSearchInputChange}
+                        onKeyDown={handleKeyDown}
                     />
 
-                    {/* Display dropdown of search results if there are any */}
                     {searchResults.length > 0 && (
                         <div className="dropdown">
                             {searchResults.map((product) => (
@@ -237,60 +251,62 @@ export default function StockIn({ store }) {
 
                     <div className="details">
                         <br />
-                        <p><strong>Barcode      :</strong> {productDetails.barcode}</p>
-                        <p><strong>Product ID   :</strong> {productDetails.productId} </p>
-                        <p><strong>Product Name :</strong> {productDetails.productName} </p>
+                        <p><strong>Product ID   : </strong> {productDetails.productId} </p>
+                        <p><strong>Product Name : </strong> {productDetails.productName} </p>
+                        <p><strong>Barcode      : </strong> {productDetails.barcode}</p>
                         <br />
                         <hr />
                         <br />
-                        <p><strong>Total In     :</strong> {productDetails.totalIn}</p>
-                        <p><strong>Total Out    :</strong> {productDetails.totalOut} </p>
-                        <p><strong>Balance QTY  :</strong> {productDetails.balanceQty}</p>
+                        <p><strong>Total In : </strong> {productDetails.totalIn}</p>
+                        <p><strong>Total Out    : </strong> {productDetails.totalOut} </p>
+                        <p><strong>Balance QTY  : </strong> {productDetails.stockQuantity}</p>
                         <br />
                         <hr />
                     </div>
                     <br/>
                     <div className="update-controls">
-                        {/* Display Store Name */}
                         <div className="store-display">
                             <label id="store-label"><strong>Store: </strong>{store}</label>
-                        <input id="update_input" type="text" placeholder="Qty" />
-                        <button id="update-button" onClick={handleUpdateStock}>Update</button>
+                            <input
+                                id="update_input"
+                                type="text"
+                                placeholder="Qty"
+                                value={quantity}
+                                onChange={(e) => setQuantity(e.target.value)} // Update quantity state on input change
+                            />
+                            <button id="update-button" onClick={handleUpdateStock}>Update</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Right Side: Stock Update History */}
             <div className="stock-right-panel">
-                <h3>Last 50 Record Stock Summary</h3>
-                <table className="summary-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Info</th>
-                            <th>QTY</th>
-                            <th>Type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {/* Example history data (you can fetch real data from your backend) */}
-                        <tr>
-                            <td>2023-10-25 12:00</td>
-                            <td>Product ID: 100001 - A4 Paper</td>
-                            <td>20</td>
-                            <td>Stock In</td>
-                        </tr>
-                        <tr>
-                            <td>2023-10-24 14:30</td>
-                            <td>Product ID: 100002 - Oil Filter</td>
-                            <td>10</td>
-                            <td>Stock Out</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <h3>Last 50 Record Stock Summary</h3>
+                <div className="scrollable-table-container">
+                    <table className="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Info</th>
+                                <th>Qty</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {last50Records.map((record, index) => (
+                                <tr key={index}>
+                                    <td>{record.productId} - {record.productName}</td>
+                                    <td className="quantity-cell" style={{color: "darkgreen"}}>{record.quantity}</td>
+                                    <td className="type-cell">{record.type}</td>
+                                    <td>{new Date(record.date).toLocaleString()}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
-                <h3>Badge Wise Available Qty</h3>
+                <br/>
+                {/*<h3>Badge Wise Available Qty</h3>
                 <table className="badge-table">
                     <thead>
                         <tr>
@@ -301,7 +317,6 @@ export default function StockIn({ store }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {/* Example badge data */}
                         <tr>
                             <td>Badge001</td>
                             <td>2023-10-20</td>
@@ -315,7 +330,7 @@ export default function StockIn({ store }) {
                             <td>30</td>
                         </tr>
                     </tbody>
-                </table>
+                </table>*/}
             </div>
         </div>
     );
