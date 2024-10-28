@@ -46,9 +46,9 @@ const Stock = () => {
     };
 
     return (
-        <div className="stock-panel">
+        <div className="stock-panel" >
             {/* Display User Info */}
-            <div className="user-info-panel">
+            <div className="user-info-panel" style={{display: "none"}}>
                 <p><strong>User: </strong>{UserName}</p>
                 <p><strong>Store: </strong>{Store}</p>
             </div>

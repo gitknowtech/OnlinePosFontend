@@ -5,7 +5,6 @@ import {
   faBacteria,
   faCodeFork,
   faPlus,
-  faShoppingBag,
   faSnowflake,
   faStore,
   faTrash,
@@ -88,7 +87,7 @@ const Product = () => {
     <div className="product-panel">
 
       {/* Display user info */}
-      <div className="user-info-panel">
+      <div className="user-info-panel" style={{display: "none"}}>
         <p>
           <strong>Username:</strong> {UserName}
         </p>

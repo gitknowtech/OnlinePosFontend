@@ -4,9 +4,8 @@ import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import "../css1/StockSupplier.css";
 
-export default function StockBatch({ store }) {
+export default function StockBatch() {
     const [products, setProducts] = useState([]);
-    const [batches, setBatches] = useState([]);
     const [selectedBatch, setSelectedBatch] = useState("");
     const [filteredBatchList, setFilteredBatchList] = useState([]);
     const [isBatchDropDownVisible, setBatchDropDownVisible] = useState(false);
@@ -20,7 +19,6 @@ export default function StockBatch({ store }) {
             const response = await axios.get("http://localhost:5000/api/stock/get_batches_stock", {
                 params: { searchTerm },
             });
-            setBatches(response.data);
             setFilteredBatchList(response.data);
         } catch (error) {
             console.error("Error fetching batches:", error);
@@ -122,8 +120,9 @@ export default function StockBatch({ store }) {
                         onBlur={() => setTimeout(() => setBatchDropDownVisible(false), 200)}
                         onFocus={() => setBatchDropDownVisible(true)}
                     />
+                    
                     {isBatchDropDownVisible && filteredBatchList.length > 0 && (
-                        <ul className="dropdown-list-stock-supplier">
+                        <ul className="dropdown-list-stock-supplier" style={{fontSize:"10px", fontWeight:"600"}}>
                             {filteredBatchList.map((batch) => (
                                 <li
                                     key={batch.id}

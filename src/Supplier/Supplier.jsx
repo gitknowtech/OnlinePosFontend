@@ -74,7 +74,7 @@ const Supplier = () => {
     <div className="supplier-panel">
 
       {/* Display user info */}
-      <div className="user-info-panel">
+      <div className="user-info-panel" style={{display: "none"}}>
         <p><strong>Username:</strong> {UserName}</p>
         <p><strong>Store:</strong> {Store}</p>
       </div>

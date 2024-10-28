@@ -4,9 +4,8 @@ import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import "../css1/StockSupplier.css";
 
-export default function StockSupplier({ store }) {
+export default function StockSupplier() {
     const [products, setProducts] = useState([]);
-    const [suppliers, setSuppliers] = useState([]);
     const [selectedSupplier, setSelectedSupplier] = useState("");
     const [filteredSupplierList, setFilteredSupplierList] = useState([]);
     const [isSupplierDropDownVisible, setSupplierDropDownVisible] = useState(false);
@@ -20,7 +19,6 @@ export default function StockSupplier({ store }) {
             const response = await axios.get("http://localhost:5000/api/suppliers/get_suppliers_stock", {
                 params: { searchTerm },
             });
-            setSuppliers(response.data);
             setFilteredSupplierList(response.data);
         } catch (error) {
             console.error("Error fetching suppliers:", error);
@@ -123,7 +121,7 @@ export default function StockSupplier({ store }) {
                         onFocus={() => setSupplierDropDownVisible(true)}
                     />
                     {isSupplierDropDownVisible && filteredSupplierList.length > 0 && (
-                        <ul className="dropdown-list-stock-supplier">
+                        <ul className="dropdown-list-stock-supplier" style={{fontSize:"10px", fontWeight:"600"}}>
                             {filteredSupplierList.map((supplier) => (
                                 <li
                                     key={supplier.Supid}

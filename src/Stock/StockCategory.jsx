@@ -4,11 +4,10 @@ import Swal from "sweetalert2";
 import "../css1/StockSupplier.css";
 import PropTypes from "prop-types";
 
-export default function StockCategory({ store }) {
+export default function StockCategory() {
     const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState("");
     const [filteredCategoryList, setFilteredCategoryList] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("");
     const [isCategoryDropDownVisible, setCategoryDropDownVisible] = useState(false);
     const [quantityRange, setQuantityRange] = useState({ min: 0, max: 0 });
     const [currentPage, setCurrentPage] = useState(1);
@@ -20,7 +19,6 @@ export default function StockCategory({ store }) {
             const response = await axios.get("http://localhost:5000/api/stock/get_categories_stock", {
                 params: { searchTerm },
             });
-            setCategories(response.data);
             setFilteredCategoryList(response.data);
         } catch (error) {
             console.error("Error fetching categories:", error);
@@ -123,7 +121,7 @@ export default function StockCategory({ store }) {
                         onFocus={() => setCategoryDropDownVisible(true)}
                     />
                     {isCategoryDropDownVisible && filteredCategoryList.length > 0 && (
-                        <ul className="dropdown-list-stock-supplier">
+                        <ul className="dropdown-list-stock-supplier" style={{fontSize:"10px", fontWeight:"600"}}>
                             {filteredCategoryList.map((category) => (
                                 <li
                                     key={category.id}

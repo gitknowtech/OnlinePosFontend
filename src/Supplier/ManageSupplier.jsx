@@ -4,7 +4,7 @@ import Swal from "sweetalert2"; // For delete confirmation and alerts
 import PropTypes from "prop-types";
 import Modal from "react-modal"; // Modal component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faBank, faAddressBook, faMedal, faVoicemail, faWebAwesome, faMobile } from "@fortawesome/free-solid-svg-icons"; // Imported faEye icon
+import { faBank, faAddressBook, faWebAwesome, faMobile } from "@fortawesome/free-solid-svg-icons"; // Imported faEye icon
 import "../css/ManageSupplier.css"; // Assuming a separate CSS file for table design
 
 export default function ManageSupplier({ store }) {
