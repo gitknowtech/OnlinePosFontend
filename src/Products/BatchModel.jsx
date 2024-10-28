@@ -98,35 +98,54 @@ export default function BatchModel({ UserName, store }) {
   };
 
   const handleUpdateClick = async (batchId) => {
-    try {
-      const response = await axios.put(
-        `http://localhost:5000/api/batches/update_batch/${batchId}`,
-        { batchName: editedBatchName }
-      );
-
-      if (response.status === 200) {
-        setBatches(
-          batches.map((batch) =>
-            batch.id === batchId ? { ...batch, batchName: editedBatchName } : batch
-          )
-        );
-        setEditingBatchId(null);
-        Swal.fire({
-          icon: "success",
-          title: "Batch Updated",
-          text: "Batch has been updated successfully!",
-        });
-      } else {
-        throw new Error("Failed to update batch");
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to update this batch?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, update it!",
+      cancelButtonText: "No, cancel",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.put(
+            `http://localhost:5000/api/batches/update_batch/${batchId}`,
+            { batchName: editedBatchName }
+          );
+  
+          if (response.status === 200) {
+            setBatches(
+              batches.map((batch) =>
+                batch.id === batchId ? { ...batch, batchName: editedBatchName } : batch
+              )
+            );
+            setEditingBatchId(null);
+            Swal.fire({
+              icon: "success",
+              title: "Batch Updated",
+              text: "Batch and related products have been updated successfully!",
+            });
+          }
+        } catch (error) {
+          if (error.response && error.response.status === 400 && error.response.data.message === 'Batch name already available') {
+            Swal.fire({
+              icon: "error",
+              title: "Duplicate Entry",
+              text: "The batch name already exists. Please choose a different name.",
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: `Error updating batch: ${error.message}`,
+            });
+          }
+        }
       }
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: `Error updating batch: ${error.message}`,
-      });
-    }
+    });
   };
+  
+  
 
   const handleDelete = async (batchName) => {
     Swal.fire({

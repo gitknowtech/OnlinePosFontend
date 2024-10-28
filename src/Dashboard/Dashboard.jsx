@@ -125,7 +125,7 @@ const Dashboard = () => {
       {/* Dashboard main navbar */}
       <div className="dashboard_header">
         <div className="company-name">
-          <h2>GitKnowTech</h2>
+          <h2 id="companyname">GitKnowTech</h2>
         </div>
         <div className="togglerIcon">
           <FontAwesomeIcon

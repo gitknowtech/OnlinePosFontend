@@ -124,23 +124,35 @@ export default function UnitModel({ UserName, store }) {
     setEditedUnitName(unitName); // Initialize the edited name with the current name
   };
 
+  
+
   const handleUpdateClick = async (unitId) => {
+    const confirmUpdate = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to update this unit?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, update it!",
+      cancelButtonText: "No, cancel!",
+    });
+  
+    if (!confirmUpdate.isConfirmed) {
+      return; // Exit if the user canceled
+    }
+  
     try {
       const response = await axios.put(
         `http://localhost:5000/api/units/update_unit/${unitId}`,
-        {
-          unitName: editedUnitName,
-        }
+        { unitName: editedUnitName }
       );
-
+  
       if (response.status === 200) {
-        // Update the unit in the state
         setUnits(
           units.map((unit) =>
             unit.id === unitId ? { ...unit, unitName: editedUnitName } : unit
           )
         );
-        setEditingUnitId(null); // Reset the editing state
+        setEditingUnitId(null);
         Swal.fire({
           icon: "success",
           title: "Unit Updated",
@@ -153,11 +165,11 @@ export default function UnitModel({ UserName, store }) {
       Swal.fire({
         icon: "error",
         title: "Error Updating Unit",
-        text: `Error updating unit: ${error.message}`,
+        text: `Error updating unit: ${error.response?.data.message || error.message}`,
       });
     }
   };
-
+  
   // Function to handle the deletion of a unit
   const handleDelete = async (unitName) => {
     Swal.fire({

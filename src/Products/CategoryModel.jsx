@@ -126,16 +126,26 @@ export default function CategoryModel({ UserName, store }) {
   };
 
   const handleUpdateClick = async (categoryId) => {
+    const confirmUpdate = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to update this category?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, update it!",
+      cancelButtonText: "No, cancel!",
+    });
+  
+    if (!confirmUpdate.isConfirmed) {
+      return; // Exit if the user canceled
+    }
+  
     try {
       const response = await axios.put(
         `http://localhost:5000/api/categories/update_category/${categoryId}`,
-        {
-          catName: editedCategoryName,
-        }
+        { catName: editedCategoryName }
       );
-
+  
       if (response.status === 200) {
-        // Update the category in the state
         setCategories(
           categories.map((category) =>
             category.id === categoryId
@@ -143,7 +153,7 @@ export default function CategoryModel({ UserName, store }) {
               : category
           )
         );
-        setEditingCategoryId(null); // Reset the editing state
+        setEditingCategoryId(null);
         Swal.fire({
           icon: "success",
           title: "Category Updated",
@@ -156,10 +166,11 @@ export default function CategoryModel({ UserName, store }) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: `Error updating category: ${error.message}`,
+        text: `Error updating category: ${error.response?.data.message || error.message}`,
       });
     }
   };
+  
 
   // Function to handle the deletion of a category
   const handleDelete = async (catName) => {

@@ -4,43 +4,43 @@ import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import "../css1/StockSupplier.css";
 
-export default function StockSupplier({ store }) {
+export default function StockBatch({ store }) {
     const [products, setProducts] = useState([]);
-    const [suppliers, setSuppliers] = useState([]);
-    const [selectedSupplier, setSelectedSupplier] = useState("");
-    const [filteredSupplierList, setFilteredSupplierList] = useState([]);
-    const [isSupplierDropDownVisible, setSupplierDropDownVisible] = useState(false);
+    const [batches, setBatches] = useState([]);
+    const [selectedBatch, setSelectedBatch] = useState("");
+    const [filteredBatchList, setFilteredBatchList] = useState([]);
+    const [isBatchDropDownVisible, setBatchDropDownVisible] = useState(false);
     const [quantityRange, setQuantityRange] = useState({ min: 0, max: 0 });
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage] = useState(10);
 
-    // Fetch suppliers based on search input
-    const fetchSuppliers = async (searchTerm = "") => {
+    // Fetch batches based on search input
+    const fetchBatches = async (searchTerm = "") => {
         try {
-            const response = await axios.get("http://localhost:5000/api/suppliers/get_suppliers_stock", {
+            const response = await axios.get("http://localhost:5000/api/stock/get_batches_stock", {
                 params: { searchTerm },
             });
-            setSuppliers(response.data);
-            setFilteredSupplierList(response.data);
+            setBatches(response.data);
+            setFilteredBatchList(response.data);
         } catch (error) {
-            console.error("Error fetching suppliers:", error);
+            console.error("Error fetching batches:", error);
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: "Error fetching suppliers",
+                text: "Error fetching batches",
             });
         }
     };
 
     useEffect(() => {
-        fetchSuppliers(); // Initial load without a search term
+        fetchBatches(); // Initial load without a search term
     }, []);
 
-    // Fetch products related to the selected supplier only
-    const fetchProductsBySupplier = async (supplierName) => {
+    // Fetch products related to the selected batch only
+    const fetchProductsByBatch = async (batchName) => {
         try {
-            const response = await axios.get("http://localhost:5000/api/products/fetch_products_by_supplier", {
-                params: { supplier: supplierName },
+            const response = await axios.get("http://localhost:5000/api/stock/fetch_products_by_batch", {
+                params: { batch: batchName },
             });
             setProducts(response.data);
         } catch (error) {
@@ -53,19 +53,19 @@ export default function StockSupplier({ store }) {
         }
     };
 
-    // Handle supplier search on user input
-    const handleSupplierSearch = (e) => {
+    // Handle batch search on user input
+    const handleBatchSearch = (e) => {
         const searchTerm = e.target.value;
-        setSelectedSupplier(searchTerm);
-        fetchSuppliers(searchTerm); // Fetch suppliers based on input search term
-        setSupplierDropDownVisible(true); // Show dropdown
+        setSelectedBatch(searchTerm);
+        fetchBatches(searchTerm); // Fetch batches based on input search term
+        setBatchDropDownVisible(true); // Show dropdown
     };
 
-    // Handle selection of supplier to fetch and display related products
-    const handleSupplierSelect = (supplierName) => {
-        setSelectedSupplier(supplierName);
-        setSupplierDropDownVisible(false); // Hide dropdown after selection
-        fetchProductsBySupplier(supplierName); // Fetch products for selected supplier
+    // Handle selection of batch to fetch and display related products
+    const handleBatchSelect = (batchName) => {
+        setSelectedBatch(batchName);
+        setBatchDropDownVisible(false); // Hide dropdown after selection
+        fetchProductsByBatch(batchName); // Fetch products for selected batch
     };
 
     // Filter products based on quantity range only
@@ -112,24 +112,24 @@ export default function StockSupplier({ store }) {
         <div className="manage-products-stock-supplier" id="manage_stock_background">
             <div className="controls-container-stock-supplier">
                 <div className="form-group-stock-supplier">
-                    <label htmlFor="selectedSupplier">Enter Supplier Name</label>
+                    <label htmlFor="selectedBatch">Enter Batch Number</label>
                     <input
-                    id="supplier_text_input-stock-supplier"
+                        id="supplier_text_input-stock-supplier"
                         type="text"
-                        value={selectedSupplier}
-                        onChange={handleSupplierSearch}
-                        placeholder="Type to search suppliers"
-                        onBlur={() => setTimeout(() => setSupplierDropDownVisible(false), 200)}
-                        onFocus={() => setSupplierDropDownVisible(true)}
+                        value={selectedBatch}
+                        onChange={handleBatchSearch}
+                        placeholder="Type to search batches"
+                        onBlur={() => setTimeout(() => setBatchDropDownVisible(false), 200)}
+                        onFocus={() => setBatchDropDownVisible(true)}
                     />
-                    {isSupplierDropDownVisible && filteredSupplierList.length > 0 && (
+                    {isBatchDropDownVisible && filteredBatchList.length > 0 && (
                         <ul className="dropdown-list-stock-supplier">
-                            {filteredSupplierList.map((supplier) => (
+                            {filteredBatchList.map((batch) => (
                                 <li
-                                    key={supplier.Supid}
-                                    onClick={() => handleSupplierSelect(supplier.Supname)}
+                                    key={batch.id}
+                                    onClick={() => handleBatchSelect(batch.batchName)}
                                 >
-                                    {supplier.Supname}
+                                    {batch.batchName}
                                 </li>
                             ))}
                         </ul>
@@ -139,7 +139,7 @@ export default function StockSupplier({ store }) {
                 <div className="quantity-range-container-stock-supplier">
                     <label>Quantity Range:</label>
                     <input
-                    id="input_quantityrange_one"
+                        id="input_quantityrange_one"
                         type="number"
                         name="min"
                         placeholder="Min"
@@ -147,7 +147,7 @@ export default function StockSupplier({ store }) {
                         onChange={handleQuantityRangeChange}
                     />
                     <input
-                    id="input_quantityrange_two"
+                        id="input_quantityrange_two"
                         type="number"
                         name="max"
                         placeholder="Max"
@@ -157,7 +157,6 @@ export default function StockSupplier({ store }) {
                 </div>
             </div>
 
-
             {/* Product table */}
             <div className="product-table" id="product_table">
                 <table>
@@ -165,8 +164,7 @@ export default function StockSupplier({ store }) {
                         <tr>
                             <th>No</th>
                             <th>Product Name</th>
-                            <th>Supplier</th>
-                            <th>Category</th>
+                            <th>Batch Number</th>
                             <th>Unit</th>
                             <th>MRP</th>
                             <th>Stock</th>
@@ -177,8 +175,7 @@ export default function StockSupplier({ store }) {
                             <tr key={product.productId}>
                                 <td>{indexOfFirstProduct + index + 1}</td>
                                 <td>{product.productName}</td>
-                                <td>{product.selectedSupplier}</td>
-                                <td>{product.selectedCategory}</td>
+                                <td>{product.batchNumber}</td>
                                 <td>{product.selectedUnit}</td>
                                 <td>{product.mrpPrice}</td>
                                 <td>{product.stockQuantity}</td>
@@ -207,6 +204,6 @@ export default function StockSupplier({ store }) {
 }
 
 // Validate props with PropTypes
-StockSupplier.propTypes = {
+StockBatch.propTypes = {
     store: PropTypes.string.isRequired,
 };

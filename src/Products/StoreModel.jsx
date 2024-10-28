@@ -103,7 +103,7 @@ export default function StoreModel({ UserName, store }) {
         `http://localhost:5000/api/stores/update_store/${storeId}`,
         { storeName: editedStoreName }
       );
-
+  
       if (response.status === 200) {
         setStores(
           stores.map((store) =>
@@ -120,13 +120,23 @@ export default function StoreModel({ UserName, store }) {
         throw new Error("Failed to update store");
       }
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: `Error updating store: ${error.message}`,
-      });
+      // Check for duplicate error message from the API
+      if (error.response && error.response.status === 400 && error.response.data.message === 'Store name already exists') {
+        Swal.fire({
+          icon: "error",
+          title: "Duplicate Entry",
+          text: "The store name already exists. Please choose a different name.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: `Error updating store: ${error.message}`,
+        });
+      }
     }
   };
+  
 
   const handleDelete = async (storeId, storeName) => {
     Swal.fire({

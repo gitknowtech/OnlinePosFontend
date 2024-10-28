@@ -6,6 +6,8 @@ import StockOutModel from "../Stock/StockOut";
 import StockTransfer from "../Stock/StockTransfer";
 import StockTransferMinus from "../Stock/StockTransferMinus";
 import StockSupplier from "../Stock/StockSupplier";
+import StockCategory from "../Stock/StockCategory";
+import StockBatch from "../Stock/StockBatch";
 
 
 
@@ -35,6 +37,14 @@ const Stock = () => {
         setActiveContent(activeContent === "StockSupplier" ? null : "StockSupplier");
     };
 
+    const toggleStockCategory = () => {
+        setActiveContent(activeContent === "StockCategory" ? null : "StockCategory");
+    };
+
+    const toggleStockBatch = () => {
+        setActiveContent(activeContent === "StockBatch" ? null : "StockBatch");
+    };
+
     return (
         <div className="stock-panel">
             {/* Display User Info */}
@@ -48,8 +58,9 @@ const Stock = () => {
                 <button onClick={toggleStockOutmodel}>Stock Out</button>
                 <button onClick={toggleStocktransferModel}>Get Stock from Other</button>
                 <button onClick={toggleStockTransferminus}>Transfer Stock for Other</button>
-                <button>Stock by Category</button>
+                <button onClick={toggleStockCategory}>Stock by Category</button>
                 <button onClick={toggleStockSupplier}>Stock by Supplier</button>
+                <button onClick={toggleStockBatch}>Stock by Batch</button>
             </div>
 
             <div className="product-content">
@@ -58,6 +69,8 @@ const Stock = () => {
                 {activeContent === "stocktransfer" && <StockTransfer store={Store} userName={UserName} />}
                 {activeContent === "StockTransferMinus" && <StockTransferMinus store={Store} userName={UserName} />}
                 {activeContent === "StockSupplier" && <StockSupplier store={Store} userName={UserName} />}
+                {activeContent === "StockCategory" && <StockCategory store={Store} userName={UserName} />}
+                {activeContent === "StockBatch" && <StockBatch store={Store} userName={UserName} />}
             </div>
         </div>
     );

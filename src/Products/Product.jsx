@@ -106,10 +106,6 @@ const Product = () => {
           <FontAwesomeIcon className="button-icon" icon={faPlus} />
           Add Products
         </button>
-        <button>
-          <FontAwesomeIcon className="button-icon" icon={faShoppingBag} />
-          Manage Stock
-        </button>
         <button onClick={togglermanageBatch}>
           <FontAwesomeIcon className="button-icon" icon={faBacteria} />
           Manage Batch
