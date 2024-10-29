@@ -1,26 +1,47 @@
-import React from 'react';
+import  { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import "../css1/invoice.css";
 
 export default function Invoice() {
+    const location = useLocation();
+    const [user, setUser] = useState("Guest");
+    const [store, setStore] = useState("Default Store");
+    const [startTime, setStartTime] = useState("");
+
+    useEffect(() => {
+        // Extract state data from the location object
+        if (location.state) {
+            const { UserName, Store } = location.state;
+            setUser(UserName || "Guest");
+            setStore(Store || "Default Store");
+        }
+
+        // Set start time when component loads
+        const now = new Date();
+        const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        setStartTime(formattedTime);
+    }, [location.state]);
+
     return (
-        <div className="invoice-container">
+        <div className="invoice-container" id='invoice_container_id' >
             {/* Left Side - Product Table */}
             <div className="left-panel">
-                <div className="header-info">
+                <div className="header-info" >
                     <div>
-                        <label>System ID:</label> <span>1730169540</span>
+                        <label>User:  <span className='span' style={{backgroundColor:"white", borderRadius:"5px"  , color:"black", paddingLeft:"15px", paddingRight:"15px" , paddingTop:"3px" , paddingBottom:"3px"}}>{user}</span></label> 
                     </div>
                     <div>
-                        <label>User:</label> <span>ABDUL</span>
+                        <label>Store: <span style={{backgroundColor:"white", borderRadius:"5px"  , color:"black", paddingLeft:"15px", paddingRight:"15px" , paddingTop:"3px" , paddingBottom:"3px"}}>{store}</span></label>
                     </div>
                     <div>
-                        <label>Start Time:</label> <span>08:09:00 AM</span>
+                        <label>Start Time: <span style={{backgroundColor:"white", borderRadius:"5px"  , color:"black", paddingLeft:"15px", paddingRight:"15px", paddingTop:"3px" , paddingBottom:"3px"}}>{startTime}</span></label>
                     </div>
                 </div>
 
-                <div className="scan-barcode">
+                <div className="scan-barcode" >
                     <input
                         type="text"
+                        autoComplete='off'
                         placeholder="Scan Barcode (Insert)"
                         className="barcode-input"
                     />
