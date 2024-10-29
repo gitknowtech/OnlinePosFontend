@@ -267,6 +267,7 @@ export default function StockOut({ store }) {
                                 placeholder="Qty"
                                 value={quantity}
                                 onChange={(e) => setQuantity(e.target.value)}
+                                autoComplete="off"
                             />
                             <button id="update-button-minus" onClick={handleUpdateStock}>Update</button>
                         </div>

@@ -20,6 +20,7 @@ export default function StockTransfer({ store }) {
         stockQuantity: "N/A",
     });
 
+    const [storeOptions, setStoreOptions] = useState([]); // State for stores
     const inputRef = useRef(null);
 
 
@@ -33,7 +34,18 @@ export default function StockTransfer({ store }) {
                 console.error("Error fetching last 50 records:", err);
             }
         };
+
+        const fetchStores = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/api/stores/get_stores");
+                setStoreOptions(response.data);
+            } catch (err) {
+                console.error("Error fetching stores:", err);
+            }
+        };
+
         fetchLast50Records();
+        fetchStores(); // Fetch stores when component mounts
     }, []);
 
 
@@ -235,6 +247,7 @@ export default function StockTransfer({ store }) {
                         value={searchQuery}
                         onChange={handleSearchInputChange}
                         onKeyDown={handleKeyDown}
+                        autoComplete="off"
                     />
 
                     {searchResults.length > 0 && (
@@ -273,18 +286,26 @@ export default function StockTransfer({ store }) {
                                 id="update_input-transfer-plus"
                                 type="text"
                                 placeholder="Qty"
+                                autoComplete="off"
                                 value={quantity}
                                 onChange={(e) => setQuantity(e.target.value)} // Update quantity state on input change
                             />
 
 
-                            <input
+                            {/* Store selection dropdown */}
+                            <select
                                 id="update_store-transfer-plus"
-                                type="text"
-                                placeholder="Enter Store Name"
                                 value={inputStoreName}
                                 onChange={(e) => setInputStoreName(e.target.value)}
-                            /> 
+                            >
+                                {!inputStoreName && <option value="">Select Store</option>}
+                                {storeOptions.map((store) => (
+                                    <option key={store.id} value={store.storeName}>
+                                        {store.storeName}
+                                    </option>
+                                ))}
+                            </select>
+
 
                             
 

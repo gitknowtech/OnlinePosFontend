@@ -240,6 +240,7 @@ export default function CategoryModel({ UserName, store }) {
           type="text"
           id="categoryName"
           value={categoryName}
+            autoComplete="off"
           onChange={(e) => setCategoryName(e.target.value)}
           placeholder="Enter category name"
         />

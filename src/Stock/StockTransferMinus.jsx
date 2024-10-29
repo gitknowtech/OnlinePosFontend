@@ -8,9 +8,9 @@ export default function StockTransferMinus({ store }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
-    const [quantity, setQuantity] = useState(""); // Ensure quantity state is used here
-    const [last50Records, setLast50Records] = useState([]); // Add this state
-    const [inputStoreName, setInputStoreName] = useState(""); // New store name field
+    const [quantity, setQuantity] = useState("");
+    const [last50Records, setLast50Records] = useState([]);
+    const [inputStoreName, setInputStoreName] = useState("");
     const [productDetails, setProductDetails] = useState({
         barcode: "N/A",
         productId: "N/A",
@@ -18,6 +18,7 @@ export default function StockTransferMinus({ store }) {
         totalOut: "N/A",
         stockQuantity: "N/A",
     });
+    const [storeOptions, setStoreOptions] = useState([]); // State for stores
 
     const inputRef = useRef(null);
 
@@ -31,10 +32,19 @@ export default function StockTransferMinus({ store }) {
                 console.error("Error fetching last 50 records:", err);
             }
         };
+
+        const fetchStores = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/api/stores/get_stores");
+                setStoreOptions(response.data);
+            } catch (err) {
+                console.error("Error fetching stores:", err);
+            }
+        };
+
         fetchLast50Records();
+        fetchStores(); // Fetch stores when component mounts
     }, []);
-
-
 
     const handleFetchProductDetails = async () => {
         try {
@@ -64,7 +74,7 @@ export default function StockTransferMinus({ store }) {
                 setLast50Records(relatedRecordsResponse.data.records);
                 setProductDetails((prevDetails) => ({
                     ...prevDetails,
-                    totalOut: relatedRecordsResponse.data.totalOut, // Set the fetched totalOut
+                    totalOut: relatedRecordsResponse.data.totalOut,
                 }));
 
                 Swal.fire({
@@ -144,7 +154,7 @@ export default function StockTransferMinus({ store }) {
                 productName,
                 barcode,
                 quantity: parsedQuantity,
-                store: inputStoreName, // Pass the store name
+                store: inputStoreName,
             });
 
             Swal.fire({
@@ -155,8 +165,8 @@ export default function StockTransferMinus({ store }) {
             });
 
             setQuantity("");
-            setInputStoreName(""); // Clear store input
-            handleFetchProductDetails(); // Refresh product details
+            setInputStoreName("");
+            handleFetchProductDetails();
         } catch (err) {
             Swal.fire({
                 icon: 'error',
@@ -265,22 +275,29 @@ export default function StockTransferMinus({ store }) {
                     <div className="update-controls-transfer-minus">
                         <div className="store-display-transfer-minus">
                             <label id="store-label-transfer-minus"><strong>Store: </strong>{store}</label>
-                            {/* Additional input field for store name */}
                             <input
                                 id="update_input-transfer-minus"
                                 type="text"
+                                autoComplete="off"
                                 placeholder="Qty"
                                 value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)} // Update quantity state on input change
+                                onChange={(e) => setQuantity(e.target.value)}
                             />
 
-                            <input
+                            {/* Store selection dropdown */}
+                            <select
                                 id="update_store-transfer-minus"
-                                type="text"
-                                placeholder="Enter Store Name"
                                 value={inputStoreName}
                                 onChange={(e) => setInputStoreName(e.target.value)}
-                            /> 
+                            >
+                                {!inputStoreName && <option value="">Select Store</option>}
+                                {storeOptions.map((store) => (
+                                    <option key={store.id} value={store.storeName}>
+                                        {store.storeName}
+                                    </option>
+                                ))}
+                            </select>
+
 
                             <button id="update-button-transfer-minus" onClick={handleUpdateStock}>Update</button>
                         </div>
@@ -318,7 +335,6 @@ export default function StockTransferMinus({ store }) {
     );
 }
 
-// Validate props with PropTypes
 StockTransferMinus.propTypes = {
     store: PropTypes.string.isRequired,
 };

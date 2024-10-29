@@ -227,10 +227,12 @@ const Dashboard = () => {
                 </li>
                 <li>
                   <div className="icon-link">
-                    <a href="#">
+                  <Link 
+                      to="invoice"
+                      state={{ UserName: username, Store:store, Type: type, Email: email, LastLogin}}>
                       <FontAwesomeIcon className="nav-icon" icon={faReceipt} />
                       <span className="link-name">INVOICE</span>
-                    </a>
+                    </Link>
                   </div>
                 </li>
                 <li>

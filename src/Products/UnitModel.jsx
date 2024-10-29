@@ -233,6 +233,7 @@ export default function UnitModel({ UserName, store }) {
           type="text"
           id="unitName"
           value={unitName}
+            autoComplete="off"
           onChange={(e) => setUnitName(e.target.value)}
           placeholder="Enter unit name"
         />

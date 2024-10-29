@@ -182,6 +182,7 @@ export default function StoreModel({ UserName, store }) {
         <label htmlFor="storeName">Store Name</label>
         <input
           type="text"
+          autoComplete="off"
           id="storeName"
           value={storeName}
           onChange={(e) => setStoreName(e.target.value)}
@@ -198,6 +199,7 @@ export default function StoreModel({ UserName, store }) {
         <div className="search-box">
           <input
             type="text"
+            autoComplete="off"
             placeholder="Search store..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

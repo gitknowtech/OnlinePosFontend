@@ -271,6 +271,7 @@ export default function StockIn({ store }) {
                                 placeholder="Qty"
                                 value={quantity}
                                 onChange={(e) => setQuantity(e.target.value)} // Update quantity state on input change
+                                autoComplete="off"
                             />
                             <button id="update-button" onClick={handleUpdateStock}>Update</button>
                         </div>

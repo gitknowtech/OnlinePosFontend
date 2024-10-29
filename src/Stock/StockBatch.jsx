@@ -119,6 +119,7 @@ export default function StockBatch() {
                         placeholder="Type to search batches"
                         onBlur={() => setTimeout(() => setBatchDropDownVisible(false), 200)}
                         onFocus={() => setBatchDropDownVisible(true)}
+                        autoComplete="off"
                     />
                     
                     {isBatchDropDownVisible && filteredBatchList.length > 0 && (

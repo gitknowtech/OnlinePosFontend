@@ -194,6 +194,7 @@ export default function BatchModel({ UserName, store }) {
         <input
           type="text"
           id="batchName"
+          autoComplete="off"
           value={batchName}
           onChange={(e) => setBatchName(e.target.value)}
           placeholder="Enter batch name"

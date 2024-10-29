@@ -119,6 +119,7 @@ export default function StockSupplier() {
                         placeholder="Type to search suppliers"
                         onBlur={() => setTimeout(() => setSupplierDropDownVisible(false), 200)}
                         onFocus={() => setSupplierDropDownVisible(true)}
+                        autoComplete="off"
                     />
                     {isSupplierDropDownVisible && filteredSupplierList.length > 0 && (
                         <ul className="dropdown-list-stock-supplier" style={{fontSize:"10px", fontWeight:"600"}}>

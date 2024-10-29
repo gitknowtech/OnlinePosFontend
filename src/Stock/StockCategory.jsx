@@ -119,6 +119,7 @@ export default function StockCategory() {
                         placeholder="Type to search categories"
                         onBlur={() => setTimeout(() => setCategoryDropDownVisible(false), 200)}
                         onFocus={() => setCategoryDropDownVisible(true)}
+                        autoComplete="off"
                     />
                     {isCategoryDropDownVisible && filteredCategoryList.length > 0 && (
                         <ul className="dropdown-list-stock-supplier" style={{fontSize:"10px", fontWeight:"600"}}>

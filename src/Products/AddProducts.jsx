@@ -478,6 +478,7 @@ export default function AddProducts({ UserName, store }) {
           <label htmlFor="productId">Product ID</label>
           <input
             type="text"
+            autoComplete="off"
             id="productId"
             value={productId}
             ref={productIdInputRef}
@@ -491,6 +492,7 @@ export default function AddProducts({ UserName, store }) {
           <label htmlFor="productName">Product Name</label>
           <input
             type="text"
+            autoComplete="off"
             id="productName"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
@@ -502,6 +504,7 @@ export default function AddProducts({ UserName, store }) {
           <label htmlFor="productNameSinhala">Product Name (Sinhala)</label>
           <input
             type="text"
+            autoComplete="off"
             id="productNameSinhala"
             value={productNameSinhala}
             onChange={(e) => setProductNameSinhala(e.target.value)}
@@ -525,6 +528,7 @@ export default function AddProducts({ UserName, store }) {
           <input
             type="text"
             id="cabinNumber"
+            autoComplete="off"
             value={cabinNumber}
             onChange={(e) => setCabinNumber(e.target.value)}
             placeholder="Enter Cabin Number of The Product"
@@ -687,6 +691,7 @@ export default function AddProducts({ UserName, store }) {
             <label htmlFor="costPrice">Cost Price</label>
             <input
               type="number"
+            autoComplete="off"
               id="costPrice"
               value={costPrice}
               onChange={(e) => setCostPrice(e.target.value)}
@@ -698,6 +703,7 @@ export default function AddProducts({ UserName, store }) {
             <label htmlFor="mrpPrice">MRP Price</label>
             <input
               type="number"
+            autoComplete="off"
               id="mrpPrice"
               value={mrpPrice}
               onChange={(e) => setMrpPrice(e.target.value)}
@@ -710,6 +716,7 @@ export default function AddProducts({ UserName, store }) {
             <label htmlFor="profitPercentage">Profit Percentage</label>
             <input
               type="number"
+            autoComplete="off"
               id="profitPercentage"
               value={profitPercentage}
               readOnly="ture"
@@ -723,6 +730,7 @@ export default function AddProducts({ UserName, store }) {
             <input
               type="number"
               id="profitAmount"
+            autoComplete="off"
               value={profitAmount}
               readOnly="true"
               onChange={(e) => setProfitAmount(e.target.value)}
@@ -736,6 +744,7 @@ export default function AddProducts({ UserName, store }) {
             <label htmlFor="discountPercentage">Discount Percentage</label>
             <input
               type="number"
+            autoComplete="off"
               id="discountPercentage"
               value={discountPercentage}
               onChange={(e) => setDiscountPercentage(e.target.value)}
@@ -749,6 +758,7 @@ export default function AddProducts({ UserName, store }) {
             <input
               type="number"
               id="discountPrice"
+            autoComplete="off"
               value={discountPrice}
               onChange={(e) => setDiscountPrice(e.target.value)}
               onBlur={handleDiscountBlur}
@@ -764,6 +774,7 @@ export default function AddProducts({ UserName, store }) {
             <input
               type="number"
               id="wholesalePercentage"
+            autoComplete="off"
               value={wholesalePercentage}
               onChange={(e) => setWholesalePercentage(e.target.value)}
               onBlur={calculateWholesaleFromPercentage}
@@ -776,6 +787,7 @@ export default function AddProducts({ UserName, store }) {
             <input
               type="number"
               id="wholesalePrice"
+            autoComplete="off"
               value={wholesalePrice}
               onChange={(e) => setWholesalePrice(e.target.value)}
               onBlur={handleWholesaleBlur}
@@ -827,6 +839,7 @@ export default function AddProducts({ UserName, store }) {
           <input
             type="number"
             id="lockedPrice"
+            autoComplete="off"
             value={lockedPrice}
             onChange={(e) => setLockedPrice(e.target.value)}
             placeholder="Enter Locked Price"
@@ -838,6 +851,7 @@ export default function AddProducts({ UserName, store }) {
           <input
             type="number"
             id="openingBalance"
+            autoComplete="off"
             value={openingBalance}
             onChange={(e) => setOpeningBalance(e.target.value)}
             placeholder="Enter Stock Opening Balance"
@@ -849,6 +863,7 @@ export default function AddProducts({ UserName, store }) {
           <input
             type="number"
             id="stockAlert"
+            autoComplete="off"
             value={stockAlert}
             onChange={(e) => setStockAlert(e.target.value)}
             placeholder="Enter Stock Alert Count"
@@ -862,6 +877,7 @@ export default function AddProducts({ UserName, store }) {
             <input
               type="text"
               id="imageLink"
+            autoComplete="off"
               value={imageLink}
               onChange={(e) => setImageLink(e.target.value)}
               placeholder="Enter Image Link"
