@@ -41,15 +41,18 @@
     margin: 0 10px;
 }
 
+/* Container for barcode and quantity input */
 .scan-barcode {
-    margin: 15px 0;
-    font-size: 10px;
-    border: 2px solid #000;
-    border-radius: 5px;
+    display: flex;
+    gap: 10px; /* Space between inputs */
+    align-items: center;
+    width: 100%;
+    margin-top: 10px; /* Adjust as needed */
 }
 
+/* Styling for barcode input to occupy 80% of the space */
 .barcode-input {
-    width: 100%;
+    flex: 8; /* Equivalent to 80% */
     padding: 10px;
     font-size: 12px;
     border: 1px solid #ccc;
@@ -57,12 +60,36 @@
     box-sizing: border-box;
 }
 
+/* Styling for quantity input to occupy 20% of the space */
+.qty-input {
+    flex: 2; /* Equivalent to 20% */
+    padding: 10px;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    text-align: center; /* Center text in quantity input */
+}
+
+/* Styling for quantity input to occupy 20% of the space */
+.price-input {
+    flex: 2; /* Equivalent to 20% */
+    padding: 10px;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    text-align: center; /* Center text in quantity input */
+}
+
+
+
 
 /* Table container with fixed height and scroll */
 .table-container {
     flex: 1;
     overflow-y: auto; /* Enable vertical scrolling */
-    max-height: 300px; /* Set a maximum height for the table container */
+    max-height: 250px; /* Set a maximum height for the table container */
     margin-top: 10px;
     font-weight: 600;
     border: 1px solid #5f5e5e;
@@ -92,12 +119,14 @@
     background-color: #d8dcf0;
     border-top: 1px solid #ccc;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .footer-options {
     display: flex;
     justify-content: flex-start; /* Align options to the left */
     gap: 10px;
+    cursor: pointer;
 }
 
 .footer-options .option-box {
@@ -106,6 +135,7 @@
     align-items: center;
     font-size: 12px;
     font-weight: 600;
+    cursor: pointer;
     padding: 8px;
     min-width: 80px;
     background-color: #fff;
@@ -118,16 +148,19 @@
 .footer-options .option-box img {
     width: 40px;
     height: 40px;
+    cursor: pointer;
     margin-bottom: 5px;
 }
 
 .footer-options .option-box input[type="checkbox"] {
     margin-bottom: 3px;
     cursor: pointer;
+    cursor: pointer;
 }
 
 .footer-options .option-box span {
     font-size: 0.8rem;
+    cursor: pointer;
     margin-top: 3px;
 }
 
@@ -162,6 +195,7 @@
     display: flex;
     flex-direction: column;
     padding: 20px;
+    cursor: pointer;
     gap: 10px;
 }
 
@@ -169,6 +203,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+    cursor: pointer;
 }
 
 .right-panel .button-grid button {
@@ -263,5 +298,59 @@ h3 {
 }
 
 #table_container_div{
-    max-height: 400px;
+    max-height: 300px;
 }
+
+#suggestions_dropdown {
+    position: absolute;
+    background-color: rgb(212, 212, 236);
+    border: 1px solid #ddd;
+    width: 25%;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    border-radius: 5px;
+    margin-top: 200px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .suggestion-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  #user_span, #store_span, #start_time_span {
+    background-color: white;
+    border-radius: 5px;
+    color: black;
+    padding: 3px 15px;
+  }
+  
+  .barcode-input {
+    width: 80%;
+    padding: 10px;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  .qty-input {
+    width: 20%;
+    padding: 10px;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-left: 5px;
+  }
+  
