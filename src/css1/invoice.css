@@ -101,11 +101,17 @@
     width: 100%;
     border-collapse: collapse;
 }
-
-.product-table th,
-.product-table td {
+.product-table th{
     padding: 8px;
     text-align: center;
+    font-weight: 600;
+    background-color: #858484;
+    border: 1px solid #4d4b4b;
+    color: #fff;
+}
+
+.product-table td {
+    padding: 5px;
     border: 1px solid #4d4b4b;
 }
 
