@@ -17,7 +17,7 @@ import salesimage from "../assets/images/sales.png";
 import dayend from "../assets/images/end.png";
 import discount from "../assets/images/discount.png";
 import wholesale from "../assets/images/wholesale.png";
-import removeImage from "../assets/images/remove.png"
+import removeImage from "../assets/images/remove.png";
 import logout from "../assets/images/user-logout.png";
 
 export default function Invoice() {
@@ -32,13 +32,16 @@ export default function Invoice() {
   const [barcode, setBarcode] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [qty, setQty] = useState("");
+  const [costPrice, setCostPrice] = useState("");
   const [suggestedPrice, setSuggestedPrice] = useState("");
   const [tableData, setTableData] = useState([]);
   const [productName, setProductName] = useState("");
   const [totalAmount, setTotalAmount] = useState("0.00");
   const [itemCount, setItemCount] = useState(0);
-  const [editingCell, setEditingCell] = useState({ rowIndex: null, field: null });
-
+  const [editingCell, setEditingCell] = useState({
+    rowIndex: null,
+    field: null,
+  });
 
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
@@ -63,25 +66,32 @@ export default function Invoice() {
   }, [location.state]);
 
 
+
   useEffect(() => {
     calculateTotals();
   }, [tableData]);
 
+
+  
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/products/fetch_categories_for_invoice");
+      const response = await axios.get(
+        "http://localhost:5000/api/products/fetch_categories_for_invoice"
+      );
       setCategories(response.data);
     } catch (error) {
-      Swal.fire("Error", "Failed to fetch categories", "error");
+      Swal.fire("Error", "Failed to fetch categories", error);
     }
   };
 
   const fetchProductsByCategory = async (categoryId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/products/fetch_products_by_category?categoryId=${categoryId}`);
+      const response = await axios.get(
+        `http://localhost:5000/api/products/fetch_products_by_category?categoryId=${categoryId}`
+      );
       setProducts(response.data);
     } catch (error) {
-      Swal.fire("Error", "Failed to fetch products", "error");
+      Swal.fire("Error", "Failed to fetch products", error);
     }
   };
 
@@ -96,10 +106,12 @@ export default function Invoice() {
 
     if (input.length > 1) {
       try {
-        const response = await axios.get(`http://localhost:5000/api/products/search?query=${input}`);
+        const response = await axios.get(
+          `http://localhost:5000/api/products/search?query=${input}`
+        );
         setSuggestions(response.data);
       } catch (error) {
-        Swal.fire("Error", "Failed to fetch product suggestions", "error");
+        Swal.fire("Error", "Failed to fetch product suggestions", error);
       }
     } else {
       setSuggestions([]);
@@ -109,6 +121,7 @@ export default function Invoice() {
   const handleSuggestionClick = (suggestion) => {
     setProductName(suggestion.productName);
     setBarcode(suggestion.barcode);
+    setCostPrice(suggestion.costPrice);
     setPrice(suggestion.mrpPrice);
     setSuggestedPrice(suggestion.mrpPrice);
     setSuggestions([]);
@@ -116,13 +129,19 @@ export default function Invoice() {
     priceInputRef.current.focus();
   };
 
+
+
   const handlePriceEnterKeyPress = (e) => {
     if (e.key === "Enter") {
       const enteredPrice = parseFloat(price);
       const originalPrice = parseFloat(suggestedPrice);
 
       if (enteredPrice > originalPrice) {
-        Swal.fire("Invalid Price", "The entered price cannot be greater than the original price", "error");
+        Swal.fire(
+          "Invalid Price",
+          "The entered price cannot be greater than the original price",
+          "error"
+        );
         priceInputRef.current.focus();
       } else {
         setQty("1");
@@ -131,59 +150,72 @@ export default function Invoice() {
     }
   };
 
-  const handleBarcodeEnterKeyPress = async (e) => {
-    if (e.key === "Enter") {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/products/search?query=${barcode}`);
-        if (response.data.length > 0) {
-          const product = response.data[0];
-          setBarcode(product.barcode);
-          setPrice(product.mrpPrice);
-          setSuggestedPrice(product.mrpPrice);
-          priceInputRef.current.focus();
-        } else {
-          Swal.fire("Not Found", "Product with this barcode does not exist", "warning");
-        }
-      } catch (error) {
-        Swal.fire("Error", "Failed to fetch product by barcode", "error");
+
+
+ const handleBarcodeEnterKeyPress = async (e) => {
+  if (e.key === "Enter") {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/products/search?query=${barcode}`
+      );
+
+      if (response.data.length > 0) {
+        const product = response.data[0];
+        setBarcode(product.barcode);
+        setPrice(product.mrpPrice);
+        setSuggestedPrice(product.mrpPrice);
+        setCostPrice(product.costPrice); // Set costPrice directly from response
+
+        priceInputRef.current.focus();
+      } else {
+        Swal.fire(
+          "Not Found",
+          "Product with this barcode does not exist",
+          "warning"
+        );
       }
+    } catch (error) {
+      Swal.fire("Error", "Failed to fetch product by barcode", error);
     }
-  };
+  }
+};
 
-  const handleQtyEnterKeyPress = (e) => {
-    if (e.key === "Enter" && qty) {
-      const costPrice = parseFloat(suggestedPrice) - (parseFloat(suggestedPrice) - parseFloat(price));
-      const discount = (suggestedPrice - price);
-      const amount = parseFloat(price) * parseFloat(qty);
 
-      setTableData((prevData) => [
-        ...prevData,
-        {
-          name: productName,
-          cost: costPrice.toFixed(2),
-          mrp: suggestedPrice,
-          discount: discount.toFixed(2),
-          rate: price,
-          quantity: qty,
-          amount: amount.toFixed(2),
-        },
-      ]);
 
-      setBarcode("");
-      setPrice("");
-      setQty("");
-      setSuggestedPrice("");
-      qtyInputRef.current.blur();
+ const handleQtyEnterKeyPress = (e) => {
+  if (e.key === "Enter" && qty) {
+    const discount = parseFloat(suggestedPrice) - parseFloat(price);
+    const amount = parseFloat(price) * parseFloat(qty);
 
-      //refocus on barcode
-      barcodeInputRef.current.focus();
-    }
-  };
+    setTableData((prevData) => [
+      ...prevData,
+      {
+        name: productName,
+        cost: costPrice.toFixed(2), // Use fetched costPrice directly
+        mrp: suggestedPrice,
+        discount: discount.toFixed(2),
+        rate: price,
+        quantity: qty,
+        amount: amount.toFixed(2),
+      },
+    ]);
+
+    // Reset inputs
+    setBarcode("");
+    setPrice("");
+    setQty("");
+    setSuggestedPrice("");
+    qtyInputRef.current.blur();
+
+    // Refocus on barcode input
+    barcodeInputRef.current.focus();
+  }
+};
+
 
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
-
 
   const handleQuantityChange = (e, index) => {
     const newQuantity = e.target.value;
@@ -193,109 +225,116 @@ export default function Invoice() {
       return newData;
     });
   };
-  
 
   const handleQuantityEnterKeyPress = (e, index) => {
     if (e.key === "Enter") {
       let quantity = parseFloat(tableData[index].quantity);
       if (isNaN(quantity) || quantity <= 0) {
-        Swal.fire("Invalid Quantity", "Please enter a valid quantity", "warning");
+        Swal.fire(
+          "Invalid Quantity",
+          "Please enter a valid quantity",
+          "warning"
+        );
         return;
       }
       const rate = parseFloat(tableData[index].rate) || 0;
       const amount = quantity * rate;
-  
+
       setTableData((prevData) => {
         const newData = [...prevData];
         newData[index].quantity = quantity.toString();
         newData[index].amount = amount.toFixed(2);
         return newData;
       });
-  
+
       // Exit edit mode
       setEditingCell({ rowIndex: null, field: null });
-  
+
       // Refocus on the barcode input
       barcodeInputRef.current.focus();
     }
   };
 
   // Store the previous rate on focus
-const handleRateFocus = (index) => {
-  setTableData((prevData) => {
-    const newData = [...prevData];
-    newData[index].prevRate = parseFloat(newData[index].rate) || 0; // Store current rate as prevRate
-    return newData;
-  });
-};
-
-// Update rate while typing
-const handleRateChange = (e, index) => {
-  const newRate = e.target.value;
-  setTableData((prevData) => {
-    const newData = [...prevData];
-    newData[index].rate = newRate;
-    return newData;
-  });
-};
-
-// Validate rate on Enter key press
-const handleRateEnterKeyPress = (e, index) => {
-  if (e.key === "Enter") {
-    let rate = parseFloat(tableData[index].rate);
-    const mrp = parseFloat(tableData[index].mrp);
-    const prevRate = tableData[index].prevRate; // Use stored prevRate for resetting if invalid
-
-    // Check if rate is valid and does not exceed MRP
-    if (isNaN(rate) || rate <= 0 || rate > mrp) {
-      Swal.fire({
-        icon: "warning",
-        title: "Invalid Rate",
-        text: "Rate must be less than or equal to MRP and greater than 0",
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-      }).then(() => {
-        // Revert to previous rate after alert is closed
-        setTableData((prevData) => {
-          const newData = [...prevData];
-          newData[index].rate = prevRate.toFixed(2); // Reset to prevRate
-          return newData;
-        });
-
-        // Clear editing cell to avoid repeated pop-ups
-        setEditingCell({ rowIndex: null, field: null });
-      });
-      return;
-    }
-
-    // If valid, calculate discount and amount, and update prevRate
-    const discount = mrp - rate;
-    const quantity = parseFloat(tableData[index].quantity) || 0;
-    const amount = rate * quantity;
-
+  const handleRateFocus = (index) => {
     setTableData((prevData) => {
       const newData = [...prevData];
-      newData[index] = {
-        ...newData[index],
-        rate: rate.toFixed(2),
-        prevRate: rate, // Save the current rate as prevRate
-        discount: discount.toFixed(2),
-        amount: amount.toFixed(2),
-      };
+      newData[index].prevRate = parseFloat(newData[index].rate) || 0; // Store current rate as prevRate
       return newData;
     });
+  };
 
-    // Clear editing cell after valid entry
-    setEditingCell({ rowIndex: null, field: null });
-  }
-};
+  // Update rate while typing
+  const handleRateChange = (e, index) => {
+    const newRate = e.target.value;
+    setTableData((prevData) => {
+      const newData = [...prevData];
+      newData[index].rate = newRate;
+      return newData;
+    });
+  };
 
-  
+  // Validate rate on Enter key press
+  const handleRateEnterKeyPress = (e, index) => {
+    if (e.key === "Enter") {
+      let rate = parseFloat(tableData[index].rate);
+      const mrp = parseFloat(tableData[index].mrp);
+      const prevRate = tableData[index].prevRate; // Use stored prevRate for resetting if invalid
+
+      // Check if rate is valid and does not exceed MRP
+      if (isNaN(rate) || rate <= 0 || rate > mrp) {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Rate",
+          text: "Rate must be less than or equal to MRP and greater than 0",
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        }).then(() => {
+          // Revert to previous rate after alert is closed
+          setTableData((prevData) => {
+            const newData = [...prevData];
+            newData[index].rate = prevRate.toFixed(2); // Reset to prevRate
+            return newData;
+          });
+
+          // Clear editing cell to avoid repeated pop-ups
+          setEditingCell({ rowIndex: null, field: null });
+        });
+        return;
+      }
+
+      // If valid, calculate discount and amount, and update prevRate
+      const discount = mrp - rate;
+      const quantity = parseFloat(tableData[index].quantity) || 0;
+      const amount = rate * quantity;
+
+      setTableData((prevData) => {
+        const newData = [...prevData];
+        newData[index] = {
+          ...newData[index],
+          rate: rate.toFixed(2),
+          prevRate: rate, // Save the current rate as prevRate
+          discount: discount.toFixed(2),
+          amount: amount.toFixed(2),
+        };
+        return newData;
+      });
+
+      // Clear editing cell after valid entry
+      setEditingCell({ rowIndex: null, field: null });
+    }
+  };
 
   const calculateTotals = () => {
-    const totalAmount = tableData.reduce((total, item) => total + parseFloat(item.amount), 0);
-    const itemCount = tableData.reduce((count, item) => count + parseFloat(item.quantity), 0);
+    const totalAmount = tableData.reduce(
+      (total, item) => total + parseFloat(item.amount),
+      0
+    );
+    const itemCount = tableData.reduce(
+      (count, item) => count + parseFloat(item.quantity),
+      0
+    );
 
     // Update state variables or display values accordingly
     // For example:
@@ -303,74 +342,24 @@ const handleRateEnterKeyPress = (e, index) => {
     setItemCount(itemCount);
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   return (
     <div className="invoice-container" id="invoice_container_id">
       <div className="left-panel">
         <div className="header-info">
           <div>
-            <label>User: <span id="user_span">{user}</span></label>
+            <label>
+              User: <span id="user_span">{user}</span>
+            </label>
           </div>
           <div>
-            <label>Store: <span id="store_span">{store}</span></label>
+            <label>
+              Store: <span id="store_span">{store}</span>
+            </label>
           </div>
           <div>
-            <label>Start Time: <span id="start_time_span">{startTime}</span></label>
+            <label>
+              Start Time: <span id="start_time_span">{startTime}</span>
+            </label>
           </div>
         </div>
 
@@ -414,7 +403,12 @@ const handleRateEnterKeyPress = (e, index) => {
                   className="suggestion-item"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
-                  <strong>{suggestion.barcode}<br />{suggestion.productId} - {suggestion.productName} - RS: {suggestion.mrpPrice}</strong>
+                  <strong>
+                    {suggestion.barcode}
+                    <br />
+                    {suggestion.productId} - {suggestion.productName} - RS:{" "}
+                    {suggestion.mrpPrice}
+                  </strong>
                 </div>
               ))}
             </div>
@@ -426,7 +420,7 @@ const handleRateEnterKeyPress = (e, index) => {
             <thead>
               <tr>
                 <th>Name</th>
-                <th style={{ display: "none" }}>Cost</th>
+                <th style={{ textAlign:"center"}}>Cost</th>
                 <th>MRP</th>
                 <th>Discount</th>
                 <th>Rate</th>
@@ -438,33 +432,36 @@ const handleRateEnterKeyPress = (e, index) => {
               {tableData.map((item, index) => (
                 <tr key={index}>
                   <td>{item.name}</td>
-                  <td style={{ display: "none" }}>{item.cost}</td>
+                  <td style={{ textAlign: "center" }}>{item.cost}</td>
                   <td style={{ textAlign: "center" }}>{item.mrp}</td>
                   <td style={{ textAlign: "center" }}>{item.discount}</td>
 
-{/* Rate Cell */}
-<td
-  style={{ textAlign: "center" }}
-  onDoubleClick={() => setEditingCell({ rowIndex: index, field: "rate" })}
->
-  {editingCell.rowIndex === index && editingCell.field === "rate" ? (
-    <>
-      <input
-        type="text"
-        value={item.rate}
-        onFocus={() => handleRateFocus(index)} // Store previous rate on focus
-        onChange={(e) => handleRateChange(e, index)}
-        onKeyDown={(e) => handleRateEnterKeyPress(e, index)}
-        style={{
-          width: "60px",
-          textAlign: "center",
-        }}
-      />
-    </>
-  ) : (
-    item.rate
-  )}
-</td>
+                  {/* Rate Cell */}
+                  <td
+                    style={{ textAlign: "center" }}
+                    onDoubleClick={() =>
+                      setEditingCell({ rowIndex: index, field: "rate" })
+                    }
+                  >
+                    {editingCell.rowIndex === index &&
+                    editingCell.field === "rate" ? (
+                      <>
+                        <input
+                          type="text"
+                          value={item.rate}
+                          onFocus={() => handleRateFocus(index)} // Store previous rate on focus
+                          onChange={(e) => handleRateChange(e, index)}
+                          onKeyDown={(e) => handleRateEnterKeyPress(e, index)}
+                          style={{
+                            width: "60px",
+                            textAlign: "center",
+                          }}
+                        />
+                      </>
+                    ) : (
+                      item.rate
+                    )}
+                  </td>
 
                   {/* Quantity Cell */}
                   <td
@@ -473,13 +470,16 @@ const handleRateEnterKeyPress = (e, index) => {
                       setEditingCell({ rowIndex: index, field: "quantity" })
                     }
                   >
-                    {editingCell.rowIndex === index && editingCell.field === "quantity" ? (
+                    {editingCell.rowIndex === index &&
+                    editingCell.field === "quantity" ? (
                       <input
                         type="text"
                         value={item.quantity}
                         onChange={(e) => handleQuantityChange(e, index)}
                         onKeyDown={(e) => handleQuantityEnterKeyPress(e, index)}
-                        onBlur={() => setEditingCell({ rowIndex: null, field: null })}
+                        onBlur={() =>
+                          setEditingCell({ rowIndex: null, field: null })
+                        }
                         style={{ width: "50px", textAlign: "center" }}
                         autoFocus
                       />
@@ -493,13 +493,16 @@ const handleRateEnterKeyPress = (e, index) => {
                       src={removeImage}
                       alt="Delete"
                       onClick={() => handleDeleteRow(index)}
-                      style={{ cursor: "pointer", width: "20px", height: "20px" }}
+                      style={{
+                        cursor: "pointer",
+                        width: "20px",
+                        height: "20px",
+                      }}
                     />
                   </td>
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
 
@@ -511,8 +514,6 @@ const handleRateEnterKeyPress = (e, index) => {
             <span>{itemCount} item(s)</span>
           </div>
         </div>
-
-
 
         <div className="footer-container">
           <div className="footer-options">
@@ -650,8 +651,9 @@ const handleRateEnterKeyPress = (e, index) => {
               {categories.map((category) => (
                 <li
                   key={category.id}
-                  className={`category-item ${selectedCategory?.id === category.id ? "active" : ""
-                    }`}
+                  className={`category-item ${
+                    selectedCategory?.id === category.id ? "active" : ""
+                  }`}
                   onClick={() => handleCategoryClick(category)}
                 >
                   {category.catName}
