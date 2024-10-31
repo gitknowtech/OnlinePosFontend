@@ -220,7 +220,7 @@ export default function StockIn({ store }) {
     };
 
     return (
-        <div className="stock-container">
+        <div className="stock-container" id="stock-container">
             <div className="stock-left-panel">
                 <h2>Update Stock<hr /></h2>
                 <div className="stock-form">
@@ -228,7 +228,7 @@ export default function StockIn({ store }) {
                         type="text"
                         ref={inputRef}
                         placeholder="Scan Barcode or Enter Product Code, Name"
-                        className="input-field"
+                        className="input-field-stock-container"
                         value={searchQuery}
                         onChange={handleSearchInputChange}
                         onKeyDown={handleKeyDown}

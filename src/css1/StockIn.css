@@ -15,7 +15,7 @@
     border-radius: 8px;
 }
 
-.input-field {
+.input-field-stock-container {
     padding: 5px 10px;
     width: 100%;
     font-size: 12px;
@@ -162,6 +162,9 @@ h2, h3 {
     color: #fff;
 }
 
+
+
+
 /* Responsive styles */
 @media (max-width: 768px) {
     .stock-container {
@@ -202,6 +205,8 @@ h2, h3 {
         left: 5%;
     }
 }
+
+
 
 @media (max-width: 480px) {
     .stock-container {
