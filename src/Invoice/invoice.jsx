@@ -36,7 +36,12 @@ export default function Invoice() {
   const [suggestedPrice, setSuggestedPrice] = useState("");
   const [tableData, setTableData] = useState([]);
   const [productName, setProductName] = useState("");
+  const [lockedPrice, setLockedPrice] = useState(null); // Initialize lockedPrice state
   const [totalAmount, setTotalAmount] = useState("0.00");
+  const [isWholesale, setIsWholesale] = useState(false);
+  const [isDiscount, setIsDiscount] = useState(false);
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  const [totalDiscount, setTotalDiscount] = useState("0.00");
   const [itemCount, setItemCount] = useState(0);
   const [editingCell, setEditingCell] = useState({
     rowIndex: null,
@@ -84,6 +89,9 @@ export default function Invoice() {
     }
   };
 
+
+
+
   const fetchProductsByCategory = async (categoryId) => {
     try {
       const response = await axios.get(
@@ -99,6 +107,8 @@ export default function Invoice() {
     setSelectedCategory(category);
     fetchProductsByCategory(category.id);
   };
+
+
 
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
@@ -118,99 +128,133 @@ export default function Invoice() {
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    setProductName(suggestion.productName);
-    setBarcode(suggestion.barcode);
-    setCostPrice(suggestion.costPrice);
-    setPrice(suggestion.mrpPrice);
-    setSuggestedPrice(suggestion.mrpPrice);
-    setSuggestions([]);
-    setQty("");
-    priceInputRef.current.focus();
-  };
-
-
 
   const handlePriceEnterKeyPress = (e) => {
     if (e.key === "Enter") {
       const enteredPrice = parseFloat(price);
       const originalPrice = parseFloat(suggestedPrice);
+  
+      // Only validate locked price if neither checkbox is selected
+      if (!isWholesale && !isDiscount) {
+        if (enteredPrice < lockedPrice || enteredPrice > originalPrice) {
+          Swal.fire(
+            "Invalid Price",
+            `The price should be between the locked price of ${lockedPrice} and the MRP of ${originalPrice}`,
+            "error"
+          );
+          priceInputRef.current.focus(); // Refocus on the price input
+          return;
+        }
+      }
+  
+      setQty("1");
+      qtyInputRef.current.focus();
+    }
+  };
+  
+  
 
-      if (enteredPrice > originalPrice) {
-        Swal.fire(
-          "Invalid Price",
-          "The entered price cannot be greater than the original price",
-          "error"
+
+  const handleBarcodeEnterKeyPress = async (e) => {
+    if (e.key === "Enter") {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/products/search?query=${barcode}`
         );
-        priceInputRef.current.focus();
-      } else {
-        setQty("1");
-        qtyInputRef.current.focus();
+  
+        if (response.data.length > 0) {
+          const product = response.data[0];
+          setBarcode(product.barcode);
+          setCostPrice(product.costPrice);
+          setLockedPrice(product.lockedPrice);
+          setProductName(product.productName);
+          setSuggestedPrice(product.mrpPrice); // Set MRP for display in the MRP column
+  
+          // Determine and set price based on selection
+          if (isWholesale) {
+            setPrice(product.wholesalePrice);
+          } else if (isDiscount) {
+            setPrice(product.discountPrice);
+          } else {
+            setPrice(product.mrpPrice);
+          }
+  
+          setSuggestions([]);
+          priceInputRef.current.focus();
+        } else {
+          Swal.fire(
+            "Not Found",
+            "Product with this barcode does not exist",
+            "warning"
+          );
+        }
+      } catch (error) {
+        Swal.fire("Error", "Failed to fetch product by barcode", error);
       }
     }
   };
 
+  
 
 
- const handleBarcodeEnterKeyPress = async (e) => {
-  if (e.key === "Enter") {
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/api/products/search?query=${barcode}`
-      );
-
-      if (response.data.length > 0) {
-        const product = response.data[0];
-        setBarcode(product.barcode);
-        setPrice(product.mrpPrice);
-        setSuggestedPrice(product.mrpPrice);
-        setCostPrice(product.costPrice); // Set costPrice directly from response
-
-        priceInputRef.current.focus();
-      } else {
-        Swal.fire(
-          "Not Found",
-          "Product with this barcode does not exist",
-          "warning"
-        );
-      }
-    } catch (error) {
-      Swal.fire("Error", "Failed to fetch product by barcode", error);
+  
+  const handleSuggestionClick = (suggestion) => {
+    setProductName(suggestion.productName); // Set product name here
+    setBarcode(suggestion.barcode);
+    setCostPrice(suggestion.costPrice);
+  
+    // Determine the price based on checkbox selections
+    if (isWholesale) {
+      setPrice(suggestion.wholesalePrice);
+      setSuggestedPrice(suggestion.wholesalePrice);
+    } else if (isDiscount) {
+      setPrice(suggestion.discountPrice);
+      setSuggestedPrice(suggestion.discountPrice);
+    } else {
+      setPrice(suggestion.mrpPrice);
+      setSuggestedPrice(suggestion.mrpPrice);
     }
-  }
-};
-
-
-
- const handleQtyEnterKeyPress = (e) => {
-  if (e.key === "Enter" && qty) {
-    const discount = parseFloat(suggestedPrice) - parseFloat(price);
-    const amount = parseFloat(price) * parseFloat(qty);
-
-    setTableData((prevData) => [
-      ...prevData,
-      {
-        name: productName,
-        cost: costPrice.toFixed(2), // Use fetched costPrice directly
-        mrp: suggestedPrice,
-        discount: discount.toFixed(2),
-        rate: price,
-        quantity: qty,
-        amount: amount.toFixed(2),
-      },
-    ]);
-
-    // Reset inputs
-    setBarcode("");
-    setPrice("");
+  
+    setSuggestions([]);
     setQty("");
-    setSuggestedPrice("");
-    qtyInputRef.current.blur();
+    priceInputRef.current.focus();
+  };
+  
 
-    // Refocus on barcode input
-    barcodeInputRef.current.focus();
-  }
-};
+
+  const handleQtyEnterKeyPress = (e) => {
+    if (e.key === "Enter" && qty) {
+      const discount = parseFloat(suggestedPrice) - parseFloat(price);
+      const amount = parseFloat(price) * parseFloat(qty);
+  
+      setTableData((prevData) => [
+        ...prevData,
+        {
+          name: productName,
+          cost: costPrice.toFixed(2),
+          mrp: suggestedPrice, // Always use MRP for MRP column
+          discount: discount.toFixed(2),
+          rate: price, // Use price for the rate column
+          quantity: qty,
+          amount: amount.toFixed(2),
+        },
+      ]);
+  
+      // Reset inputs
+      setProductName("");
+      setBarcode("");
+      setPrice("");
+      setQty("");
+      setSuggestedPrice("");
+      qtyInputRef.current.blur();
+  
+      // Refocus on barcode input
+      barcodeInputRef.current.focus();
+    }
+  };
+  
+
+
 
 
   const handleDeleteRow = (index) => {
@@ -225,6 +269,10 @@ export default function Invoice() {
       return newData;
     });
   };
+
+
+
+
 
   const handleQuantityEnterKeyPress = (e, index) => {
     if (e.key === "Enter") {
@@ -255,92 +303,82 @@ export default function Invoice() {
     }
   };
 
-  // Store the previous rate on focus
-  const handleRateFocus = (index) => {
-    setTableData((prevData) => {
-      const newData = [...prevData];
-      newData[index].prevRate = parseFloat(newData[index].rate) || 0; // Store current rate as prevRate
-      return newData;
-    });
-  };
 
-  // Update rate while typing
-  const handleRateChange = (e, index) => {
-    const newRate = e.target.value;
-    setTableData((prevData) => {
-      const newData = [...prevData];
-      newData[index].rate = newRate;
-      return newData;
-    });
-  };
-
-  // Validate rate on Enter key press
-  const handleRateEnterKeyPress = (e, index) => {
-    if (e.key === "Enter") {
-      let rate = parseFloat(tableData[index].rate);
-      const mrp = parseFloat(tableData[index].mrp);
-      const prevRate = tableData[index].prevRate; // Use stored prevRate for resetting if invalid
-
-      // Check if rate is valid and does not exceed MRP
-      if (isNaN(rate) || rate <= 0 || rate > mrp) {
-        Swal.fire({
-          icon: "warning",
-          title: "Invalid Rate",
-          text: "Rate must be less than or equal to MRP and greater than 0",
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-        }).then(() => {
-          // Revert to previous rate after alert is closed
-          setTableData((prevData) => {
-            const newData = [...prevData];
-            newData[index].rate = prevRate.toFixed(2); // Reset to prevRate
-            return newData;
-          });
-
-          // Clear editing cell to avoid repeated pop-ups
-          setEditingCell({ rowIndex: null, field: null });
-        });
-        return;
-      }
-
-      // If valid, calculate discount and amount, and update prevRate
-      const discount = mrp - rate;
-      const quantity = parseFloat(tableData[index].quantity) || 0;
-      const amount = rate * quantity;
-
-      setTableData((prevData) => {
-        const newData = [...prevData];
-        newData[index] = {
-          ...newData[index],
-          rate: rate.toFixed(2),
-          prevRate: rate, // Save the current rate as prevRate
-          discount: discount.toFixed(2),
-          amount: amount.toFixed(2),
-        };
-        return newData;
-      });
-
-      // Clear editing cell after valid entry
-      setEditingCell({ rowIndex: null, field: null });
-    }
-  };
 
   const calculateTotals = () => {
     const totalAmount = tableData.reduce(
       (total, item) => total + parseFloat(item.amount),
       0
     );
-    const itemCount = tableData.reduce(
-      (count, item) => count + parseFloat(item.quantity),
+  
+    const totalQuantity = tableData.reduce(
+      (total, item) => total + parseFloat(item.quantity),
       0
     );
-
-    // Update state variables or display values accordingly
-    // For example:
+  
+    const totalDiscount = tableData.reduce(
+      (total, item) => total + parseFloat(item.discount) * parseFloat(item.quantity),
+      0
+    );
+  
+    const totalItems = tableData.length;
+  
     setTotalAmount(totalAmount.toFixed(2));
-    setItemCount(itemCount);
+    setTotalQuantity(totalQuantity);
+    setTotalDiscount(totalDiscount.toFixed(2));
+    setItemCount(totalItems);
   };
+  
+  
+
+
+  const handleCheckboxChange = async (type) => {
+    if (type === "wholesale") {
+      setIsWholesale(!isWholesale);
+      setIsDiscount(false); // Uncheck discount if wholesale is checked
+    } else if (type === "discount") {
+      setIsDiscount(!isDiscount);
+      setIsWholesale(false); // Uncheck wholesale if discount is checked
+    }
+  };
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   return (
     <div className="invoice-container" id="invoice_container_id">
@@ -383,7 +421,9 @@ export default function Invoice() {
             onChange={(e) => setPrice(e.target.value)}
             onKeyDown={handlePriceEnterKeyPress}
             ref={priceInputRef}
+            readOnly={isWholesale || isDiscount} // Lock the input
           />
+
           <input
             type="text"
             autoComplete="off"
@@ -435,33 +475,7 @@ export default function Invoice() {
                   <td style={{ textAlign: "center" }}>{item.cost}</td>
                   <td style={{ textAlign: "center" }}>{item.mrp}</td>
                   <td style={{ textAlign: "center" }}>{item.discount}</td>
-
-                  {/* Rate Cell */}
-                  <td
-                    style={{ textAlign: "center" }}
-                    onDoubleClick={() =>
-                      setEditingCell({ rowIndex: index, field: "rate" })
-                    }
-                  >
-                    {editingCell.rowIndex === index &&
-                    editingCell.field === "rate" ? (
-                      <>
-                        <input
-                          type="text"
-                          value={item.rate}
-                          onFocus={() => handleRateFocus(index)} // Store previous rate on focus
-                          onChange={(e) => handleRateChange(e, index)}
-                          onKeyDown={(e) => handleRateEnterKeyPress(e, index)}
-                          style={{
-                            width: "60px",
-                            textAlign: "center",
-                          }}
-                        />
-                      </>
-                    ) : (
-                      item.rate
-                    )}
-                  </td>
+                  <td style={{ textAlign: "center" }}>{item.rate}</td>
 
                   {/* Quantity Cell */}
                   <td
@@ -506,14 +520,22 @@ export default function Invoice() {
           </table>
         </div>
 
+
         <div className="total-display">
+          <div className="item-count" style={{ marginRight: "40px" }}>
+            <span>{itemCount} Item(s)</span>
+          </div>
+          <div className="total-quantity" style={{ marginRight: "40px" }}>
+            <span>{totalQuantity} Quantity(s)</span>
+          </div>
+          <div className="total-discount" style={{ marginRight: "40px" }}>
+            <span>Discount: {totalDiscount}</span>
+          </div>
           <div className="total-amount">
             <span>{totalAmount}</span>
           </div>
-          <div className="item-count">
-            <span>{itemCount} item(s)</span>
-          </div>
         </div>
+
 
         <div className="footer-container">
           <div className="footer-options">
@@ -528,6 +550,8 @@ export default function Invoice() {
                 <input
                   type="checkbox"
                   id="wholesale"
+                  checked={isWholesale}
+                  onChange={() => handleCheckboxChange("wholesale")}
                   style={{ marginLeft: "5px", marginRight: "5px" }}
                 />
                 <span>Wholesale (F8)</span>
@@ -544,6 +568,8 @@ export default function Invoice() {
                 <input
                   type="checkbox"
                   id="special"
+                  checked={isDiscount}
+                  onChange={() => handleCheckboxChange("discount")}
                   style={{ marginLeft: "5px", marginRight: "5px" }}
                 />
                 <span>Special (F9)</span>

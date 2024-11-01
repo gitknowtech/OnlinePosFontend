@@ -220,11 +220,12 @@ export default function ManageProducts({ store }) {
 
 
       {/* Product table */}
-      <div className="product-table">
+      <div className="product-table-product">
         <table>
           <thead>
             <tr>
               <th>No</th>
+              <th>Product ID</th>
               <th>Product Name</th>
               <th>Supplier</th>
               <th>Category</th>
@@ -239,9 +240,10 @@ export default function ManageProducts({ store }) {
           </thead>
           <tbody>
             {currentProducts.map((product, index) => (
-              <tr key={product.productId}>
+              <tr>
                 {/* No column to display continuous numbering */}
                 <td>{indexOfFirstProduct + index + 1}</td>
+                <td>{product.productId}</td>
                 <td>
                   <FontAwesomeIcon
                     icon={faPlusCircle}

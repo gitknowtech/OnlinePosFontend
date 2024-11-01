@@ -106,7 +106,7 @@ export default function ManageProductsRemoved({ store }) {
       </div>
 
       {/* Product table */}
-      <div className="product-table">
+      <div className="product-table-product">
         <table>
           <thead>
             <tr>

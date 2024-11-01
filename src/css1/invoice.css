@@ -191,10 +191,19 @@
 }
 
 .total-display .item-count {
-    font-size: 0.8rem;
-    color: #ccc;
+    font-size: 1rem;
+    color: #e2e1e1;
 }
 
+.total-display .total-discount {
+    font-size:1rem;
+    color: #e2e1e1;
+}
+
+.total-display .total-quantity {
+    font-size: 1rem;
+    color: #e2e1e1;
+}
 
 .right-panel {
     flex: 1;
