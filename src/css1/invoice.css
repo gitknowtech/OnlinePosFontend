@@ -244,73 +244,102 @@
 
 
 .display-panels {
-    display: flex;
-    gap: 20px;
     margin-top: 20px;
-}
-
-.category-display-panel, .product-display-panel {
-    flex: 1;
-    background-color: #f5f5f5;
-    border-radius: 5px;
     padding: 10px;
-    overflow-y: auto;
-    max-height: 400px; /* Adjust as needed */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f5f5f5;
 }
 
-/* Adjusting the category and product lists for the desired style */
-.category-list, .product-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+.keyboard-toggle {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
 }
 
-.category-item, .product-item {
-    padding: 8px;
+.keyboard-toggle button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #f0f0f0;
+    margin: 0 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    border-bottom: 1px solid #ccc; /* Optional: Divider between items */
-    font-size: 0.9rem;
-    color: #fff;
-    background-color: #800080; /* Purple background for category items */
-}
-
-.category-item {
-    background-color: #800080; /* Category item color */
-    text-align: center;
-}
-
-.product-item {
-    background-color: #d4a5a5; /* Light purple background for product items */
-    color: black;
-    text-align: left;
-}
-
-/* Highlight on hover and active selection */
-.category-item:hover, .product-item:hover {
-    background-color: #4b0082; /* Darker shade on hover */
-}
-
-.category-item.active {
-    background-color: #660066; /* Darker purple for selected category */
     font-weight: bold;
-}
-
-/* Optional: Adjusted scrollbar styling for better appearance */
-.category-display-panel::-webkit-scrollbar, .product-display-panel::-webkit-scrollbar {
-    width: 8px;
-}
-
-.category-display-panel::-webkit-scrollbar-thumb, .product-display-panel::-webkit-scrollbar-thumb {
-    background-color: #800080;
     border-radius: 4px;
+    transition: background-color 0.3s;
 }
 
+.keyboard-toggle .active {
+    background-color: #007bff;
+    color: white;
+}
+
+.numeric-keypad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.keypad-row {
+    display: flex;
+    justify-content: center;
+    margin: 5px 0;
+}
+
+.keypad-row button {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+}
+
+/* Add distinct color on hover for better feedback */
+.keypad-row button:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Alphabet keypad styling with ID */
+#alphabet-keypad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+#alphabet-keypad .keypad-row {
+    display: flex;
+    justify-content: center;
+    margin: 5px 0;
+}
+
+#alphabet-keypad .keypad-row button {
+    width: 50px;
+    height: 50px;
+    margin: 3px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+}
+
+#alphabet-keypad .keypad-row button:hover {
+    background-color: #007bff;
+    color: white;
+}
 
 h3 {
     text-align: center;
     margin-bottom: 10px;
 }
+
 
 #table_container_div{
     max-height: 300px;
