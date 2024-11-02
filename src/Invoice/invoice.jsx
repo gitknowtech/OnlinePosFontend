@@ -10,7 +10,7 @@ import "../css1/invoice.css";
 import productimage from "../assets/images/products.png";
 import bill from "../assets/images/bill.png";
 import customer from "../assets/images/customer.png";
-import expenses from "../assets/images/expenses.png";
+import expensesImage from "../assets/images/expenses.png";
 import monthsales from "../assets/images/month.png";
 import otheritem from "../assets/images/otheritem.png";
 import quatation from "../assets/images/quotation.png";
@@ -79,7 +79,7 @@ export default function Invoice() {
   //Expenses Model Related Content
 
   const [isExpensesModalOpen, setIsExpensesModalOpen] = useState(false);
-  const [expenses, setExpenses] = useState([]);
+  const [ setExpenses] = useState([]);
 
   const handleExpensesClick = () => setIsExpensesModalOpen(true);
   const handleCloseExpensesModal = () => setIsExpensesModalOpen(false);
@@ -542,6 +542,7 @@ export default function Invoice() {
                   id="wholesale"
                   checked={isWholesale}
                   onChange={() => handleCheckboxChange("wholesale")}
+                  
                   style={{ marginLeft: "5px", marginRight: "5px" }}
                 />
                 <span>Wholesale (F8)</span>
@@ -607,8 +608,8 @@ export default function Invoice() {
 
       {/* Right Side - Numeric and Alphabet Keyboards */}
       <div className="right-panel">
-        <div className="display-panels">
-          <div className="keyboard-toggle">
+        <div className="display-panels" style={{display:"none"}}>
+          <div className="keyboard-toggle" >
             <button
               onClick={() => setActiveKeyboard("numeric")}
               className={activeKeyboard === "numeric" ? "active" : ""}
@@ -730,7 +731,7 @@ export default function Invoice() {
           </button>
           <button onClick={handleExpensesClick}>
             <img
-              src={expenses}
+              src={expensesImage}
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
             My Expenses
