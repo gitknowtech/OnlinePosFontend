@@ -76,19 +76,13 @@ export default function Invoice() {
     setIsOtherItemModalOpen(false);
   };
 
-  //Expenses Model Related Content
-
+  // State to control expenses modal visibility
   const [isExpensesModalOpen, setIsExpensesModalOpen] = useState(false);
-  const [ setExpenses] = useState([]);
 
   const handleExpensesClick = () => setIsExpensesModalOpen(true);
   const handleCloseExpensesModal = () => setIsExpensesModalOpen(false);
 
-  const handleAddExpense = (newExpense) => {
-    setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
-  };
   
-
 
   useEffect(() => {
     if (location.state) {
@@ -753,13 +747,14 @@ export default function Invoice() {
 
         </div>
 
+
         {/* Render the ExpensesModel */}
         <ExpensesModel
           show={isExpensesModalOpen}
           onClose={handleCloseExpensesModal}
-          onAdd={handleAddExpense}
           user={user}
           store={store}
+          onAdd={(newExpense) => setTableData((prev) => [...prev, newExpense])}
         />
 
         {/* Render the OtherItemModel */}

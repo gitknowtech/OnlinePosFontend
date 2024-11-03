@@ -1,111 +1,103 @@
-/* Overlay */
-#modal-overlay-expenses {
+/* Modal container styling */
+#expenses_modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Align at the top */
-    padding-top: 100px; /* Offset from the top */
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
-}
+  }
   
-/* Modal Content */
-#modal-content-expenses {
-    background: #fff;
+  /* Modal content styling */
+  #expenses_modal_content {
+    background-color: #fff;
+    width: 50%;
     padding: 20px;
     border-radius: 8px;
-    width: 900px;
-    position: relative;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-/* Close Button */
-#modal-close-button-expenses {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
-    border: none;
-    padding: 5px, 5px;
-    border-radius: 100%;
-    color: #db0000;
-    font-size: 18px;
-    font-weight: 1000;
-    cursor: pointer;
-}
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+  }
   
-#modal-close-button-expenses:hover {
-    color: #000;
-}
-
-/* Modal Heading */
-#modal-content-expenses h2 {
-    margin-bottom: 20px;
+  /* Close button styling */
+  #expenses_close_button {
+    float: right;
     font-size: 24px;
-    color: #333;
-}
-
-/* Input Fields */
-#modal-content-expenses input[type="number"],
-#modal-content-expenses textarea {
-    width: 20%;
-    padding: 6px 10px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #888;
+  }
+  
+  #expenses_close_button:hover {
+    color: #000;
+  }
+  
+  /* Form group styling */
+  #expenses_form_group {
     margin-bottom: 15px;
+  }
+  
+  #expenses_form_group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  #expenses_form_group input {
+    width: 100%;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 12px;
-    text-align: left; /* Ensure text aligns left */
-}
-
-#modal-content-expenses textarea {
-    resize: vertical;
-    height: 40px;
-}
-
-/* Add Button */
-#modal-content-expenses button.add-button {
-    width: 100px;
-    padding: 8px;
-    background-color: #28a745;
+    box-sizing: border-box;
+  }
+  
+  /* Button styling */
+  #expenses_add_button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
     border: none;
     border-radius: 4px;
-    color: #fff;
-    font-size: 16px;
     cursor: pointer;
-}
-
-#modal-content-expenses button.add-button:hover {
-    background-color: #218838;
-}
-
-/* Expenses Table */
-.expenses-table {
+    margin-top: 10px;
+  }
+  
+  #expenses_add_button:hover {
+    background-color: #45a049;
+  }
+  
+  /* Table styling */
+  #expenses_table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    font-size: 14px;
-}
-
-.expenses-table th, .expenses-table td {
-    padding: 8px;
+  }
+  
+  #expenses_table th,
+  #expenses_table td {
     border: 1px solid #ddd;
-    text-align: left;
-}
-
-.expenses-table th {
-    background-color: #f8f9fa;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  #expenses_table th {
+    background-color: #f2f2f2;
     font-weight: bold;
-}
+  }
+  
+  #expenses_table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
 
-.expenses-table td[contenteditable="true"] {
-    background-color: #f9f9f9;
-    cursor: text;
-}
-
-.expenses-table td[contenteditable="true"]:focus {
-    outline: 2px solid #007BFF;
-}
+  #expenses_table input {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
