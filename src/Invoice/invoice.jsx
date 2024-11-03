@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import OtherItemModel from "../models/OtherItemModel";
+import ReturnModel from "../models/ReturnModel";
 import ExpensesModel from "../models/ExpensesModel";
 import "../css1/invoice.css";
 
@@ -43,45 +44,65 @@ export default function Invoice() {
   const [totalDiscount, setTotalDiscount] = useState("0.00");
   const [itemCount, setItemCount] = useState(0);
   const [activeKeyboard, setActiveKeyboard] = useState("numeric");
-  const [editingCell, setEditingCell] = useState({ rowIndex: null, field: null });
+  const [editingCell, setEditingCell] = useState({
+    rowIndex: null,
+    field: null,
+  });
 
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
   const barcodeInputRef = useRef(null);
 
-
-  // OtherItem model related contents 
+  
+  // OtherItem model related contents
   const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);
-
   const handleOtherItemClick = () => setIsOtherItemModalOpen(true);
   const handleCloseOtherItemModal = () => setIsOtherItemModalOpen(false);
-
-  const handleAddOtherItem = (item) => {
-    const { productName, productCost, productSale, qty, discount } = item;
-    const amount = parseFloat(productSale) * parseFloat(qty);
-  
-    setTableData((prevData) => [
-      ...prevData,
-      {
-        name: productName,
-        cost: parseFloat(productCost).toFixed(2),
-        mrp: parseFloat(productSale).toFixed(2),
-        discount: discount,
-        rate: parseFloat(productSale).toFixed(2),
-        quantity: parseFloat(qty).toFixed(2),
-        amount: amount.toFixed(2),
-      },
-    ]);
-  
-    setIsOtherItemModalOpen(false);
-  };
-
   // State to control expenses modal visibility
   const [isExpensesModalOpen, setIsExpensesModalOpen] = useState(false);
-
   const handleExpensesClick = () => setIsExpensesModalOpen(true);
   const handleCloseExpensesModal = () => setIsExpensesModalOpen(false);
+  // State to control the visibility of the ReturnModel
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      switch (e.key) {
+        case "F1":
+          e.preventDefault(); // Prevent default browser action for F1
+          barcodeInputRef.current?.focus(); // Focus the barcode input
+          break;
+        case "F4":
+          e.preventDefault(); // Prevent default browser action for F4
+          setIsOtherItemModalOpen((prev) => !prev); // Toggle OtherItemModel visibility
+          break;
+        case "F7":
+          e.preventDefault(); // Prevent default browser action for F7
+          handleReturnClick(); // Run the handleReturnClick function
+          break;
+        case "F6":
+          e.preventDefault(); // Prevent default browser action for F6
+          setIsExpensesModalOpen((prev) => !prev); // Toggle ExpensesModel visibility
+          break;
+        case "Escape":
+          e.preventDefault(); // Prevent default browser action for Escape
+          // Close all modals by setting their state to false
+          setIsOtherItemModalOpen(false);
+          setIsExpensesModalOpen(false);
+          setIsReturnModalOpen(false);
+          break;
+        default:
+          // Do nothing for other keys, allowing them to work as usual
+          break;
+      }
+    };
+  
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []); // No dependencies needed unless states/functions change
   
 
   useEffect(() => {
@@ -100,12 +121,97 @@ export default function Invoice() {
     setStartTime(formattedTime);
   }, [location.state]);
 
-
+  
 
   useEffect(() => {
     calculateTotals();
   }, [tableData]);
 
+  
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "F9") {
+        e.preventDefault(); // Prevent default browser action
+        setIsWholesale((prev) => !prev); // Toggle wholesale checkbox
+        if (!isWholesale) {
+          setIsDiscount(false); // Ensure discount is unchecked if wholesale is toggled on
+        }
+      } else if (e.key === "F8") {
+        e.preventDefault(); // Prevent default browser action
+        setIsDiscount((prev) => !prev); // Toggle discount checkbox
+        if (!isDiscount) {
+          setIsWholesale(false); // Ensure wholesale is unchecked if discount is toggled on
+        }
+      }
+    };
+  
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isWholesale, isDiscount]); // Add dependencies to keep the hook up-to-date
+  
+  
+
+
+  const handleAddOtherItem = (item) => {
+    const { productName, productCost, productSale, qty, discount } = item;
+    const amount = parseFloat(productSale) * parseFloat(qty);
+
+    setTableData((prevData) => [
+      ...prevData,
+      {
+        name: productName,
+        cost: parseFloat(productCost).toFixed(2),
+        mrp: parseFloat(productSale).toFixed(2),
+        discount: discount,
+        rate: parseFloat(productSale).toFixed(2),
+        quantity: parseFloat(qty).toFixed(2),
+        amount: amount.toFixed(2),
+      },
+    ]);
+
+    setIsOtherItemModalOpen(false);
+  };
+
+
+
+  // Function to handle when the "Return" button is clicked
+  const handleReturnClick = () => {
+    console.log("Return button clicked"); // Debugging log
+    setIsReturnModalOpen(true);
+  };
+
+  const handleCloseReturnModal = () => {
+    setIsReturnModalOpen(false);
+  };
+
+
+
+  const handleAddReturnItem = (item) => {
+    // Adjust the data to have negative values
+    const amount = -Math.abs(parseFloat(item.productSale) * parseFloat(item.qty));
+  
+    setTableData((prevData) => [
+      ...prevData,
+      {
+        name: item.productName,
+        cost: (-Math.abs(parseFloat(item.productCost))).toFixed(2),
+        mrp: (-Math.abs(parseFloat(item.mrp).toFixed(2))), // Ensure MRP retains original value
+        discount: (-Math.abs(parseFloat(item.discount))).toFixed(2),
+        rate: (-Math.abs(parseFloat(item.productSale))).toFixed(2),
+        quantity: (-Math.abs(parseFloat(item.qty))).toFixed(2),
+        amount: amount.toFixed(2),
+        type: 'return', // Add a 'type' field to mark this as a return
+      },
+    ]);
+  
+    setIsReturnModalOpen(false);
+  };
+  
+
+  
 
   const handleQuantityChange = (e, index) => {
     const newQuantity = e.target.value;
@@ -115,33 +221,35 @@ export default function Invoice() {
       return newData;
     });
   };
-  
 
   const handleQuantityEnterKeyPress = (e, index) => {
     if (e.key === "Enter") {
       let quantity = parseFloat(tableData[index].quantity);
       if (isNaN(quantity) || quantity <= 0) {
-        Swal.fire("Invalid Quantity", "Please enter a valid quantity", "warning");
+        Swal.fire(
+          "Invalid Quantity",
+          "Please enter a valid quantity",
+          "warning"
+        );
         return;
       }
       const rate = parseFloat(tableData[index].rate) || 0;
       const amount = quantity * rate;
-  
+
       setTableData((prevData) => {
         const newData = [...prevData];
         newData[index].quantity = quantity.toString();
         newData[index].amount = amount.toFixed(2);
         return newData;
       });
-  
+
       // Exit edit mode
       setEditingCell({ rowIndex: null, field: null });
-  
+
       // Refocus on the barcode input
       barcodeInputRef.current.focus();
     }
   };
-
 
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
@@ -161,12 +269,6 @@ export default function Invoice() {
     }
   };
 
-
-
-
-
-
-
   const handlePriceEnter = () => {
     const enteredPrice = parseFloat(price);
     const originalPrice = parseFloat(suggestedPrice);
@@ -185,12 +287,6 @@ export default function Invoice() {
     setQty("1");
     qtyInputRef.current.focus();
   };
-
-
-
-
-
-
 
   const handleBarcodeEnter = async () => {
     try {
@@ -229,11 +325,6 @@ export default function Invoice() {
   };
 
 
-
-
-
-
-
   const handleQtyEnter = () => {
     if (qty) {
       const discount = parseFloat(suggestedPrice) - parseFloat(price);
@@ -249,6 +340,7 @@ export default function Invoice() {
           rate: price,
           quantity: qty,
           amount: amount.toFixed(2),
+          type: 'new', // Mark as a new row
         },
       ]);
 
@@ -261,16 +353,9 @@ export default function Invoice() {
     }
   };
 
-
-
-
-
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
-
-
-
 
   const calculateTotals = () => {
     const totalAmount = tableData.reduce(
@@ -295,9 +380,6 @@ export default function Invoice() {
     setItemCount(tableData.length);
   };
 
-
-
-
   const handleVirtualEnter = () => {
     if (document.activeElement === barcodeInputRef.current) {
       handleBarcodeEnter();
@@ -307,10 +389,6 @@ export default function Invoice() {
       handleQtyEnter();
     }
   };
-  
-  
-
-
 
   const handleCheckboxChange = (type) => {
     if (type === "wholesale") {
@@ -321,9 +399,6 @@ export default function Invoice() {
       setIsWholesale(false);
     }
   };
-
-
-
 
   const handleSuggestionClick = (suggestion) => {
     setBarcode(suggestion.barcode);
@@ -344,37 +419,37 @@ export default function Invoice() {
     priceInputRef.current.focus();
   };
 
-
-
   const handleNumericInput = (value) => {
     if (document.activeElement) {
       document.activeElement.value += value;
-      document.activeElement.dispatchEvent(new Event("input", { bubbles: true }));
+      document.activeElement.dispatchEvent(
+        new Event("input", { bubbles: true })
+      );
     }
   };
-  
+
   const handleAlphabetInput = (value) => {
     if (document.activeElement) {
       document.activeElement.value += value;
-      document.activeElement.dispatchEvent(new Event("input", { bubbles: true }));
+      document.activeElement.dispatchEvent(
+        new Event("input", { bubbles: true })
+      );
     }
   };
-  
+
   const handleClear = () => {
     if (document.activeElement) {
       document.activeElement.value = "";
-      document.activeElement.dispatchEvent(new Event("input", { bubbles: true }));
+      document.activeElement.dispatchEvent(
+        new Event("input", { bubbles: true })
+      );
     }
   };
-
-
-
 
   return (
     <div className="invoice-container" id="invoice_container_id">
       <div className="left-panel">
         <div className="header-info">
-          
           <div>
             <label>
               User: <span id="user_span">{user}</span>
@@ -396,7 +471,7 @@ export default function Invoice() {
           <input
             type="text"
             autoComplete="off"
-            placeholder="Scan Barcode (Insert)"
+            placeholder="Scan Barcode (F1)"
             className="barcode-input"
             value={barcode}
             onChange={handleBarcodeChange}
@@ -460,26 +535,46 @@ export default function Invoice() {
             </thead>
             <tbody>
               {tableData.map((item, index) => (
-                <tr key={index}>
+                <tr
+                key={index}
+                className={
+                  item.type === "return"
+                    ? "return-row"
+                    : item.type === "new"
+                    ? "new-row"
+                    : ""
+                }
+                style={
+                  item.type === "return"
+                    ? { backgroundColor: "#fcd8d8" } // Light red for return
+                    : item.type === "new"
+                    ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                    : {}
+                }
+              >
+              
                   <td>{item.name}</td>
                   <td style={{ textAlign: "center" }}>{item.cost}</td>
                   <td style={{ textAlign: "center" }}>{item.mrp}</td>
                   <td style={{ textAlign: "center" }}>{item.discount}</td>
                   <td style={{ textAlign: "center" }}>{item.rate}</td>
-                   {/* Quantity Cell */}
-                   <td
+                  {/* Quantity Cell */}
+                  <td
                     style={{ textAlign: "center" }}
                     onDoubleClick={() =>
                       setEditingCell({ rowIndex: index, field: "quantity" })
                     }
                   >
-                    {editingCell.rowIndex === index && editingCell.field === "quantity" ? (
+                    {editingCell.rowIndex === index &&
+                    editingCell.field === "quantity" ? (
                       <input
                         type="text"
                         value={item.quantity}
                         onChange={(e) => handleQuantityChange(e, index)}
                         onKeyDown={(e) => handleQuantityEnterKeyPress(e, index)}
-                        onBlur={() => setEditingCell({ rowIndex: null, field: null })}
+                        onBlur={() =>
+                          setEditingCell({ rowIndex: null, field: null })
+                        }
                         style={{ width: "50px", textAlign: "center" }}
                         autoFocus
                       />
@@ -536,10 +631,9 @@ export default function Invoice() {
                   id="wholesale"
                   checked={isWholesale}
                   onChange={() => handleCheckboxChange("wholesale")}
-                  
                   style={{ marginLeft: "5px", marginRight: "5px" }}
                 />
-                <span>Wholesale (F8)</span>
+                <span>Wholesale (F9)</span>
               </label>
             </div>
             <div className="option-box">
@@ -557,10 +651,10 @@ export default function Invoice() {
                   onChange={() => handleCheckboxChange("discount")}
                   style={{ marginLeft: "5px", marginRight: "5px" }}
                 />
-                <span>Special (F9)</span>
+                <span>Special (F8)</span>
               </label>
             </div>
-            <div className="option-box">
+            <div className="option-box" onClick={handleReturnClick}>
               <label htmlFor="return">
                 <img
                   src={returnimage}
@@ -568,7 +662,7 @@ export default function Invoice() {
                   style={{ marginLeft: "5px" }}
                 />
                 <br />
-                <span>Return</span>
+                <span>Return (F7)</span>
               </label>
             </div>
             <div className="option-box">
@@ -602,8 +696,8 @@ export default function Invoice() {
 
       {/* Right Side - Numeric and Alphabet Keyboards */}
       <div className="right-panel">
-        <div className="display-panels" style={{display:"none"}}>
-          <div className="keyboard-toggle" >
+        <div className="display-panels" style={{ display: "none" }}>
+          <div className="keyboard-toggle">
             <button
               onClick={() => setActiveKeyboard("numeric")}
               className={activeKeyboard === "numeric" ? "active" : ""}
@@ -655,35 +749,50 @@ export default function Invoice() {
             <div id="alphabet-keypad">
               <div className="keypad-row">
                 {["A", "B", "C", "D", "E", "F"].map((letter) => (
-                  <button key={letter} onClick={() => handleAlphabetInput(letter)}>
+                  <button
+                    key={letter}
+                    onClick={() => handleAlphabetInput(letter)}
+                  >
                     {letter}
                   </button>
                 ))}
               </div>
               <div className="keypad-row">
                 {["G", "H", "I", "J", "K", "L"].map((letter) => (
-                  <button key={letter} onClick={() => handleAlphabetInput(letter)}>
+                  <button
+                    key={letter}
+                    onClick={() => handleAlphabetInput(letter)}
+                  >
                     {letter}
                   </button>
                 ))}
               </div>
               <div className="keypad-row">
                 {["M", "N", "O", "P", "Q", "R"].map((letter) => (
-                  <button key={letter} onClick={() => handleAlphabetInput(letter)}>
+                  <button
+                    key={letter}
+                    onClick={() => handleAlphabetInput(letter)}
+                  >
                     {letter}
                   </button>
                 ))}
               </div>
               <div className="keypad-row">
                 {["S", "T", "U", "V", "W", "X"].map((letter) => (
-                  <button key={letter} onClick={() => handleAlphabetInput(letter)}>
+                  <button
+                    key={letter}
+                    onClick={() => handleAlphabetInput(letter)}
+                  >
                     {letter}
                   </button>
                 ))}
               </div>
               <div className="keypad-row">
                 {["Y", "Z"].map((letter) => (
-                  <button key={letter} onClick={() => handleAlphabetInput(letter)}>
+                  <button
+                    key={letter}
+                    onClick={() => handleAlphabetInput(letter)}
+                  >
                     {letter}
                   </button>
                 ))}
@@ -695,7 +804,7 @@ export default function Invoice() {
 
         <div className="button-grid">
           {/* Action buttons with icons */}
-          <button  onClick={handleOtherItemClick}>
+          <button onClick={handleOtherItemClick}>
             <img
               src={otheritem}
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
@@ -744,17 +853,14 @@ export default function Invoice() {
             />
             Monthly Sale
           </button>
-
         </div>
 
-
-        {/* Render the ExpensesModel */}
         <ExpensesModel
           show={isExpensesModalOpen}
           onClose={handleCloseExpensesModal}
           user={user}
           store={store}
-          onAdd={(newExpense) => setTableData((prev) => [...prev, newExpense])}
+          onAdd={() => {}}
         />
 
         {/* Render the OtherItemModel */}
@@ -764,6 +870,12 @@ export default function Invoice() {
           onAdd={handleAddOtherItem}
         />
 
+        {/* Render the ReturnModel */}
+        <ReturnModel
+          show={isReturnModalOpen}
+          onClose={handleCloseReturnModal}
+          onAdd={handleAddReturnItem}
+        />
       </div>
     </div>
   );

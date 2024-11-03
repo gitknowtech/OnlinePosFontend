@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import ReactDOM from 'react-dom';
 import "./OtherItemModel.css";
+import PropTypes from "prop-types";
 import Swal from 'sweetalert2';
 
 
@@ -95,5 +96,13 @@ function OtherItemModel({ show, onClose, onAdd }) {
     document.body
   );
 }
+
+// Define prop types for the component
+OtherItemModel.propTypes = {
+  show: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onAdd: PropTypes.func.isRequired,
+};
+
 
 export default OtherItemModel;
