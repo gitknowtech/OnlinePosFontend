@@ -5,11 +5,13 @@ import {
   faUserPlus,
   faClipboardList,
   faChartLine,
-  faStore,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import "../css1/Customer.css"
 import AddCustomer from './AddCustomer';
+import ManageCustomer from "./ManageCustomer";
+
+
 
 const Customer = () => {
   const location = useLocation(); // Get location object
@@ -84,6 +86,7 @@ const Customer = () => {
       {/* Replace modal with embedded content */}
       <div className="customer-content">
         {activeContent === "addCustomer" && <AddCustomer UserName={UserName} store={Store} />}
+        {activeContent === "manageCustomer" && <ManageCustomer UserName={UserName} store={Store} />}
       </div>
     </div>
   );

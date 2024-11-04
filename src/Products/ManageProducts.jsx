@@ -6,6 +6,7 @@ import Modal from "react-modal"; // Modal component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../css/ManageProducts.css"; // Assuming a separate CSS file for table design
 import { faBell, faPlusCircle } from "@fortawesome/free-solid-svg-icons"; // Icons
+import ProductUpdate from "./ProductUpdate";
 
 export default function ManageProducts({ store }) {
   const [products, setProducts] = useState([]);
@@ -17,11 +18,11 @@ export default function ManageProducts({ store }) {
   const [modalType, setModalType] = useState(""); // Modal type state for different modals
   const [largeImage, setLargeImage] = useState(null); // State for the large image
 
-  // Fetch product data from the database
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/products/fetch_products");
+        console.log('Products fetched:', response.data); // Log to check data
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products: ", error);
@@ -34,36 +35,78 @@ export default function ManageProducts({ store }) {
     };
     fetchProducts();
   }, []);
+  
 
 
+  // Open edit modal and set the selected product
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+    setModalType("editProduct");
+    setModalIsOpen(true);
+  };
+
+  // Handle product update
+  const handleUpdate = async (updatedProduct) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/products/update_product/${updatedProduct.productId}`,
+        updatedProduct
+      );
+      if (response.status === 200) {
+        Swal.fire("Success", "Product updated successfully!", "success");
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.productId === updatedProduct.productId ? updatedProduct : product
+          )
+        );
+        setModalIsOpen(false); // Close modal after update
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `Failed to update product: ${error.response?.data?.message || error.message}`,
+      });
+    }
+  };
+  
 
   // Function to handle status toggle on double-click
   const handleStatusToggle = async (productId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     try {
-      const response = await axios.put(`http://localhost:5000/api/products/update_status/${productId}`, {
-        status: newStatus,
-      });
+      const response = await axios.put(
+        `http://localhost:5000/api/products/update_status/${productId}`,
+        {
+          status: newStatus,
+        }
+      );
       if (response.status === 200) {
         setProducts((prevProducts) =>
           prevProducts.map((product) =>
-            product.productId === productId ? { ...product, status: newStatus } : product
+            product.productId === productId
+              ? { ...product, status: newStatus }
+              : product
           )
         );
-        Swal.fire("Status Updated", `Product status changed to ${newStatus}`, "success");
+        Swal.fire(
+          "Status Updated",
+          `Product status changed to ${newStatus}`,
+          "success"
+        );
       }
     } catch (error) {
       console.error("Error updating product status:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: `Failed to update product status: ${error.response?.data?.message || error.message}`,
+        text: `Failed to update product status: ${
+          error.response?.data?.message || error.message
+        }`,
       });
     }
   };
-  
-
-  
 
   // Function to display Product Name (Sinhala) in the modal
   const handleViewProductNameSinhala = (productId) => {
@@ -116,8 +159,7 @@ export default function ManageProducts({ store }) {
     setModalType(""); // Reset modal type
   };
 
-
-  //delete products 
+  //delete products
   const handleDelete = async (productId) => {
     Swal.fire({
       title: `Are you sure you want to delete product "${productId}"?`,
@@ -129,43 +171,57 @@ export default function ManageProducts({ store }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`http://localhost:5000/api/products/delete_product/${productId}`);
+          const response = await axios.delete(
+            `http://localhost:5000/api/products/delete_product/${productId}`
+          );
           if (response.status === 200) {
-            setProducts(products.filter((product) => product.productId !== productId));
-            Swal.fire("Deleted!", `Product "${productId}" has been deleted.`, "success");
+            setProducts(
+              products.filter((product) => product.productId !== productId)
+            );
+            Swal.fire(
+              "Deleted!",
+              `Product "${productId}" has been deleted.`,
+              "success"
+            );
           }
         } catch (err) {
           console.error("Error deleting product:", err);
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: `Failed to delete product: ${err.response?.data?.message || err.message}`,
+            text: `Failed to delete product: ${
+              err.response?.data?.message || err.message
+            }`,
           });
         }
       }
     });
   };
 
-
-
-
   // Filter products based on the search term, store, or show all if store is 'all'
   const filteredProducts = products.filter((product) => {
-    const isStoreMatch = store === "all" || product.store === store || product.store === "all";
-    const isSearchMatch = product.productName.toLowerCase().includes(searchTerm.toLowerCase());
+    const isStoreMatch =
+      store === "all" || product.store === store || product.store === "all";
+    const isSearchMatch = product.productName
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     return isStoreMatch && isSearchMatch;
   });
 
   // Pagination logic
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
 
   // Calculate total pages
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   // Handle pagination next and previous
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handleNextPage = () =>
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
   // Handle changing the number of products displayed per page
@@ -191,33 +247,33 @@ export default function ManageProducts({ store }) {
     return pages;
   };
 
-
   return (
     <div className="manage-products">
+      <div className="controls-container">
+        {/* Search box */}
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
-<div className="controls-container">
-  {/* Search box */}
-  <div className="search-box">
-    <input
-      type="text"
-      placeholder="Search products..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-    />
-  </div>
-
-  {/* Products per page combo box */}
-  <div className="rows-per-page">
-    <label>Show: </label>
-    <select value={productsPerPage} onChange={handleProductsPerPageChange}>
-      <option value="10">10</option>
-      <option value="20">20</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-    </select>
-  </div>
-</div>
-
+        {/* Products per page combo box */}
+        <div className="rows-per-page">
+          <label>Show: </label>
+          <select
+            value={productsPerPage}
+            onChange={handleProductsPerPageChange}
+          >
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
 
       {/* Product table */}
       <div className="product-table-product">
@@ -240,7 +296,9 @@ export default function ManageProducts({ store }) {
           </thead>
           <tbody>
             {currentProducts.map((product, index) => (
-              <tr>
+              <tr key={product.productId}>
+                {" "}
+                {/* Added key prop here */}
                 {/* No column to display continuous numbering */}
                 <td>{indexOfFirstProduct + index + 1}</td>
                 <td>{product.productId}</td>
@@ -248,8 +306,10 @@ export default function ManageProducts({ store }) {
                   <FontAwesomeIcon
                     icon={faPlusCircle}
                     style={{ cursor: "pointer" }}
-                    onClick={() => handleViewProductNameSinhala(product.productId)}
-                  />{"  "}
+                    onClick={() =>
+                      handleViewProductNameSinhala(product.productId)
+                    }
+                  />{" "}
                   {product.productName}
                 </td>
                 <td>{product.selectedSupplier}</td>
@@ -260,7 +320,7 @@ export default function ManageProducts({ store }) {
                     icon={faPlusCircle}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewProfitDetails(product.productId)}
-                  />{"  "}
+                  />{" "}
                   {product.costPrice}
                 </td>
                 <td>
@@ -268,7 +328,7 @@ export default function ManageProducts({ store }) {
                     icon={faPlusCircle}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewMRPDetails(product.productId)}
-                  />{"  "}
+                  />{" "}
                   {product.mrpPrice}
                 </td>
                 <td>
@@ -276,27 +336,37 @@ export default function ManageProducts({ store }) {
                     icon={faBell}
                     style={{ cursor: "pointer" }}
                     onClick={() => handleViewStockAlert(product.productId)}
-                  />{"  "}
+                  />{" "}
                   {product.stockQuantity}
                 </td>
                 <td
-                  onDoubleClick={() => handleViewLargeImage(product.imageLink)} // Double-click to view large image
+                  onDoubleClick={() => handleViewLargeImage(product.imageLink)}
                   style={{ cursor: "pointer" }}
                 >
-                  <img src={product.imageLink} className="product-image" />
+                  <img
+                    src={product.imageLink}
+                    className="product-image"
+                    alt="Product"
+                  />
                 </td>
                 <td
-                  onDoubleClick={() => handleStatusToggle(product.productId, product.status)} // Double-click event for status toggle
+                  onDoubleClick={() =>
+                    handleStatusToggle(product.productId, product.status)
+                  }
                   style={{ cursor: "pointer" }}
                 >
-                  <span className={product.status === "active" ? "status-active" : "status-inactive"}>
+                  <span
+                    className={
+                      product.status === "active"
+                        ? "status-active"
+                        : "status-inactive"
+                    }
+                  >
                     {product.status === "active" ? "Active" : "Inactive"}
                   </span>
                 </td>
                 <td className="action-button">
-                  <button
-                    className="edit-button"
-                  >
+                <button className="edit-button" onClick={() => handleEdit(product)}>
                     Edit
                   </button>
                   <button
@@ -312,9 +382,11 @@ export default function ManageProducts({ store }) {
         </table>
       </div>
 
-       {/* Pagination */}
-       <div className="pagination">
-        <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+      {/* Pagination */}
+      <div className="pagination">
+        <button onClick={handlePrevPage} disabled={currentPage === 1}>
+          Previous
+        </button>
         {getPaginationNumbers().map((number) => (
           <button
             key={number}
@@ -324,19 +396,29 @@ export default function ManageProducts({ store }) {
             {number}
           </button>
         ))}
-        <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+        <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+          Next
+        </button>
       </div>
 
-      {/* Modals */}
+     {/* Product Update Modal */}
+     {selectedProduct && modalType === "editProduct" && (
+        <ProductUpdate
+          product={selectedProduct}
+          onClose={closeModal}
+          onUpdate={handleUpdate}
+        />
+      )}
+
+      {/* Other modals for displaying details */}
       <Modal
-        isOpen={modalIsOpen}
+        isOpen={modalIsOpen && modalType !== "editProduct"}
         onRequestClose={closeModal}
         contentLabel="Product Details"
         className="modal-content"
         overlayClassName="modal-overlay"
         ariaHideApp={false}
       >
-        {/* Modal content depending on selected product and modal type */}
         {selectedProduct && modalType === "productNameSinhala" ? (
           <div>
             <p>
@@ -367,10 +449,10 @@ export default function ManageProducts({ store }) {
         ) : selectedProduct && modalType === "profitView" ? (
           <div>
             <p>
-              <strong>Profit Price: </strong> {selectedProduct.profitAmount}
+              <strong>Profit Price:</strong> {selectedProduct.profitAmount}
             </p>
             <p>
-              <strong>Profit Percentage: </strong> {selectedProduct.profitPercentage}%
+              <strong>Profit Percentage:</strong> {selectedProduct.profitPercentage}%
             </p>
           </div>
         ) : selectedProduct && modalType === "stockAlert" ? (
@@ -381,7 +463,11 @@ export default function ManageProducts({ store }) {
           </div>
         ) : modalType === "largeImage" && largeImage ? (
           <div>
-            <img src={largeImage} alt="Product" style={{ width: "100%", height: "auto" }} />
+            <img
+              src={largeImage}
+              alt="Product"
+              style={{ width: "100%", height: "auto" }}
+            />
           </div>
         ) : (
           <p>No product details available.</p>

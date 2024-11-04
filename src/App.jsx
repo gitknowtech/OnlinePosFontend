@@ -8,7 +8,8 @@ import Product from './Products/Product';
 import Supplier from './Supplier/Supplier'; // Import Supplier
 import Stock from './Stock/Stock'; //Import Stock
 import Invoice from './Invoice/invoice';
-import Customer from './CustomerFile/customer';
+import Customer from './CustomerFile/Customer';
+import ManageCustomer from './CustomerFile/ManageCustomer';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="stock" element={<Stock/>}/>{/* Stock Route*/}
           <Route path="invoice" element={<Invoice/>}/>{/*Invoice Route */}
           <Route path="customer" element={<Customer/>}/>{/* customer router*/}
+          <Route path="manageCustomer" element={<ManageCustomer/>}/>{/* manage customer route*/}
           {/* You can add other nested routes under Dashboard */}
         </Route>
 

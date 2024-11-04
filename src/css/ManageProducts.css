@@ -54,7 +54,7 @@
 }
 
 .product-table-product th {
-  background-color: #f4f4f4;
+  background-color: #c2c1c1;
   font-weight: bold;
 }
 
@@ -87,11 +87,11 @@
 /* Action buttons styling */
 .action-button button {
   margin-right: 5px;
-  padding: 6px 12px;
+  padding: 6px 10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .edit-button {
