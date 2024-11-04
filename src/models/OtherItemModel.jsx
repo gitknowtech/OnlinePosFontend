@@ -61,6 +61,15 @@ function OtherItemModel({ show, onClose, onAdd }) {
       onClose();
     };
 
+
+    const handleKeyDown = (e) => {
+      if(e.key === 'Enter'){
+        handleAddToList();
+      }
+    }
+
+
+
   return ReactDOM.createPortal(
     <div id='modal-overlay-other-item'>
       <div id='modal-content-other-item'>
@@ -89,6 +98,7 @@ function OtherItemModel({ show, onClose, onAdd }) {
           placeholder="Quantity"
           value={qty}
           onChange={(e) => setQty(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <button className="add-button" onClick={handleAddToList}>Add to List</button>
       </div>

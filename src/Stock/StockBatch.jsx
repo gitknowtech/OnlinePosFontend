@@ -158,7 +158,7 @@ export default function StockBatch() {
             </div>
 
             {/* Product table */}
-            <div className="product-table" id="product_table">
+            <div  id="product-table-supplier-stock">
                 <table>
                     <thead>
                         <tr>

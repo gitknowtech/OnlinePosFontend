@@ -55,6 +55,14 @@ function ReturnModel({ show, onClose, onAdd }) {
     setProductMRP('');
   };
 
+
+  const handleKeyDown = (e) => {
+    if(e.key === 'Enter'){
+      handleAddToList();
+    }
+  }
+
+
   const handleAddToList = () => {
     if (!productName) {
       Swal.fire('Error', 'Please enter a product name', 'error');
@@ -137,9 +145,10 @@ function ReturnModel({ show, onClose, onAdd }) {
           type="text"
           placeholder="Quantity"
           value={qty}
-          onChange={(e) => setQty(e.target.value)}
+          onChange={(e) => setQty(e.target.value)} 
+          onKeyDown={handleKeyDown}
         />
-        <button className="add-button" onClick={handleAddToList}>Add to Return</button>
+        <button className="add-button-return-item" onClick={handleAddToList}>Add to Return</button>
       </div>
     </div>,
     document.body

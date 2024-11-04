@@ -4,6 +4,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import OtherItemModel from "../models/OtherItemModel";
 import ReturnModel from "../models/ReturnModel";
+import StockModel from "../models/StockModel";
 import ExpensesModel from "../models/ExpensesModel";
 import "../css1/invoice.css";
 
@@ -18,10 +19,10 @@ import quatation from "../assets/images/quotation.png";
 import returnimage from "../assets/images/return.png";
 import salesimage from "../assets/images/sales.png";
 import dayend from "../assets/images/end.png";
+import payment from "../assets/images/payment.png";
 import discount from "../assets/images/discount.png";
 import wholesale from "../assets/images/wholesale.png";
 import removeImage from "../assets/images/remove.png";
-import logout from "../assets/images/user-logout.png";
 
 export default function Invoice() {
   const location = useLocation();
@@ -63,7 +64,39 @@ export default function Invoice() {
   const handleExpensesClick = () => setIsExpensesModalOpen(true);
   const handleCloseExpensesModal = () => setIsExpensesModalOpen(false);
   // State to control the visibility of the ReturnModel
-  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);// State to control the visibility of the StockModel
+  const [isStockModalOpen, setIsStockModalOpen] = useState(false);
+  
+  // Function to open the StockModel
+  const handleStockClick = () => {
+    setIsStockModalOpen(true);
+  };
+
+  // Function to close the StockModel
+  const handleCloseStockModal = () => {
+    setIsStockModalOpen(false);
+  };
+
+  const handleProductSelect = (product) => {
+    if (!product || !product.barcode) {
+      console.error("Invalid product data:", product);
+      Swal.fire('Error', 'Invalid product data', 'error');
+      return;
+    }
+  
+    // Set only the barcode state
+    setBarcode(product.barcode);
+    setCostPrice(product.costPrice);
+    setProductName(product.productName);
+    setPrice(product.salePrice);
+    setSuggestedPrice(product.mrpPrice);
+    setLockedPrice(product.lockedPrice);
+  
+    // Refocus on barcode input after selection
+    barcodeInputRef.current.focus();
+  };
+  
+  
 
 
   useEffect(() => {
@@ -81,9 +114,13 @@ export default function Invoice() {
           e.preventDefault(); // Prevent default browser action for F7
           handleReturnClick(); // Run the handleReturnClick function
           break;
-        case "F6":
+        case "F3":
           e.preventDefault(); // Prevent default browser action for F6
           setIsExpensesModalOpen((prev) => !prev); // Toggle ExpensesModel visibility
+          break;
+        case "F6":
+          e.preventDefault();
+          setIsStockModalOpen((prev) => !prev);
           break;
         case "Escape":
           e.preventDefault(); // Prevent default browser action for Escape
@@ -91,6 +128,7 @@ export default function Invoice() {
           setIsOtherItemModalOpen(false);
           setIsExpensesModalOpen(false);
           setIsReturnModalOpen(false);
+          setIsStockModalOpen(false);
           break;
         default:
           // Do nothing for other keys, allowing them to work as usual
@@ -358,27 +396,33 @@ export default function Invoice() {
   };
 
   const calculateTotals = () => {
-    const totalAmount = tableData.reduce(
+    // Filter out items with negative discount or quantity
+    const validItems = tableData.filter(
+      (item) => parseFloat(item.discount) >= 0 && parseFloat(item.quantity) >= 0
+    );
+  
+    const totalAmount = validItems.reduce(
       (total, item) => total + parseFloat(item.amount),
       0
     );
-
-    const totalQuantity = tableData.reduce(
+  
+    const totalQuantity = validItems.reduce(
       (total, item) => total + parseFloat(item.quantity),
       0
     );
-
-    const totalDiscount = tableData.reduce(
+  
+    const totalDiscount = validItems.reduce(
       (total, item) =>
         total + parseFloat(item.discount) * parseFloat(item.quantity),
       0
     );
-
+  
     setTotalAmount(totalAmount.toFixed(2));
     setTotalQuantity(totalQuantity);
     setTotalDiscount(totalDiscount.toFixed(2));
-    setItemCount(tableData.length);
+    setItemCount(validItems.length);
   };
+  
 
   const handleVirtualEnter = () => {
     if (document.activeElement === barcodeInputRef.current) {
@@ -521,7 +565,7 @@ export default function Invoice() {
         </div>
 
         <div className="table-container" id="table_container_div">
-          <table className="product-table">
+          <table className="product-table" id="product-table-invoice">
             <thead>
               <tr>
                 <th>Name</th>
@@ -587,7 +631,26 @@ export default function Invoice() {
                     <img
                       src={removeImage}
                       alt="Delete"
-                      onClick={() => handleDeleteRow(index)}
+                      onClick={() => {
+                        Swal.fire({
+                          title: 'Are you sure?',
+                          text: "You won't be able to revert this!",
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#3085d6',
+                          cancelButtonColor: '#d33',
+                          confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            handleDeleteRow(index); // Call the delete function if confirmed
+                            Swal.fire(
+                              'Deleted!',
+                              'The row has been deleted.',
+                              'success'
+                            );
+                          }
+                        });
+                      }}
                       style={{
                         cursor: "pointer",
                         width: "20px",
@@ -665,7 +728,7 @@ export default function Invoice() {
                 <span>Return (F7)</span>
               </label>
             </div>
-            <div className="option-box">
+            <div className="option-box" onClick={handleStockClick}>
               <label htmlFor="stock">
                 <img
                   src={productimage}
@@ -673,7 +736,7 @@ export default function Invoice() {
                   style={{ marginLeft: "5px" }}
                 />
                 <br />
-                <span>Stock</span>
+                <span>Stock (F6)</span>
               </label>
             </div>
             <div className="option-box">
@@ -684,10 +747,10 @@ export default function Invoice() {
               </label>
             </div>
             <div className="option-box">
-              <label htmlFor="logout">
-                <img src={logout} alt="Logout" style={{ marginLeft: "5px" }} />
+              <label htmlFor="payment">
+                <img src={payment} alt="Payment" style={{ marginLeft: "15   px" }} />
                 <br />
-                <span>Logout</span>
+                <span>Payment (F9)</span>
               </label>
             </div>
           </div>
@@ -837,7 +900,7 @@ export default function Invoice() {
               src={expensesImage}
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
-            My Expenses
+            My Expenses (F3)
           </button>
           <button>
             <img
@@ -875,6 +938,13 @@ export default function Invoice() {
           show={isReturnModalOpen}
           onClose={handleCloseReturnModal}
           onAdd={handleAddReturnItem}
+        />
+
+        {/* Render the StockModel */}
+        <StockModel
+          show={isStockModalOpen}
+          onClose={handleCloseStockModal}
+          onProductSelect={handleProductSelect}
         />
       </div>
     </div>

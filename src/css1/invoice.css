@@ -97,11 +97,11 @@
     border-radius: 5px;
 }
 
-.product-table {
+#product-table-invoice {
     width: 100%;
     border-collapse: collapse;
 }
-.product-table th{
+#product-table-invoice th{
     padding: 8px;
     text-align: center;
     font-weight: 600;
@@ -110,7 +110,7 @@
     color: #fff;
 }
 
-.product-table td {
+#product-table-invoice td {
     padding: 5px;
     border: 1px solid #4d4b4b;
 }

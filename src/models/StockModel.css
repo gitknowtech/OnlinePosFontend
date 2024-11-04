@@ -1,0 +1,117 @@
+/* StockModel.css */
+
+/* Modal Overlay */
+#modal-overlay-StockModel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  /* Modal Content */
+  #modal-content-StockModel {
+    background-color: #fff;
+    width: 80%;
+    max-width: 900px;
+    height: 400px;
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* Close Button */
+  #modal-close-button-StockModel {
+    position: absolute;
+    right: 5px;
+    top: 0px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: red;
+    cursor: pointer;
+  }
+  
+  /* Title */
+  #title-StockModel {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  
+  /* Search Container */
+  #search-container-StockModel {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  #search-input-StockModel {
+    flex: 1;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  
+  /* Loading Indicator */
+  #loading-indicator-StockModel {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  /* Product Table Container */
+  #product-table-container-StockModel {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 700;
+    overflow-y: auto;
+  }
+  
+  #product-table-StockModel {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  #product-table-StockModel th,
+  #product-table-StockModel td {
+    padding: 10px;
+    font-size: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  #product-table-StockModel th {
+    background-color: #f7f7f7;
+    font-weight: bold;
+  }
+  
+  #product-table-StockModel td {
+    vertical-align: middle;
+  }
+  
+  .badge {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #fff;
+  }
+  
+  .badge-on {
+    background-color: green;
+  }
+  
+  .badge-off {
+    background-color: red;
+  }
+  
+
+  

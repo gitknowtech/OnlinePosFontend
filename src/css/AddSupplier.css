@@ -1,6 +1,6 @@
 .supplier-model {
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: #e4e7ff;
     border-radius: 8px;
     align-items: center;
     font-size: 12px;
@@ -74,7 +74,7 @@
   }
   
   .supplier-form button {
-    background-color: #75fd7c;
+    background-color: #7ad47f;
     padding: 10px 15px;
     font-size: 14px;
     font-weight: 800;
@@ -85,7 +85,7 @@
   }
   
   .supplier-form button:hover {
-    background-color: #109b17;
+    background-color: #0b5e0f;
     color: #fff;
     transition: all 0.3s ease-in-out;
   }
