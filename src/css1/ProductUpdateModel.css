@@ -97,19 +97,24 @@ h2 {
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  
+  font-weight: 600;
   transition: background-color 0.2s ease;
 }
 
 #product-update-actions button:hover {
   background-color: #0056b3;
+  font-weight: 600;
 }
 
 #product-update-actions button[type="button"] {
-  background-color: #6c757d;
+  background-color: #ff0909;
+  margin-right: 20px;
+  font-weight: 600;
 }
 
 #product-update-actions button[type="button"]:hover {
-  background-color: #5a6268;
+  background-color: #6e0707;
 }
 
 @media (max-width: 768px) {

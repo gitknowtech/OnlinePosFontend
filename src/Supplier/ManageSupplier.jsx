@@ -6,6 +6,7 @@ import Modal from "react-modal"; // Modal component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBank, faAddressBook, faWebAwesome, faMobile } from "@fortawesome/free-solid-svg-icons"; // Imported faEye icon
 import "../css/ManageSupplier.css"; // Assuming a separate CSS file for table design
+import SupplierUpdate from "./SupplierUpdate";
 
 export default function ManageSupplier({ store }) {
   const [suppliers, setSuppliers] = useState([]);
@@ -15,6 +16,8 @@ export default function ManageSupplier({ store }) {
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
   const [modalContent, setModalContent] = useState(null); // Content to display in the modal
   const [modalTitle, setModalTitle] = useState(""); // Title for the modalconst [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
+  const [showUpdateModal, setShowUpdateModal] = useState(false); // State for showing the update modal
+  const [selectedSupplierId, setSelectedSupplierId] = useState(null); // Supplier ID to edit
   
 
   // Fetch supplier data from the database
@@ -37,6 +40,25 @@ export default function ManageSupplier({ store }) {
     fetchSuppliers();
   }, []);
 
+
+  const handleEditClick = (supId) => {
+    setSelectedSupplierId(supId);
+    setShowUpdateModal(true);
+  };
+
+  const handleUpdateComplete = () => {
+    setShowUpdateModal(false);
+    // Refresh the supplier list after update
+    const fetchUpdatedSuppliers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/suppliers/get_suppliers");
+        setSuppliers(response.data);
+      } catch (error) {
+        console.error("Error refreshing suppliers:", error);
+      }
+    };
+    fetchUpdatedSuppliers();
+  };
 
 
   const handleAddressClick = async (Supid) => {
@@ -123,32 +145,51 @@ export default function ManageSupplier({ store }) {
   
 
 
-  // Function to fetch and display bank details in the modal
-  const handleViewBankDetails = async (supId) => {
-    try {
-      const response = await axios.get(`http://localhost:5000/api/suppliers/get_supplier_bank_details/${supId}`);
-      const bankDetails = response.data;
-      setModalTitle("Bank Details");
-      setModalContent(
-        <div>
-          <p>
-            <strong>Bank Name:</strong> {bankDetails.supBank}
-          </p>
-          <p>
-            <strong>Account Number:</strong> {bankDetails.supBankNo}
-          </p>
-        </div>
-      );
-      setModalIsOpen(true); // Open modal
-    } catch (error) {
-      console.error("Error fetching bank details:", error);
+  // Function to fetch and display all bank details for a specific supplier
+const handleViewBankDetails = async (supId) => {
+  try {
+    const response = await axios.get(`http://localhost:5000/api/suppliers/get_supplier_bank_details/${supId}`);
+    const bankDetailsList = response.data;
+
+    if (bankDetailsList.length === 0) {
       Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Could not fetch bank details.",
+        icon: "info",
+        title: "No Bank Details",
+        text: "No bank details found for this supplier.",
       });
+      return;
     }
-  };
+
+    setModalTitle("Bank Details");
+    setModalContent(
+      <div>
+        {bankDetailsList.map((bankDetail, index) => (
+          <div key={index} style={{ marginBottom: "10px" }}>
+            <p>
+              <strong>Bank Name:</strong> {bankDetail.supBank}
+            </p>
+            <p>
+              <strong>Account Number:</strong> {bankDetail.supBankNo}
+            </p>
+            <p>
+              <strong>Saved Time:</strong> {new Date(bankDetail.saveTime).toLocaleString()}
+            </p>
+            <hr />
+          </div>
+        ))}
+      </div>
+    );
+    setModalIsOpen(true); // Open modal
+  } catch (error) {
+    console.error("Error fetching bank details:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Could not fetch bank details.",
+    });
+  }
+};
+
 
   // Function to close the modal
   const closeModal = () => {
@@ -327,7 +368,9 @@ export default function ManageSupplier({ store }) {
                 </td>
                 <td>{supplier.store}</td>
                 <td>
-                  <button className="action-button edit-button">Edit</button>
+                <button className="action-button edit-button" onClick={() => handleEditClick(supplier.Supid)}>
+                    Edit
+                  </button>
                   <button className="action-button delete-button" onClick={() => handleDelete(supplier.Supid)}>
                     Delete
                   </button>
@@ -379,6 +422,15 @@ export default function ManageSupplier({ store }) {
         {modalContent ? modalContent : <p>No details available.</p>}
         <button onClick={closeModal}>Close</button>
       </Modal>
+
+       {/* Modal for updating supplier details */}
+       {showUpdateModal && (
+        <SupplierUpdate
+          supplierId={selectedSupplierId}
+          onClose={() => setShowUpdateModal(false)}
+          onUpdate={handleUpdateComplete}
+        />
+      )}
 
     </div>
   );

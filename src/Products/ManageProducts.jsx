@@ -35,7 +35,7 @@ export default function ManageProducts({ store }) {
     };
     fetchProducts();
   }, []);
-  
+
 
 
   // Open edit modal and set the selected product
@@ -70,7 +70,7 @@ export default function ManageProducts({ store }) {
       });
     }
   };
-  
+
 
   // Function to handle status toggle on double-click
   const handleStatusToggle = async (productId, currentStatus) => {
@@ -101,9 +101,8 @@ export default function ManageProducts({ store }) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: `Failed to update product status: ${
-          error.response?.data?.message || error.message
-        }`,
+        text: `Failed to update product status: ${error.response?.data?.message || error.message
+          }`,
       });
     }
   };
@@ -189,24 +188,33 @@ export default function ManageProducts({ store }) {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: `Failed to delete product: ${
-              err.response?.data?.message || err.message
-            }`,
+            text: `Failed to delete product: ${err.response?.data?.message || err.message
+              }`,
           });
         }
       }
     });
   };
 
-  // Filter products based on the search term, store, or show all if store is 'all'
+  // Enhanced filter products function for global search
   const filteredProducts = products.filter((product) => {
     const isStoreMatch =
       store === "all" || product.store === store || product.store === "all";
-    const isSearchMatch = product.productName
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+
+    const searchTermLower = searchTerm.toLowerCase();
+
+    // Check if the search term matches any of the relevant product fields
+    const isSearchMatch =
+      product.productName.toLowerCase().includes(searchTermLower) ||
+      product.productId.toLowerCase().includes(searchTermLower) ||
+      product.selectedSupplier.toLowerCase().includes(searchTermLower) ||
+      product.selectedCategory.toLowerCase().includes(searchTermLower) ||
+      product.selectedUnit.toLowerCase().includes(searchTermLower) ||
+      product.status.toLowerCase().includes(searchTermLower);
+
     return isStoreMatch && isSearchMatch;
   });
+
 
   // Pagination logic
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -366,7 +374,7 @@ export default function ManageProducts({ store }) {
                   </span>
                 </td>
                 <td className="action-button">
-                <button className="edit-button" onClick={() => handleEdit(product)}>
+                  <button className="edit-button" onClick={() => handleEdit(product)}>
                     Edit
                   </button>
                   <button
@@ -401,8 +409,8 @@ export default function ManageProducts({ store }) {
         </button>
       </div>
 
-     {/* Product Update Modal */}
-     {selectedProduct && modalType === "editProduct" && (
+      {/* Product Update Modal */}
+      {selectedProduct && modalType === "editProduct" && (
         <ProductUpdate
           product={selectedProduct}
           onClose={closeModal}

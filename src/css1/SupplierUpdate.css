@@ -1,0 +1,105 @@
+/* SupplierUpdate.css */
+
+/* Main modal container */
+#supplier-update-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    z-index: 1001;
+    width: 60%;
+    overflow-y: auto; /* Enable vertical scrolling for overflow */
+  }
+  
+  /* Form container with grid layout */
+  #form-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2-column layout */
+    gap: 15px; /* Space between columns */
+  }
+  
+  /* Form groups */
+  [id^="form-group-"] {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Labels */
+  [id^="form-group-"] label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  /* Inputs and selects */
+  [id^="form-group-"] input,
+  [id^="form-group-"] select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  /* Button group */
+  #button-group {
+    grid-column: span 2; /* Make the button group span both columns */
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  /* Save button */
+  #saveButton {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  #saveButton:hover {
+    background-color: #218838;
+  }
+  
+  /* Cancel button */
+  #cancelButton {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  #cancelButton:hover {
+    background-color: #c82333;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 600px) {
+    #supplier-update-modal {
+      padding: 15px;
+    }
+  
+    #form-container {
+      grid-template-columns: 1fr; /* Single column layout for smaller screens */
+    }
+  
+    [id^="form-group-"] input,
+    [id^="form-group-"] select {
+      padding: 6px;
+    }
+  
+    #saveButton,
+    #cancelButton {
+      padding: 8px 12px;
+    }
+  }
+  

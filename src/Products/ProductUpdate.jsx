@@ -23,7 +23,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
       try {
         const supplierResponse = await axios.get("http://localhost:5000/api/suppliers/get_suppliers");
         setSupplierList(supplierResponse.data);
-      } catch  {
+      } catch {
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -34,7 +34,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
       try {
         const categoryResponse = await axios.get("http://localhost:5000/api/categories/get_categories");
         setCategoryList(categoryResponse.data);
-      } catch  {
+      } catch {
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -45,7 +45,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
       try {
         const unitResponse = await axios.get("http://localhost:5000/api/units/get_units");
         setUnitList(unitResponse.data);
-      } catch  {
+      } catch {
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -56,7 +56,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
       try {
         const batchResponse = await axios.get("http://localhost:5000/api/batches/get_batches");
         setBatchList(batchResponse.data);
-      } catch  {
+      } catch {
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -89,59 +89,65 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
     }
   };
 
-  const calculateDiscountFromPercentage = () => {
+
+  // Additional functions to handle calculations based on user input
+  const handleDiscountBlur = () => {
     const mrp = parseFloat(formData.mrpPrice) || 0;
-    const discountPercent = parseFloat(formData.discountPercentage) || 0;
-    const discountAmount = (mrp * discountPercent) / 100;
-    const realPrice = mrp - discountAmount;
-  
-    setFormData((prev) => ({
-      ...prev,
-      discountPrice: discountAmount.toFixed(2),
-      realPrice: realPrice.toFixed(2),
-    }));
-  
-    if (realPrice > mrp || realPrice < 0) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Discounted Price cannot be greater or negative than MRP Price!",
-      });
+    const discountPrice = parseFloat(formData.discountPrice) || 0;
+
+    if (mrp && discountPrice) {
+      const discountPercentage = ((mrp - discountPrice) / mrp) * 100;
       setFormData((prev) => ({
         ...prev,
-        discountPrice: "",
-        realPrice: "",
-      }));
-    }
-  };
-  
-  const calculateWholesaleFromPercentage = () => {
-    const mrp = parseFloat(formData.mrpPrice) || 0;
-    const wholesalePercent = parseFloat(formData.wholesalePercentage) || 0;
-    const wholesaleAmount = (mrp * wholesalePercent) / 100;
-    const realWholesalePrice = mrp - wholesaleAmount;
-  
-    setFormData((prev) => ({
-      ...prev,
-      wholesalePrice: wholesaleAmount.toFixed(2),
-      realWholesalePrice: realWholesalePrice.toFixed(2),
-    }));
-  
-    if (realWholesalePrice > mrp || realWholesalePrice < 0) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Wholesale Price cannot be greater or negative than MRP Price!",
-      });
-      setFormData((prev) => ({
-        ...prev,
-        wholesalePrice: "",
-        realWholesalePrice: "",
+        discountPercentage: discountPercentage.toFixed(2),
       }));
     }
   };
 
-  
+  const handleDiscountPercentageBlur = () => {
+    const mrp = parseFloat(formData.mrpPrice) || 0;
+    const discountPercentage = parseFloat(formData.discountPercentage) || 0;
+
+    if (mrp && discountPercentage) {
+      const discountPrice = mrp - (mrp * discountPercentage) / 100;
+      setFormData((prev) => ({
+        ...prev,
+        discountPrice: discountPrice.toFixed(2),
+      }));
+    }
+  };
+
+  const handleWholesaleBlur = () => {
+    const mrp = parseFloat(formData.mrpPrice) || 0;
+    const wholesalePrice = parseFloat(formData.wholesalePrice) || 0;
+
+    if (mrp && wholesalePrice) {
+      const wholesalePercentage = ((mrp - wholesalePrice) / mrp) * 100;
+      setFormData((prev) => ({
+        ...prev,
+        wholesalePercentage: wholesalePercentage.toFixed(2),
+      }));
+    }
+  };
+
+  const handleWholesalePercentageBlur = () => {
+    const mrp = parseFloat(formData.mrpPrice) || 0;
+    const wholesalePercentage = parseFloat(formData.wholesalePercentage) || 0;
+
+    if (mrp && wholesalePercentage) {
+      const wholesalePrice = mrp - (mrp * wholesalePercentage) / 100;
+      setFormData((prev) => ({
+        ...prev,
+        wholesalePrice: wholesalePrice.toFixed(2),
+      }));
+    }
+  };
+
+  // Add these to the input fields as onBlur handlers
+
+
+
+
   const calculateProfit = () => {
     const cost = parseFloat(formData.costPrice) || 0;
     const mrp = parseFloat(formData.mrpPrice) || 0;
@@ -158,7 +164,9 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
+      // Format date fields to 'YYYY-MM-DD'
       const formattedFormData = {
         ...formData,
         manufacturingDate: formData.manufacturingDate
@@ -173,6 +181,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
         `http://localhost:5000/api/products/update_product/${formData.productId}`,
         formattedFormData
       );
+
       Swal.fire({
         icon: "success",
         title: "Product Updated",
@@ -187,6 +196,8 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
       });
     }
   };
+
+
 
   return (
     <div id="product-update-modal-overlay">
@@ -296,33 +307,57 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
             </div>
             <div className="form-group">
               <label>Discount Percentage</label>
-              <input type="number" name="discountPercentage" value={formData.discountPercentage} onChange={handleInputChange} onBlur={calculateDiscountFromPercentage} />
+              <input
+                type="number"
+                name="discountPercentage"
+                value={formData.discountPercentage}
+                onChange={handleInputChange}
+                onBlur={handleDiscountPercentageBlur} // Calculate discount price based on percentage
+              />
             </div>
             <div className="form-group">
               <label>Discount Price</label>
-              <input type="number" name="discountPrice" value={formData.discountPrice} readOnly />
+              <input
+                type="number"
+                name="discountPrice"
+                value={formData.discountPrice}
+                onChange={handleInputChange}
+                onBlur={handleDiscountBlur} // Calculate discount percentage based on price
+              />
             </div>
             <div className="form-group">
               <label>Wholesale Percentage</label>
-              <input type="number" name="wholesalePercentage" value={formData.wholesalePercentage} onChange={handleInputChange} onBlur={calculateWholesaleFromPercentage} />
+              <input
+                type="number"
+                name="wholesalePercentage"
+                value={formData.wholesalePercentage}
+                onChange={handleInputChange}
+                onBlur={handleWholesalePercentageBlur} // Calculate wholesale price based on percentage
+              />
             </div>
             <div className="form-group">
               <label>Wholesale Price</label>
-              <input type="number" name="wholesalePrice" value={formData.wholesalePrice} readOnly />
+              <input
+                type="number"
+                name="wholesalePrice"
+                value={formData.wholesalePrice}
+                onChange={handleInputChange}
+                onBlur={handleWholesaleBlur} // Calculate wholesale percentage based on price
+              />
             </div>
             <div className="form-group">
               <label>Locked Price</label>
               <input type="number" name="lockedPrice" value={formData.lockedPrice} onChange={handleInputChange} />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{display:"none"}}>
               <label>Store</label>
-              <input type="text" name="store" value={formData.store} onChange={handleInputChange} />
+              <input type="text" name="store" value={formData.store} readOnly onChange={handleInputChange} />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{display:"none"}}>
               <label>User</label>
-              <input type="text" name="user" value={formData.user} onChange={handleInputChange} />
+              <input type="text" name="user" value={formData.user} readOnly onChange={handleInputChange} />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{display:"none"}}>
               <label>Status</label>
               <select name="status" value={formData.status} onChange={handleInputChange}>
                 <option value="active">Active</option>

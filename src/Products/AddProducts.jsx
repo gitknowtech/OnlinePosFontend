@@ -392,7 +392,8 @@ export default function AddProducts({ UserName, store }) {
       });
       return;
     }
-
+  
+    // Prepare the product data to be saved, using real prices for wholesalePrice and discountPrice
     const productData = {
       productId,
       productName,
@@ -408,9 +409,9 @@ export default function AddProducts({ UserName, store }) {
       mrpPrice,
       profitPercentage,
       profitAmount,
-      discountPrice,
+      discountPrice: realPrice, // Save realPrice as discountPrice
       discountPercentage,
-      wholesalePrice,
+      wholesalePrice: realWholesalePrice, // Save realWholesalePrice as wholesalePrice
       wholesalePercentage,
       lockedPrice,
       openingBalance,
@@ -420,7 +421,7 @@ export default function AddProducts({ UserName, store }) {
       imageLink,
       status: isActive ? "Active" : "Inactive",
     };
-
+  
     try {
       const response = await axios.post(
         "http://localhost:5000/api/products/create_product",
@@ -444,6 +445,7 @@ export default function AddProducts({ UserName, store }) {
       });
     }
   };
+  
 
   const resetFormFields = () => {
     setProductId("");
