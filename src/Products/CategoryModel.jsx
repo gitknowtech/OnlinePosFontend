@@ -325,6 +325,7 @@ export default function CategoryModel({ UserName, store }) {
                   )}
 
                   <button
+                  id="delete-button-category-model"
                     className="delete-button"
                     onClick={() => handleDelete(category.catName)}
                   >

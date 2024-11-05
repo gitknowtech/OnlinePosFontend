@@ -142,7 +142,6 @@ export default function AddCustomer({ UserName, store }) {
 
   return (
     <div id="customer-model">
-      <h2 id="customer-header">Customer Details</h2>
       <div id="customer-form">
         <div id="cusId-group">
           <label htmlFor="cusId">Customer ID</label>
@@ -166,7 +165,6 @@ export default function AddCustomer({ UserName, store }) {
           />
         </div>
 
-        <h2 id="location-header">Customer Address</h2><br />
         <div id="address1-group">
           <label htmlFor="address1">Address 1</label>
           <input
@@ -189,7 +187,6 @@ export default function AddCustomer({ UserName, store }) {
           />
         </div>
 
-        <h2 id="contact-header">Contact Details</h2><br />
         <div id="mobile1-group">
           <label htmlFor="mobile1">Mobile 1</label>
           <input

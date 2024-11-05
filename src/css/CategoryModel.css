@@ -1,6 +1,6 @@
 .category-model {
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #bfd2f5;
   border-radius: 8px;
   font-weight: 600;
 }
@@ -53,6 +53,7 @@
   width: 100%;
   font-size: 12px;
   border-collapse: collapse;
+  background-color: #fff;
 }
 
 .category-grid th, .category-grid td {
@@ -62,7 +63,8 @@
 }
 
 .category-grid th {
-  background-color: #f2f2f2;
+  background-color: #636161;
+  color: #fff;
 }
 
 .editing-row {
@@ -153,7 +155,7 @@
 }
 
 /* Style the delete button text to be red */
-.button-td .delete-button {
+.button-td #delete-button-category-model {
   background-color: #ee857b;
   cursor: pointer;
   border: 1px solid gray;
@@ -176,7 +178,7 @@
   margin-right: 10px;
 }
 
-.button-td .delete-button:hover{
+.button-td #delete-button-category-model:hover{
   background-color: rgb(133, 5, 5);
   transition: all 0.3s ease-in-out;
   color: #fff;

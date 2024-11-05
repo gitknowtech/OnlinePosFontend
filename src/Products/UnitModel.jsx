@@ -316,6 +316,7 @@ export default function UnitModel({ UserName, store }) {
                   )}
 
                   <button
+                  id="delete-button-unit-model"
                     className="delete-button"
                     onClick={() => handleDelete(unit.unitName)}
                   >

@@ -99,52 +99,52 @@ export default function SupplierUpdate({ supplierId, onClose, onUpdate }) {
 
           <div id="form-group-Supname">
             <label htmlFor="Supname">Supplier Name</label>
-            <input type="text" id="Supname" name="Supname" value={supplierData.Supname} onChange={handleChange} />
+            <input type="text" id="Supname" name="Supname" autoComplete="off" value={supplierData.Supname} readOnly onChange={handleChange} />
           </div>
 
           <div id="form-group-address1">
             <label htmlFor="address1">Address 1</label>
-            <input type="text" id="address1" name="address1" value={supplierData.address1} onChange={handleChange} />
+            <input type="text" id="address1" name="address1" autoComplete="off" value={supplierData.address1} onChange={handleChange} />
           </div>
 
           <div id="form-group-address2">
             <label htmlFor="address2">Address 2</label>
-            <input type="text" id="address2" name="address2" value={supplierData.address2} onChange={handleChange} />
+            <input type="text" id="address2" name="address2" autoComplete="off" value={supplierData.address2} onChange={handleChange} />
           </div>
 
           <div id="form-group-address3">
             <label htmlFor="address3">Address 3</label>
-            <input type="text" id="address3" name="address3" value={supplierData.address3} onChange={handleChange} />
+            <input type="text" id="address3" name="address3" autoComplete="off" value={supplierData.address3} onChange={handleChange} />
           </div>
 
           <div id="form-group-mobile1">
             <label htmlFor="mobile1">Mobile 1</label>
-            <input type="text" id="mobile1" name="mobile1" value={supplierData.mobile1} onChange={handleChange} />
+            <input type="text" id="mobile1" name="mobile1" autoComplete="off" value={supplierData.mobile1} onChange={handleChange} />
           </div>
 
           <div id="form-group-mobile2">
             <label htmlFor="mobile2">Mobile 2</label>
-            <input type="text" id="mobile2" name="mobile2" value={supplierData.mobile2} onChange={handleChange} />
+            <input type="text" id="mobile2" name="mobile2" autoComplete="off" value={supplierData.mobile2} onChange={handleChange} />
           </div>
 
           <div id="form-group-mobile3">
             <label htmlFor="mobile3">Mobile 3</label>
-            <input type="text" id="mobile3" name="mobile3" value={supplierData.mobile3} onChange={handleChange} />
+            <input type="text" id="mobile3" name="mobile3" autoComplete="off" value={supplierData.mobile3} onChange={handleChange} />
           </div>
 
           <div id="form-group-email">
             <label htmlFor="email">Email</label>
-            <input type="email" id="email" name="email" value={supplierData.email} onChange={handleChange} />
+            <input type="email" id="email" name="email" autoComplete="off" value={supplierData.email} onChange={handleChange} />
           </div>
 
           <div id="form-group-website">
             <label htmlFor="website">Website</label>
-            <input type="text" id="website" name="website" value={supplierData.website} onChange={handleChange} />
+            <input type="text" id="website" name="website" autoComplete="off" value={supplierData.website} onChange={handleChange} />
           </div>
 
           <div id="form-group-idno">
             <label htmlFor="idno">ID Number</label>
-            <input type="text" id="idno" name="idno" value={supplierData.idno} onChange={handleChange} />
+            <input type="text" id="idno" name="idno" autoComplete="off" value={supplierData.idno} onChange={handleChange} />
           </div>
 
           <div id="form-group-company">
@@ -171,7 +171,7 @@ export default function SupplierUpdate({ supplierId, onClose, onUpdate }) {
 
           <div id="form-group-accountNumber">
             <label htmlFor="accountNumber">Account Number</label>
-            <input type="text" id="accountNumber" name="accountNumber" value={supplierData.accountNumber} onChange={handleChange} />
+            <input type="text" id="accountNumber" name="accountNumber" autoComplete="off" value={supplierData.accountNumber} onChange={handleChange} />
           </div>
         </div>
 

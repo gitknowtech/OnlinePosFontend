@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2'; // Import SweetAlert2
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons'; // Import search icon
 import "../css/BankModel.css"; // Assuming similar styles for BankModel
 
 export default function BankModel({ UserName, store }) {
@@ -195,7 +193,7 @@ export default function BankModel({ UserName, store }) {
 
       <div className="bank-grid">
         <table>
-          <thead>
+          <thead id='bank-grid-header'>
             <tr>
               <th>No</th>
               <th>Bank Name</th>
@@ -215,7 +213,7 @@ export default function BankModel({ UserName, store }) {
                 <td>{bank.saveTime}</td>
                 <td className="button-td">
                   <button
-                    className="delete-button"
+                    className="delete-button" id='delete-button-bank-model'
                     onClick={() => handleDelete(bank.bankName)}
                   >
                     Delete

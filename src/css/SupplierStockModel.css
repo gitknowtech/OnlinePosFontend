@@ -1,0 +1,72 @@
+.modal-content-stock-update-container {
+  max-width: 1000px; /* Set a fixed maximum width for the modal */
+  width: 120%; /* Ensure the modal width adapts up to 90% of the viewport */
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  margin-top: 30px;
+}
+
+#product-table-container {
+  max-height: 500px; /* Ensure the table container can scroll vertically */
+  overflow-y: auto;
+  width: 100%; /* Make the container span the modal's width */
+}
+
+#product-table {
+  width: 100%; /* Ensure the table uses the full width of its container */
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 12px; /* Adjust font size for readability */
+  table-layout: fixed; /* Ensure the columns have a fixed width */
+}
+
+#product-table th,
+#product-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  overflow: hidden; /* Prevents content from overflowing */
+  font-weight: 600;
+  text-overflow: ellipsis; /* Adds "..." for overflowing text */
+  white-space: nowrap; /* Prevents text from wrapping */
+}
+
+#product-table th{
+    text-align: center;
+    font-weight: 600;
+}
+
+#product-table th {
+  background-color: #777676;
+  color: #fff;
+  font-weight: bold;
+}
+
+#quantity-filter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 20px; /* Space between input fields */
+}
+
+#minQuantity,
+#maxQuantity {
+  width: 120px; /* Increase the width of the input fields */
+  padding: 5px;
+  font-weight: 800;
+}
+
+#close-button {
+  padding: 5px 15px;
+  background-color: #d33;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 20px; /* Adds spacing above the button */
+}
+
+#close-button:hover {
+  background-color: #c12c2c;
+}

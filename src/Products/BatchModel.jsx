@@ -219,7 +219,7 @@ export default function BatchModel({ UserName, store }) {
 
       <div className="batch-grid">
         <table>
-          <thead>
+          <thead id="batch-grid-batch-model">
             <tr>
               <th>No</th>
               <th>Batch Name</th>

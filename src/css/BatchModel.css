@@ -1,6 +1,6 @@
 .batch-model {
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: #cedafa;
     border-radius: 8px;
     font-weight: 600;
   }
@@ -39,6 +39,7 @@
   .batch-model .batch-grid table {
     width: 100%;
     font-size: 12px;
+    background-color: #fff;
     border-collapse: collapse;
   }
   
@@ -49,8 +50,10 @@
     text-align: left;
   }
   
-  .batch-grid th {
-    background-color: #f2f2f2;
+#batch-grid-batch-model th {
+  background-color: #706f6f;
+  font-weight: bold;
+  color: #fff;
   }
   
   .batch-grid .button-td {

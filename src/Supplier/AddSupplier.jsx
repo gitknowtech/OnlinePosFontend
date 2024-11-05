@@ -30,7 +30,7 @@ export default function AddSupplier({ UserName, store }) {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/suppliers/get_banks");
+        const response = await axios.get("http://localhost:5000/api/banks/get_banks");
         setBankList(response.data);
       } catch (error) {
         console.error("Error fetching banks: ", error);
@@ -181,7 +181,6 @@ export default function AddSupplier({ UserName, store }) {
 
   return (
     <div className="supplier-model">
-      <h2>Supplier Details</h2>
       <div className="check-box" style={{display:"none"}}>
         <input
           type="checkbox"
@@ -214,7 +213,6 @@ export default function AddSupplier({ UserName, store }) {
         </div>
 
 
-        <h2>Supplier Location Details</h2>
         <div className="form-group">
           <label htmlFor="address1">Address 1</label>
           <input
@@ -248,7 +246,6 @@ export default function AddSupplier({ UserName, store }) {
           />
         </div>
 
-        <h2>Supplier Contact Details</h2>
         <div className="form-group">
           <label htmlFor="mobile1">Mobile 1</label>
           <input
@@ -283,7 +280,6 @@ export default function AddSupplier({ UserName, store }) {
         </div>
 
 
-        <h2>Supplier Webite Details</h2>
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
@@ -340,7 +336,6 @@ export default function AddSupplier({ UserName, store }) {
           />
         </div>
 
-        <h2>Supplier Bank Details Details</h2>
         <div className="form-group">
           <label htmlFor="bank">Bank Name</label>
           <select 

@@ -14,6 +14,7 @@ import BankModel from "../Supplier/BankModel";
 import AddSupplier from '../Supplier/AddSupplier';
 import ManageSupplier from '../Supplier/ManageSupplier';
 import ManageSupplierDelete from '../Supplier/ManageSuppliersRemoved';
+import CreatePerchasing from "../Supplier/createNewPercheses";
 
 
 
@@ -26,7 +27,7 @@ const Supplier = () => {
 
   // Function to toggle the purchasing content
   const togglePurchasingContent = () => {
-    setActiveContent(activeContent === "purchasing" ? null : "purchasing"); // Toggle purchasing content
+    setActiveContent(activeContent === "createNewPerches" ? null : "createNewPerches"); // Toggle purchasing content
   };
 
   // Function to toggle the supplier content
@@ -120,6 +121,7 @@ const Supplier = () => {
         {activeContent === "addSupplier" && <AddSupplier UserName={UserName} store={Store} />}
         {activeContent === "manageSupplier" && <ManageSupplier UserName={UserName} store={Store} />}
         {activeContent === "manageSupplierDelete" && <ManageSupplierDelete UserName={UserName} store={Store}/>}
+        {activeContent === "createNewPerches" && <CreatePerchasing UserName={UserName} store={Store}/>}
       </div>
     </div>
   );

@@ -208,9 +208,9 @@ export default function StoreModel({ UserName, store }) {
       </div>
 
       <div className="batch-grid">
-        <table>
+        <table id="batch-grid-header">
           <thead>
-            <tr>
+            <tr id="batch-grid-">
               <th>No</th>
               <th>Store Name</th>
               <th>User</th>
