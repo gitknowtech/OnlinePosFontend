@@ -43,7 +43,7 @@
 #summary-container-purchase input,
 #summary-container-purchase select {
   padding: 8px;
-  width: 100%;
+  width: 85%;
   border: 1px solid #00796b;
   border-radius: 4px;
   background-color: #f9f9f9;
@@ -71,7 +71,7 @@
 
 /* Table styling */
 #table-container-purchase {
-  margin-top: 20px;
+  margin-top: 10px;
   overflow-x: auto;
 }
 
@@ -87,13 +87,76 @@
   border: 1px solid #ddd;
   padding: 8px;
   font-weight: 600;
-  text-align: center;
 }
 
 #purchase-table-purchase th {
   background-color: #8d8b8b;
   color: #fff;
 }
+
+#totals-container-purchase {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #e9ecef;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#totals-container-purchase .totals-label {
+  flex: 1;
+  text-align: center;
+}
+
+#totals-container-purchase .totals-label label {
+  font-weight: bold;
+  color: #333;
+  margin-right: 5px;
+}
+
+#totals-container-purchase .totals-label span {
+  font-size: 16px;
+  color: #007bff;
+  font-weight: 600;
+  margin-left: 15px;
+}
+
+#delete-button-perchase-table{
+  color: #000;
+  background-color: rgb(245, 122, 122);
+  font-weight: 600;
+}
+
+#delete-button-perchase-table:hover{
+  color: #fff;
+  background-color: rgb(110, 8, 8);
+  font-weight: 600;
+  transition: 0.5s ease-in-out;
+}
+
+#save-button-purchase {
+  width: 50px;
+  padding: 10px;
+  margin: 10px 0;
+  cursor: pointer;
+  background-color: #54da9b;
+  color: #000000;
+  font-weight: 700;
+  border: none;
+  border-radius: 5px;
+}
+
+#save-button-purchase:hover {
+  background-color: #0c6e3d;
+  color: #fff;
+  transition: 0.5s ease-in-out;
+}
+
+
+
+
+
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {
@@ -110,5 +173,13 @@
   }
   #add-button-purchase {
     width: 100%; /* Full width button on small screens */
+  }
+  #totals-container-purchase {
+    flex-direction: column; /* Stack items vertically on smaller screens */
+    padding: 15px;
+  }
+
+  #totals-container-purchase .totals-label {
+    margin: 5px 0; /* Adjusts spacing for each label when stacked */
   }
 }

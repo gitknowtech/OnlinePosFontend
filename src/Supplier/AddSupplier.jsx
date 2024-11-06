@@ -181,6 +181,8 @@ export default function AddSupplier({ UserName, store }) {
 
   return (
     <div className="supplier-model">
+      
+      <h2>Add Supplier</h2>
       <div className="check-box" style={{display:"none"}}>
         <input
           type="checkbox"
