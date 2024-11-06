@@ -1,82 +1,114 @@
-#create-new-purchases {
-    font-size: 12px;
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 5px;
-    max-width: 1000px;
-    margin: auto;
-    background-color: #5d67c7;
+/* Container for purchase panel */
+#purchase-panel-purchase {
+  font-size: 12px;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 5px;
+  width: 100%;
+  max-width: auto;
+  margin: auto;
+  background-color: #c5caf8;
+  overflow-x: auto; /* Allow horizontal scrolling on smaller screens */
+}
+
+/* Panel header styling */
+#panel-header-purchase {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Form and summary containers arranged in a single row */
+#form-container-purchase,
+#summary-container-purchase {
+  display: flex;
+  flex-direction: row; /* Arrange all inputs in one row */
+  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: nowrap; /* Prevent wrapping */
+}
+
+/* General styling for input groups to place label above input */
+.input-group-purhase-supplier {
+  display: flex;
+  flex-direction: column;
+  min-width: 250px;
+  gap: 4px;
+}
+
+/* Input and select styling */
+#form-container-purchase input,
+#summary-container-purchase input,
+#summary-container-purchase select {
+  padding: 8px;
+  width: 100%;
+  border: 1px solid #00796b;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  font-size: 12px;
+}
+
+/* Button styling */
+#add-button-purchase {
+  width: auto;
+  padding: 8px;
+  margin: 10px 0;
+  cursor: pointer;
+  background-color: #5edd62;
+  color: #000;
+  border: none;
+  font-weight: 700;
+  border-radius: 5px;
+}
+
+#add-button-purchase:hover {
+  background-color: #0e5811;
+  color: #fff;
+  transition: 0.3s ease-in-out;
+}
+
+/* Table styling */
+#table-container-purchase {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+#purchase-table-purchase {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  margin-bottom: 40px;
+}
+
+#purchase-table-purchase th,
+#purchase-table-purchase td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+
+#purchase-table-purchase th {
+  background-color: #8d8b8b;
+  color: #fff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  #form-container-purchase,
+  #summary-container-purchase {
+    flex-wrap: wrap; /* Allow wrapping on medium screens */
   }
-  
-  #panel-header {
-    text-align: center;
-    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  #form-container-purchase,
+  #summary-container-purchase {
+    flex-wrap: wrap; /* Allow wrapping on small screens */
   }
-  
-  #form-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: space-between;
-    margin-bottom: 10px;
+  #add-button-purchase {
+    width: 100%; /* Full width button on small screens */
   }
-  
-  #form-container input {
-    padding: 5px;
-    flex: 1 1 15%; /* Responsive width for each input field */
-    min-width: 100px;
-  }
-  
-  #add-button {
-    display: block;
-    width: 15%; /* Fixed width of 15% for the button */
-    padding: 5px;
-    margin: 10px 0;
-    cursor: pointer;
-    background-color: #5edd62;
-    color: #000;
-    border: none;
-    font-weight: 700;
-    border-radius: 5px;
-    align-self: flex-start;
-  }
-  
-  #add-button:hover {
-    background-color: #0e5811;
-    color: #fff;
-    font-weight: 700;
-    transition: 0.5s ease-in-out;
-    
-  }
-  
-  #table-container {
-    margin-top: 20px;
-    overflow-x: auto; /* Ensures horizontal scrolling if needed */
-  }
-  
-  #purchase-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  #purchase-table th, #purchase-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-  }
-  
-  #purchase-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-  }
-  
-  @media (max-width: 768px) {
-    #form-container input {
-      flex: 1 1 45%; /* Adjust width for smaller screens */
-    }
-  
-    #add-button {
-      width: 100%; /* Full width on smaller screens */
-    }
-  }
-  
+}

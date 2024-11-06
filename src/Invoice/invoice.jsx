@@ -260,6 +260,8 @@ export default function Invoice() {
     });
   };
 
+
+
   const handleQuantityEnterKeyPress = (e, index) => {
     if (e.key === "Enter") {
       let quantity = parseFloat(tableData[index].quantity);
@@ -289,6 +291,8 @@ export default function Invoice() {
     }
   };
 
+
+
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
@@ -306,6 +310,8 @@ export default function Invoice() {
       setSuggestions([]);
     }
   };
+
+
 
   const handlePriceEnter = () => {
     const enteredPrice = parseFloat(price);
@@ -326,6 +332,8 @@ export default function Invoice() {
     qtyInputRef.current.focus();
   };
 
+
+  
   const handleBarcodeEnter = async () => {
     try {
       const response = await axios.get(
@@ -401,7 +409,7 @@ export default function Invoice() {
       (item) => parseFloat(item.discount) >= 0 && parseFloat(item.quantity) >= 0
     );
   
-    const totalAmount = validItems.reduce(
+    const totalAmount = tableData.reduce(
       (total, item) => total + parseFloat(item.amount),
       0
     );
