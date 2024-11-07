@@ -1,11 +1,11 @@
-// src/components/CreateNewPurchases.jsx
+// src/components/PurchasingDetails.jsx
 
 import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2"; // Import SweetAlert2
 import "../css/CreateNewPercheses.css"; // Assuming a CSS file for styling
 
-export default function CreateNewPurchases() {
+export default function PurchasingDetails() {
   // State variables
   const [searchInvoiceId, setSearchInvoiceId] = useState("");
   const [purchases, setPurchases] = useState([]);
@@ -16,9 +16,11 @@ export default function CreateNewPurchases() {
   const [grossTotal, setGrossTotal] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const [documentLink, setDocumentLink] = useState(""); // New state variable for document link
 
   // Base URL for the backend
   const BASE_URL = "http://localhost:5000/api/purchases";
+  const BACKEND_URL = "http://localhost:5000"; // Base URL of the backend server
 
   // Handle search
   const handleSearch = async () => {
@@ -27,7 +29,9 @@ export default function CreateNewPurchases() {
       return;
     }
     try {
-      const response = await axios.get(`${BASE_URL}/get_purchase/${searchInvoiceId}`);
+      const response = await axios.get(
+        `${BASE_URL}/get_purchase/${searchInvoiceId}`
+      );
       const data = response.data;
 
       if (!data || !data.purchases || data.purchases.length === 0) {
@@ -38,7 +42,8 @@ export default function CreateNewPurchases() {
       // Map purchases data to the expected format
       const mappedPurchases = data.purchases.map((purchase) => ({
         id: purchase.id,
-        productCode: purchase.ProCode || purchase.ProductCode || "", // Adjust based on your backend field name
+        productCode:
+          purchase.ProCode || purchase.ProductCode || "", // Adjust based on your backend field name
         productName: purchase.ProName || "",
         unitPrice: parseFloat(purchase.UnitPrice) || 0,
         quantity: parseFloat(purchase.Quantity) || 0,
@@ -53,10 +58,21 @@ export default function CreateNewPurchases() {
       setGrossTotal(parseFloat(summary.gross_total) || 0);
       setTotalQuantity(parseFloat(summary.total_quantity) || 0);
       setTotalItems(summary.total_items || 0);
-      setInvoiceDate(summary.invoice_date ? summary.invoice_date.split('T')[0] : "");
+      setInvoiceDate(
+        summary.invoice_date ? summary.invoice_date.split("T")[0] : ""
+      );
       setCashAmount(parseFloat(summary.cash_amount) || 0);
       setCreditAmount(parseFloat(summary.credit_amount) || 0);
       setSupplierName(summary.SupplierName || ""); // Set supplier name directly
+
+      // Adjust the document link to include the backend server's base URL
+      const adjustedDocumentLink = summary.document_link
+        ? `${BACKEND_URL}${summary.document_link}`
+        : "";
+      setDocumentLink(adjustedDocumentLink); // Set document link
+
+      // Log the adjusted document link for debugging
+      console.log("Adjusted Document Link:", adjustedDocumentLink);
     } catch (error) {
       console.error("Error fetching data:", error);
       Swal.fire("Error", "Failed to fetch data.", "error");
@@ -89,7 +105,6 @@ export default function CreateNewPurchases() {
               <th>Unit Price</th>
               <th>Quantity</th>
               <th>Total</th>
-              {/* Removed Document column */}
             </tr>
           </thead>
           <tbody>
@@ -106,7 +121,6 @@ export default function CreateNewPurchases() {
                 <td style={{ textAlign: "center" }}>
                   {purchase.total.toFixed(2)}
                 </td>
-                {/* Removed Document cell */}
               </tr>
             ))}
           </tbody>
@@ -133,44 +147,33 @@ export default function CreateNewPurchases() {
       <div id="summary-container-purchase">
         <div className="input-group-purhase-supplier">
           <label htmlFor="supplier-name">Supplier:</label>
-          <input
-            id="supplier-name"
-            type="text"
-            value={supplierName}
-            readOnly
-          />
+          <input id="supplier-name" type="text" value={supplierName} readOnly />
         </div>
 
         <div className="input-group-purhase-supplier">
           <label htmlFor="invoice-date">Invoice Date:</label>
-          <input
-            id="invoice-date"
-            type="date"
-            value={invoiceDate}
-            readOnly
-          />
+          <input id="invoice-date" type="date" value={invoiceDate} readOnly />
         </div>
 
         <div className="input-group-purhase-supplier">
           <label htmlFor="cash-amount">Cash Amount:</label>
-          <input
-            id="cash-amount"
-            type="number"
-            value={cashAmount}
-            readOnly
-          />
+          <input id="cash-amount" type="number" value={cashAmount} readOnly />
         </div>
 
         <div className="input-group-purhase-supplier">
           <label htmlFor="credit-amount">Credit Amount:</label>
-          <input
-            id="credit-amount"
-            type="number"
-            value={creditAmount}
-            readOnly
-          />
+          <input id="credit-amount" type="number" value={creditAmount} readOnly />
         </div>
       </div>
+
+      {/* View Document Link */}
+      {documentLink && (
+        <div id="document-link-section">
+          <button onClick={() => window.open(documentLink, "_blank")}>
+            View Document
+          </button>
+        </div>
+      )}
     </div>
   );
 }

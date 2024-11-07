@@ -14,7 +14,7 @@ export default function CreateNewPurchases() {
   const [total, setTotal] = useState(0);
   const [purchases, setPurchases] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
-  const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [selectedSupplier, setSelectedSupplier] = useState("");   
   const [invoiceId, setInvoiceId] = useState("");
   const [invoiceDate, setInvoiceDate] = useState("");
   const [cashAmount, setCashAmount] = useState(0);
