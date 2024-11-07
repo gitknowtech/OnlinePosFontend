@@ -1,0 +1,59 @@
+/* src/css/PurchasingDetails.css */
+
+.purchasing-details-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .search-box input {
+    flex: 1;
+    padding: 8px;
+    font-size: 16px;
+  }
+  
+  .search-box button {
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .summary-section, .purchases-section {
+    margin-top: 30px;
+  }
+  
+  .summary-table, .purchases-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .summary-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+  
+  .purchases-table th, .purchases-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .purchases-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .summary-table a {
+    color: #007BFF;
+    text-decoration: none;
+  }
+  
+  .summary-table a:hover {
+    text-decoration: underline;
+  }
+  

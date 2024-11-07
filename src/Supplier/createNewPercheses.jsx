@@ -162,6 +162,7 @@ export default function CreateNewPurchases() {
     const saveData = {
       purchases: purchases.map((purchase) => ({
         InvoiceId: invoiceId,
+        ProCode: purchase.productCode, 
         ProName: purchase.productName,
         UnitPrice: purchase.unitPrice,
         Quantity: purchase.quantity,
@@ -289,7 +290,7 @@ export default function CreateNewPurchases() {
           <tbody>
             {purchases.map((purchase, index) => (
               <tr key={purchase.id}>
-                <td>{purchase.productCode}</td>
+                 <td>{purchase.productCode}</td>
                 <td>{purchase.productName}</td>
                 <td style={{ textAlign: "center" }}>
                   {purchase.unitPrice.toFixed(2)}
