@@ -1,0 +1,131 @@
+/* src/css/DueSummary.css */
+
+/* General styles */
+#due-summary {
+  padding: 20px;
+  background-color: #ccd5f1;
+}
+
+#due-summary-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Search container */
+#search-container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+#search-container input[type="text"] {
+  width: 200px;
+  padding: 5px;
+}
+
+#search-button {
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+/* Table styles */
+#due-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#due-summary-table th,
+#due-summary-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+#due-summary-table th {
+  background-color: #646464;
+  color: #fff;
+}
+
+#due-summary-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#due-summary-table tr:hover {
+  background-color: #eaeaea;
+}
+
+/* Action buttons */
+button[id^="payment-button-"],
+button[id^="delete-button-"],
+button[id^="view-document-"] {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 5px;
+}
+
+button[id^="payment-button-"] img,
+button[id^="delete-button-"] img,
+button[id^="view-document-"] img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Modal styles */
+#modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 400px;
+}
+
+#modal-content h3 {
+  margin-top: 0;
+}
+
+.modal-field {
+  margin-bottom: 15px;
+}
+
+.modal-field label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.modal-field input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+#modal-buttons {
+  text-align: right;
+}
+
+#modal-buttons button {
+  margin-left: 10px;
+  padding: 8px 16px;
+}
+
+#update-button,
+#cancel-button {
+  cursor: pointer;
+}

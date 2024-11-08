@@ -12,6 +12,7 @@ import Customer from './CustomerFile/Customer';
 import ManageCustomer from './CustomerFile/ManageCustomer';
 import CreatePerches from  './Supplier/createNewPercheses';
 import PerchasingDetails from './Supplier/PurchasingDetails';
+import DueSummery  from "./Supplier/DueSummary";
 
 
 
@@ -36,6 +37,7 @@ function App() {
           <Route path="manageCustomer" element={<ManageCustomer/>}/>{/* manage customer route*/}
           <Route path="createNewPerches" element={<CreatePerches/>}/>
           <Route path="purchasingDetails" element={<PerchasingDetails/>}/>
+          <Route path="DueSummery" element={<DueSummery/>}/>
           {/* You can add other nested routes under Dashboard */}
         </Route>
 

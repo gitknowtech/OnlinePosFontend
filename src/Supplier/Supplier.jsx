@@ -16,6 +16,7 @@ import ManageSupplier from '../Supplier/ManageSupplier';
 import ManageSupplierDelete from '../Supplier/ManageSuppliersRemoved';
 import CreatePerchasing from "../Supplier/createNewPercheses";
 import PurchasingDetails from "../Supplier/PurchasingDetails";
+import DueSummery from "../Supplier/DueSummary";
 
 
 
@@ -70,6 +71,14 @@ const Supplier = () => {
     }
   }
 
+  const togglerManageSupplierDueSummery = () => {
+    if(activeContent === "DueSummery"){
+      setActiveContent(null);
+    }else{
+      setActiveContent("DueSummery");
+    }
+  }
+
 
 
   return (
@@ -106,7 +115,7 @@ const Supplier = () => {
           <FontAwesomeIcon className="button-icon" icon={faSnowflake} />
           Purchasing Details
         </button>
-        <button>
+        <button onClick={togglerManageSupplierDueSummery}>
           <FontAwesomeIcon className="button-icon" icon={faSnowflake} />
           Due Summary
         </button>
@@ -124,6 +133,7 @@ const Supplier = () => {
         {activeContent === "manageSupplierDelete" && <ManageSupplierDelete UserName={UserName} store={Store}/>}
         {activeContent === "createNewPerches" && <CreatePerchasing UserName={UserName} store={Store}/>}
         {activeContent === "purchasingDetails" && <PurchasingDetails UserName={UserName} store={Store}/>}
+        {activeContent === "DueSummery" && <DueSummery UserName={UserName} store={Store}/>}
       </div>
     </div>
   );
