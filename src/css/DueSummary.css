@@ -19,6 +19,8 @@
 
 #search-container input[type="text"] {
   width: 200px;
+  font-size: 12px;
+  font-weight: 600;
   padding: 5px;
 }
 
@@ -60,7 +62,8 @@
 /* Action buttons */
 button[id^="payment-button-"],
 button[id^="delete-button-"],
-button[id^="view-document-"] {
+button[id^="view-document-"],
+button[id^="history-button-"] {
   background: none;
   border: none;
   cursor: pointer;
@@ -70,11 +73,17 @@ button[id^="view-document-"] {
 
 button[id^="payment-button-"] img,
 button[id^="delete-button-"] img,
-button[id^="view-document-"] img {
+button[id^="view-document-"] img ,
+button[id^="history-button-"] img{
   width: 20px;
   height: 20px;
 }
 
+#delete-button-Due-Summery
+{
+  width: 20px;
+  height: 20px;
+}
 /* Modal styles */
 #modal-overlay {
   position: fixed;
@@ -128,4 +137,116 @@ button[id^="view-document-"] img {
 #update-button,
 #cancel-button {
   cursor: pointer;
+}
+
+
+/* Modal overlay */
+#modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 999; /* Ensure it is on top of other elements */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal content */
+#modal-content {
+  background-color: #fff; /* White background */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  width: 90%; /* Responsive width */
+  max-width: 600px; /* Maximum width */
+  padding: 20px; /* Padding for content */
+  z-index: 1000; /* Ensure it's above the overlay */
+  animation: slideDown 0.3s ease; /* Smooth animation */
+}
+
+/* Modal header */
+#modal-content h3 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 1px solid #ccc; /* Divider line */
+  padding-bottom: 10px;
+}
+
+/* Modal table */
+#modal-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+#modal-content table th,
+#modal-content table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+#modal-content table th {
+  background-color: #f4f4f4; /* Light grey background for headers */
+  font-weight: bold;
+}
+
+/* Buttons container */
+#modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Spacing between buttons */
+}
+
+#modal-buttons button {
+  background-color: #007bff; /* Blue background */
+  color: #fff; /* White text */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+#modal-buttons button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+#modal-buttons button:last-child {
+  background-color: #dc3545; /* Red for cancel/close button */
+}
+
+#modal-buttons button:last-child:hover {
+  background-color: #a71d2a; /* Darker red on hover */
+}
+
+#close-button-due-summery{
+  background-color: #f38a8a;
+  font-weight: 700;
+}
+
+
+#close-button-due-summery:hover{
+  background-color: #830505;
+  font-weight: 700;
+  color: #fff;
+  transition: 0.5s ease-in-out;
+}
+
+
+/* Animation for modal */
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
