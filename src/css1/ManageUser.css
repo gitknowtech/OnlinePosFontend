@@ -1,0 +1,61 @@
+.manage-user {
+    background-color: #e0f7fa; /* Light blue background */
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  #user-table-manage-user {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white; /* White table background */
+    margin-top: 10px;
+  }
+  
+  #user-table-manage-user th,
+  #user-table-manage-user td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  #user-table-manage-user th {
+    background-color: #007bb5; /* Dark blue header */
+    color: white;
+    font-weight: bold;
+  }
+  
+  #user-table-manage-user tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  #user-table-manage-user tr:hover {
+    background-color: #d9f4ff; /* Light hover effect */
+  }
+  
+  .icon-manage-user {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+  
+  .view-button-manage-user,
+  .edit-button-manage-user,
+  .delete-button-manage-user {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+  }
+  
+  .view-button-manage-user:hover .icon-manage-user,
+  .edit-button-manage-user:hover .icon-manage-user,
+  .delete-button-manage-user:hover .icon-manage-user {
+    transform: scale(1.1); /* Slight zoom on hover */
+    transition: transform 0.2s;
+  }
+  
+  .action-icons-manage-user {
+    display: flex;
+    gap: 10px;
+  }
+  

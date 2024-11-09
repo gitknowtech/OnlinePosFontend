@@ -285,14 +285,13 @@ const Dashboard = () => {
                 </li>
                 <li>
                   <div className="icon-link">
-                    <a href="#">
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faUserGroup}
-                      />
-                      <span className="link-name">USER</span>
-                    </a>
-                  </div>
+                  <Link
+                    to="ManageUser"
+                    state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
+                      <FontAwesomeIcon className="nav-icon" icon={faUserSecret}/>
+                      <span className="link-name">User</span>
+                    </Link>
+                    </div>
                 </li>
 
                 <li>

@@ -1,10 +1,11 @@
 
+#manage-customer-container{
+  background-color: #d2d9f7;
+  padding: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
 
-.manage-customer {
-    padding: 20px;
-    font-size: 14px;
-    font-weight: 600;
-  }
   
   #manage-customer-search-box input {
     padding: 10px;
@@ -17,6 +18,7 @@
   
   #manage-customer-table table {
     width: 100%;
+    background-color: #fff;
     border-radius: 10px;
     border-collapse: collapse;
     margin-top: 20px;

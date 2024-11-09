@@ -9,6 +9,7 @@ import paymentImage from "../assets/icons/money.png";
 import deleteImage from "../assets/icons/bin.png";
 import viewImage from "../assets/icons/view.png";
 import historyImage from "../assets/icons/history.png";
+
 export default function DueSummary() {
   const [summaries, setSummaries] = useState([]);
   const [searchInvoiceId, setSearchInvoiceId] = useState("");
@@ -22,9 +23,7 @@ export default function DueSummary() {
   const [showHistoryModal, setShowHistoryModal] = useState(false); // New state for history modal
   const [paymentHistory, setPaymentHistory] = useState([]); // Payment history data
   const [referenceNumber, setReferenceNumber] = useState(""); // New reference number state
-
-  // Base URL for the backend
-  const BASE_URL = "http://localhost:5000/api/purchases";
+  const [currentGeneratedId, setCurrentGeneratedId] = useState(""); // Keep track of the current generatedId
 
   // Fetch summaries on component mount
   useEffect(() => {
@@ -36,7 +35,7 @@ export default function DueSummary() {
     try {
       let response;
       if (invoiceId) {
-        response = await axios.get(`${BASE_URL}/get_purchase/${invoiceId}`);
+        response = await axios.get(`http://localhost:5000/api/purchases/get_purchase/${invoiceId}`);
         const data = response.data;
 
         if (!data || !data.summary) {
@@ -54,7 +53,7 @@ export default function DueSummary() {
 
         setSummaries([summary]);
       } else {
-        response = await axios.get(`${BASE_URL}/get_purchase_summaries`);
+        response = await axios.get(`http://localhost:5000/api/purchases/get_purchase_summaries`);
         const data = response.data;
 
         if (!data || data.length === 0) {
@@ -79,9 +78,10 @@ export default function DueSummary() {
   const handleHistory = async (generatedId) => {
     try {
       const response = await axios.get(
-        `${BASE_URL}/get_payment_history/${generatedId}`
+        `http://localhost:5000/api/purchases/get_payment_history/${generatedId}`
       ); // Fetch payment history
       setPaymentHistory(response.data || []); // Set the payment history data
+      setCurrentGeneratedId(generatedId); // Set the current generatedId
       setShowHistoryModal(true); // Open the modal
     } catch (error) {
       console.error("Error fetching payment history:", error);
@@ -89,27 +89,6 @@ export default function DueSummary() {
     }
   };
 
-  // Handle delete action
-  const handleDelete = async (generatedId) => {
-    try {
-      const confirm = await Swal.fire({
-        title: "Are you sure?",
-        text: "This will delete the purchase summary and all related data.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-      });
-
-      if (confirm.isConfirmed) {
-        await axios.delete(`${BASE_URL}/delete_purchase/${generatedId}`);
-        Swal.fire("Deleted!", "The purchase has been deleted.", "success");
-        fetchSummaries();
-      }
-    } catch (error) {
-      console.error("Error deleting purchase:", error);
-      Swal.fire("Error", "Failed to delete purchase.", "error");
-    }
-  };
 
   // Handle payment action
   const handlePayment = (generatedId) => {
@@ -165,7 +144,7 @@ export default function DueSummary() {
 
       // Send update request to backend
       const response = await axios.put(
-        `${BASE_URL}/update_payment/${paymentGeneratedId}`,
+        `http://localhost:5000/api/purchases/update_payment/${paymentGeneratedId}`,
         updateData
       );
 
@@ -186,42 +165,43 @@ export default function DueSummary() {
     }
   };
 
-  // Handle delete payment record from history
-  const handleDeleteHistory = async (generatedId, payment, savedTime) => {
-    const formattedTime = moment(savedTime).format("YYYY-MM-DD HH:mm:ss"); // Ensure time format matches database
-
-    try {
-      const confirm = await Swal.fire({
-        title: "Are you sure?",
-        text: "This will delete the selected payment record and update the totals.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-      });
-
-      if (!confirm.isConfirmed) return;
-
-      // Backend call to delete the record
-      const response = await axios.delete(`${BASE_URL}/delete_payment/${generatedId}`, {
-        data: { payment, savedTime: formattedTime }, // Ensure consistent time format
-      });
-
-      if (response.status === 200) {
-        Swal.fire("Deleted!", "The payment record has been deleted.", "success");
-
-        // Refresh the payment history and summaries
-        fetchSummaries();
-        handleHistory(generatedId);
-      } else {
-        Swal.fire("Error", "Failed to delete the payment record.", "error");
-      }
-    } catch (error) {
-      console.error("Error during payment deletion:", error);
-      Swal.fire("Error", "Failed to delete the payment record.", "error");
-    }
-  };
-
   
+  
+  
+  // Handle delete action for whole related data
+const handleDelete = async (generatedId) => {
+  try {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "This will delete all related data for the selected purchase.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    // Call backend to delete the related data
+    const response = await axios.delete(
+      `http://localhost:5000/api/purchases/delete_whole_data/${generatedId}`
+    );
+
+    if (response.status === 200) {
+      Swal.fire("Deleted!", "All related data has been deleted.", "success");
+
+      // Refresh the summaries
+      fetchSummaries();
+    } else {
+      Swal.fire("Error", "Failed to delete the data.", "error");
+    }
+  } catch (error) {
+    console.error("Error deleting related data:", error);
+    Swal.fire("Error", "Failed to delete the data.", "error");
+  }
+};
+
+
+
 
   const handleCashAmountChange = (e) => {
     let newCashAmount = parseFloat(e.target.value) || 0;
@@ -381,56 +361,55 @@ export default function DueSummary() {
       )}
 
       {/* History Modal */}
-{showHistoryModal && (
-  <div id="modal-overlay">
-    <div id="modal-content">
-      <h3>Payment History</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Payment</th>
-            <th>Reference</th>
-            <th>Saved Time</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paymentHistory.map((history) => (
-            <tr key={history.id}>
-              <td>{history.id}</td>
-              <td>{history.payment}</td>
-              <td>{history.refference}</td>
-              <td>{new Date(history.saved_time).toLocaleString()}</td>
-              <td>
-                <button
-                  id="delete-button-due-summery"
-                  title="Delete Payment"
-                  onClick={() =>
-                    handleDeleteHistory(
-                      history.id, // Use id for precise deletion
-                      history.payment,
-                      history.saved_time
-                    )
-                  }
-                >
-                  <img src={deleteImage} alt="Delete Payment" />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <button
-        id="close-button-due-summery"
-        onClick={() => setShowHistoryModal(false)}
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
-
+      {showHistoryModal && (
+        <div id="modal-overlay">
+          <div id="modal-content">
+            <h3>Payment History</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Payment</th>
+                  <th>Reference</th>
+                  <th>Saved Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paymentHistory.map((history) => (
+                  <tr key={history.id}>
+                    <td>{history.id}</td>
+                    <td>{history.payment}</td>
+                    <td>{history.refference}</td>
+                    <td>{new Date(history.saved_time).toLocaleString()}</td>
+                    <td>
+                      <button
+                        id="delete-button-due-summery"
+                        title="Delete Payment"
+                        onClick={() =>
+                          handleDeleteHistory(
+                            history.id, // Use id for precise deletion
+                            history.payment,
+                            history.saved_time
+                          )
+                        }
+                      >
+                        <img src={deleteImage} alt="Delete Payment" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button
+              id="close-button-due-summery"
+              onClick={() => setShowHistoryModal(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

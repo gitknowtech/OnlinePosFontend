@@ -1,0 +1,148 @@
+/* Product panel styling */
+.user-management-panel{
+  background-color: #f4f4f9;
+  border-radius: 5px;
+  padding: 20px;
+  font-family: sans-serif-black;
+  height: auto; /* Allow the panel to expand dynamically */
+  min-height: 1000px; /* Set a minimum height to ensure visibility */
+  box-sizing: border-box;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  overflow-y: auto; /* Enable scrolling if content overflows */
+}
+  
+  .panel-title {
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  
+  /* General styles for the button-list container */
+  .button-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end; /* Aligns buttons to the left */
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 30px; /* Adds space between buttons */
+    margin-bottom: 20px;
+  }
+  
+  /* Default button style */
+  .button-list button {
+    background-color: #add8e6; /* Light blue background */
+    color: #000000; /* Black text */
+    border: none; /* No border */
+    padding: 5px 10px; /* Padding to make the button larger */
+    font-size: 12px; /* Font size */
+    font-weight: 700;
+    border-radius: 10px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for hover effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+  }
+  
+  /* Hover state for button */
+  .button-list button:hover {
+    background-color: #f7e335; /* Yellow background */
+    font-weight: 800;
+  }
+  
+  .button-list .button-icon {
+    font-size: 12px;
+    margin-right: 10px;
+  }
+  
+  
+/* Product content styling */
+.user-management-content {
+  width: 100%; /* Full width */
+  min-height: 300px; /* Ensure a minimum height */
+  border-radius: 10px;
+  box-sizing: border-box;
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
+  transition: height 0.3s ease; /* Smooth transition for height changes */
+}
+
+/* Add a custom scrollbar style (optional) */
+.user-management-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.user-management-content::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+}
+
+#add-user-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#modal-content-user-model {
+  background-color: #fff;
+  padding: 20px;
+  width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#modal-content-user-model h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#add-user-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+#add-user-form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#modal-buttons-user-model {
+  display: flex;
+  justify-content: space-between;
+}
+
+#submit-button-user-model,
+#cancel-button-user-model {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#submit-button-user-model {
+  background-color: #28a745;
+  color: #fff;
+}
+
+#cancel-button-user-model {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+#submit-button-user-model:hover {
+  background-color: #218838;
+}
+
+#cancel-button-user-model:hover {
+  background-color: #c82333;
+}
+
+  
