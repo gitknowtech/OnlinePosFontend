@@ -50,11 +50,11 @@ export default function Invoice() {
     rowIndex: null,
     field: null,
   });
+  const [percentage, setPercentage] = useState(""); // State for percentage input
 
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
   const barcodeInputRef = useRef(null);
-
 
   // OtherItem model related contents
   const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);
@@ -71,18 +71,23 @@ export default function Invoice() {
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
-
-  
   const handleOpenPaymentModal = () => {
-    // Check if there is any data in the table
+    console.log("Payment button clicked");
+    console.log("tableData:", tableData); // Check tableData contents
     if (tableData.length === 0) {
-      Swal.fire("Error", "Please add products to the table before proceeding to payment.", "error");
+      Swal.fire(
+        "Error",
+        "Please add products to the table before proceeding to payment.",
+        "error"
+      );
       return;
     }
-  
-    setIsPaymentModalOpen(true);
+
+    setIsPaymentModalOpen(false); // Force a rerender
+    setTimeout(() => setIsPaymentModalOpen(true), 0);
   };
-const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
+
+  const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
 
   // Function to open the StockModel
   const handleStockClick = () => {
@@ -97,7 +102,7 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
   const handleProductSelect = (product) => {
     if (!product || !product.barcode) {
       console.error("Invalid product data:", product);
-      Swal.fire('Error', 'Invalid product data', 'error');
+      Swal.fire("Error", "Invalid product data", "error");
       return;
     }
 
@@ -112,9 +117,6 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     // Refocus on barcode input after selection
     barcodeInputRef.current.focus();
   };
-
-
-
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -139,7 +141,7 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
           e.preventDefault();
           setIsStockModalOpen((prev) => !prev);
           break;
-        case "F9":
+        case "F10":
           e.preventDefault();
           handleOpenPaymentModal();
           break;
@@ -162,9 +164,6 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     };
   }, []);
 
-
-
-
   useEffect(() => {
     if (location.state) {
       const { UserName, Store } = location.state;
@@ -181,13 +180,9 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     setStartTime(formattedTime);
   }, [location.state]);
 
-
-
   useEffect(() => {
     calculateTotals();
   }, [tableData]);
-
-
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -212,30 +207,26 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     };
   }, [isWholesale, isDiscount]); // Add dependencies to keep the hook up-to-date
 
-
-
-
   const handleAddOtherItem = (item) => {
-    const { productName, productCost, productSale, qty, discount } = item;
-    const amount = parseFloat(productSale) * parseFloat(qty);
-
+    const { productName, productCost, productMRP, productRate, qty, discount } = item;
+    const amount = parseFloat(productRate) * parseFloat(qty); // Calculate amount based on Rate and Quantity
+  
     setTableData((prevData) => [
       ...prevData,
       {
         name: productName,
-        cost: parseFloat(productCost).toFixed(2),
-        mrp: parseFloat(productSale).toFixed(2),
-        discount: discount,
-        rate: parseFloat(productSale).toFixed(2),
-        quantity: parseFloat(qty).toFixed(2),
-        amount: amount.toFixed(2),
+        cost: parseFloat(productCost).toFixed(2), // Cost
+        mrp: parseFloat(productMRP).toFixed(2),   // MRP
+        discount: parseFloat(discount).toFixed(2), // Discount calculated as MRP - Rate
+        rate: parseFloat(productRate).toFixed(2), // Rate
+        quantity: parseFloat(qty).toFixed(2),     // Quantity
+        amount: amount.toFixed(2),               // Total amount (Rate * Quantity)
       },
     ]);
-
-    setIsOtherItemModalOpen(false);
+  
+    setIsOtherItemModalOpen(false); // Close the modal after adding the item
   };
-
-
+  
 
   // Function to handle when the "Return" button is clicked
   const handleReturnClick = () => {
@@ -247,31 +238,28 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     setIsReturnModalOpen(false);
   };
 
-
-
   const handleAddReturnItem = (item) => {
     // Adjust the data to have negative values
-    const amount = -Math.abs(parseFloat(item.productSale) * parseFloat(item.qty));
+    const amount = -Math.abs(
+      parseFloat(item.productSale) * parseFloat(item.qty)
+    );
 
     setTableData((prevData) => [
       ...prevData,
       {
         name: item.productName,
         cost: (-Math.abs(parseFloat(item.productCost))).toFixed(2),
-        mrp: (-Math.abs(parseFloat(item.mrp).toFixed(2))), // Ensure MRP retains original value
+        mrp: -Math.abs(parseFloat(item.mrp).toFixed(2)), // Ensure MRP retains original value
         discount: (-Math.abs(parseFloat(item.discount))).toFixed(2),
         rate: (-Math.abs(parseFloat(item.productSale))).toFixed(2),
-        quantity: (-Math.abs(parseFloat(item.qty))).toFixed(2),
+        quantity: (Math.abs(parseFloat(item.qty))).toFixed(2),
         amount: amount.toFixed(2),
-        type: 'return', // Add a 'type' field to mark this as a return
+        type: "return", // Add a 'type' field to mark this as a return
       },
     ]);
 
     setIsReturnModalOpen(false);
   };
-
-
-
 
   const handleQuantityChange = (e, index) => {
     const newQuantity = e.target.value;
@@ -282,7 +270,13 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     });
   };
 
-
+  const clearInvoiceTable = () => {
+    setTableData([]); // Clears the table data
+    setTotalAmount("0.00");
+    setTotalQuantity(0);
+    setTotalDiscount("0.00");
+    setItemCount(0);
+  };
 
   const handleQuantityEnterKeyPress = (e, index) => {
     if (e.key === "Enter") {
@@ -313,8 +307,6 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     }
   };
 
-
-
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
@@ -333,7 +325,28 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     }
   };
 
+  const handlePercentageChange = (value) => {
+    setPercentage(value);
+  };
 
+  const handlePercentageEnter = () => {
+    const enteredPercentage = parseFloat(percentage);
+
+    if (isNaN(enteredPercentage) || enteredPercentage <= 0) {
+      Swal.fire(
+        "Invalid Percentage",
+        "Please enter a valid percentage",
+        "warning"
+      );
+      return;
+    }
+
+    const calculatedPrice = parseFloat(price) * (1 - enteredPercentage / 100);
+
+    setPrice(calculatedPrice.toFixed(2)); // Update the price based on percentage
+    setPercentage(""); // Clear the percentage input
+    qtyInputRef.current.focus(); // Move focus to the quantity input
+  };
 
   const handlePriceEnter = () => {
     const enteredPrice = parseFloat(price);
@@ -353,8 +366,6 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     setQty("1");
     qtyInputRef.current.focus();
   };
-
-
 
   const handleBarcodeEnter = async () => {
     try {
@@ -392,7 +403,6 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     }
   };
 
-
   const handleQtyEnter = () => {
     if (qty) {
       const discount = parseFloat(suggestedPrice) - parseFloat(price);
@@ -408,7 +418,7 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
           rate: price,
           quantity: qty,
           amount: amount.toFixed(2),
-          type: 'new', // Mark as a new row
+          type: "new", // Mark as a new row
         },
       ]);
 
@@ -452,7 +462,6 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
     setTotalDiscount(totalDiscount.toFixed(2));
     setItemCount(validItems.length);
   };
-
 
   const handleVirtualEnter = () => {
     if (document.activeElement === barcodeInputRef.current) {
@@ -566,6 +575,16 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
           <input
             type="text"
             autoComplete="off"
+            placeholder="%"
+            style={{ width: "70px" }}
+            className="percentage-input"
+            onChange={(e) => handlePercentageChange(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handlePercentageEnter()}
+            value={percentage}
+          />
+          <input
+            type="text"
+            autoComplete="off"
             placeholder="QTY"
             className="qty-input"
             value={qty}
@@ -615,18 +634,17 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
                     item.type === "return"
                       ? "return-row"
                       : item.type === "new"
-                        ? "new-row"
-                        : ""
+                      ? "new-row"
+                      : ""
                   }
                   style={
                     item.type === "return"
                       ? { backgroundColor: "#fcd8d8" } // Light red for return
                       : item.type === "new"
-                        ? { backgroundColor: "#d8fcdb" } // Light green for new items
-                        : {}
+                      ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                      : {}
                   }
                 >
-
                   <td>{item.name}</td>
                   <td style={{ textAlign: "center" }}>{item.cost}</td>
                   <td style={{ textAlign: "center" }}>{item.mrp}</td>
@@ -640,7 +658,7 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
                     }
                   >
                     {editingCell.rowIndex === index &&
-                      editingCell.field === "quantity" ? (
+                    editingCell.field === "quantity" ? (
                       <input
                         type="text"
                         value={item.quantity}
@@ -663,20 +681,20 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
                       alt="Delete"
                       onClick={() => {
                         Swal.fire({
-                          title: 'Are you sure?',
+                          title: "Are you sure?",
                           text: "You won't be able to revert this!",
-                          icon: 'warning',
+                          icon: "warning",
                           showCancelButton: true,
-                          confirmButtonColor: '#3085d6',
-                          cancelButtonColor: '#d33',
-                          confirmButtonText: 'Yes, delete it!'
+                          confirmButtonColor: "#3085d6",
+                          cancelButtonColor: "#d33",
+                          confirmButtonText: "Yes, delete it!",
                         }).then((result) => {
                           if (result.isConfirmed) {
                             handleDeleteRow(index); // Call the delete function if confirmed
                             Swal.fire(
-                              'Deleted!',
-                              'The row has been deleted.',
-                              'success'
+                              "Deleted!",
+                              "The row has been deleted.",
+                              "success"
                             );
                           }
                         });
@@ -778,12 +796,15 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
             </div>
             <div className="option-box" onClick={handleOpenPaymentModal}>
               <label htmlFor="payment">
-                <img src={payment} alt="Payment" style={{ marginLeft: "5px" }} />
+                <img
+                  src={payment}
+                  alt="Payment"
+                  style={{ marginLeft: "20px" }}
+                />
                 <br />
-                <span>Payment (F9)</span>
+                <span>Payment (F10)</span>
               </label>
             </div>
-
           </div>
         </div>
       </div>
@@ -954,7 +975,7 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
           onClose={handleCloseExpensesModal}
           user={user}
           store={store}
-          onAdd={() => { }}
+          onAdd={() => {}}
         />
 
         {/* Render the OtherItemModel */}
@@ -978,14 +999,13 @@ const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
           onProductSelect={handleProductSelect}
         />
 
-<PaymentModel
-        show={isPaymentModalOpen}
-        onClose={handleClosePaymentModal}
-        totalAmount={parseFloat(totalAmount || 0)}
-      />
-
+        <PaymentModel
+          show={isPaymentModalOpen}
+          onClose={handleClosePaymentModal}
+          totalAmount={parseFloat(totalAmount || 0)}
+          clearInvoiceTable={clearInvoiceTable}
+        />
       </div>
     </div>
   );
 }
-

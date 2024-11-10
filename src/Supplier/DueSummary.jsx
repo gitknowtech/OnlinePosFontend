@@ -1,6 +1,3 @@
-// src/components/DueSummary.jsx
-
-import moment from "moment"; // For consistent time formatting
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -20,10 +17,10 @@ export default function DueSummary() {
   const [paymentGrossTotal, setPaymentGrossTotal] = useState(0);
   const [paymentCashAmount, setPaymentCashAmount] = useState(0);
   const [paymentCreditAmount, setPaymentCreditAmount] = useState(0);
+
   const [showHistoryModal, setShowHistoryModal] = useState(false); // New state for history modal
   const [paymentHistory, setPaymentHistory] = useState([]); // Payment history data
-  const [referenceNumber, setReferenceNumber] = useState(""); // New reference number state
-  const [currentGeneratedId, setCurrentGeneratedId] = useState(""); // Keep track of the current generatedId
+  const [referenceNumber, setReferenceNumber] = useState(""); // Reference number for payments
 
   // Fetch summaries on component mount
   useEffect(() => {
@@ -39,11 +36,7 @@ export default function DueSummary() {
         const data = response.data;
 
         if (!data || !data.summary) {
-          Swal.fire(
-            "Info",
-            "No purchase summaries found for the given Invoice ID.",
-            "info"
-          );
+          Swal.fire("Info", "No purchase summaries found for the given Invoice ID.", "info");
           return;
         }
 
@@ -74,22 +67,6 @@ export default function DueSummary() {
     fetchSummaries(searchInvoiceId.trim());
   };
 
-  // Handle payment history action
-  const handleHistory = async (generatedId) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/api/purchases/get_payment_history/${generatedId}`
-      ); // Fetch payment history
-      setPaymentHistory(response.data || []); // Set the payment history data
-      setCurrentGeneratedId(generatedId); // Set the current generatedId
-      setShowHistoryModal(true); // Open the modal
-    } catch (error) {
-      console.error("Error fetching payment history:", error);
-      Swal.fire("Error", "Failed to fetch payment history.", "error");
-    }
-  };
-
-
   // Handle payment action
   const handlePayment = (generatedId) => {
     const summary = summaries.find((item) => item.generatedid === generatedId);
@@ -109,53 +86,39 @@ export default function DueSummary() {
   const handleUpdatePayment = async () => {
     const newCashAmount = parseFloat(paymentCashAmount);
     const currentCashAmount =
-      summaries.find((summary) => summary.generatedid === paymentGeneratedId)
-        ?.cash_amount || 0;
+      summaries.find((summary) => summary.generatedid === paymentGeneratedId)?.cash_amount || 0;
 
-    // Validation: Check if the cash amount is less than the current cash amount
     if (newCashAmount < currentCashAmount) {
-      Swal.fire(
-        "Error",
-        "New cash amount cannot be less than the current cash amount.",
-        "error"
-      );
+      Swal.fire("Error", "New cash amount cannot be less than the current cash amount.", "error");
       return;
     }
 
-    // Validation: Check if the cash amount exceeds the gross total
     if (newCashAmount > paymentGrossTotal) {
       Swal.fire("Error", "Cash amount cannot exceed the gross total.", "error");
       return;
     }
 
-    // Validation: Reference number is required
     if (!referenceNumber) {
       Swal.fire("Error", "Reference number is required for updates.", "error");
       return;
     }
 
     try {
-      // Prepare data for update
       const updateData = {
         cashAmount: newCashAmount,
-        creditAmount: paymentGrossTotal - newCashAmount, // Calculate remaining credit
+        creditAmount: paymentGrossTotal - newCashAmount,
         referenceNumber,
       };
 
-      // Send update request to backend
       const response = await axios.put(
         `http://localhost:5000/api/purchases/update_payment/${paymentGeneratedId}`,
         updateData
       );
 
       if (response.status === 200) {
-        Swal.fire(
-          "Success",
-          "Payment amounts updated successfully.",
-          "success"
-        );
-        fetchSummaries(); // Refresh the summaries
-        setShowPaymentModal(false); // Close the modal
+        Swal.fire("Success", "Payment amounts updated successfully.", "success");
+        fetchSummaries();
+        setShowPaymentModal(false);
       } else {
         Swal.fire("Error", "Failed to update payment amounts.", "error");
       }
@@ -165,43 +128,79 @@ export default function DueSummary() {
     }
   };
 
-  
-  
-  
-  // Handle delete action for whole related data
-const handleDelete = async (generatedId) => {
-  try {
-    const confirm = await Swal.fire({
-      title: "Are you sure?",
-      text: "This will delete all related data for the selected purchase.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-    });
+  // Handle delete action for entire purchase-related data
+  const handleDelete = async (generatedId) => {
+    try {
+      const confirm = await Swal.fire({
+        title: "Are you sure?",
+        text: "This will delete all related data for the selected purchase.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+      });
 
-    if (!confirm.isConfirmed) return;
+      if (!confirm.isConfirmed) return;
 
-    // Call backend to delete the related data
-    const response = await axios.delete(
-      `http://localhost:5000/api/purchases/delete_whole_data/${generatedId}`
-    );
+      const response = await axios.delete(
+        `http://localhost:5000/api/purchases/delete_whole_data/${generatedId}`
+      );
 
-    if (response.status === 200) {
-      Swal.fire("Deleted!", "All related data has been deleted.", "success");
-
-      // Refresh the summaries
-      fetchSummaries();
-    } else {
+      if (response.status === 200) {
+        Swal.fire("Deleted!", "All related data has been deleted.", "success");
+        fetchSummaries();
+      } else {
+        Swal.fire("Error", "Failed to delete the data.", "error");
+      }
+    } catch (error) {
+      console.error("Error deleting related data:", error);
       Swal.fire("Error", "Failed to delete the data.", "error");
     }
-  } catch (error) {
-    console.error("Error deleting related data:", error);
-    Swal.fire("Error", "Failed to delete the data.", "error");
-  }
-};
+  };
 
+  // Handle payment history action
+  const handleHistory = async (generatedId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/purchases/get_payment_history/${generatedId}`
+      );
+      setPaymentHistory(response.data || []);
+      setShowHistoryModal(true);
+    } catch (error) {
+      console.error("Error fetching payment history:", error);
+      Swal.fire("Error", "Failed to fetch payment history.", "error");
+    }
+  };
 
+  // Handle delete payment history
+  const handleDeleteHistory = async (historyId, payment, savedTime) => {
+    try {
+      const confirm = await Swal.fire({
+        title: "Are you sure?",
+        text: `This will delete the payment of ${payment} saved on ${new Date(
+          savedTime
+        ).toLocaleString()}.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+      });
 
+      if (!confirm.isConfirmed) return;
+
+      const response = await axios.delete(
+        `http://localhost:5000/api/purchases/delete_payment_history/${historyId}`
+      );
+
+      if (response.status === 200) {
+        Swal.fire("Deleted!", "Payment history entry has been deleted.", "success");
+        setPaymentHistory((prev) => prev.filter((item) => item.id !== historyId));
+      } else {
+        Swal.fire("Error", "Failed to delete payment history.", "error");
+      }
+    } catch (error) {
+      console.error("Error deleting payment history:", error);
+      Swal.fire("Error", "Failed to delete payment history.", "error");
+    }
+  };
 
   const handleCashAmountChange = (e) => {
     let newCashAmount = parseFloat(e.target.value) || 0;
@@ -388,7 +387,7 @@ const handleDelete = async (generatedId) => {
                         title="Delete Payment"
                         onClick={() =>
                           handleDeleteHistory(
-                            history.id, // Use id for precise deletion
+                            history.id,
                             history.payment,
                             history.saved_time
                           )

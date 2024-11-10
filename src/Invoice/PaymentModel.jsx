@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import Swal from "sweetalert2";
+import PropTypes from "prop-types"; // Import PropTypes for validation
 import "../css1/payment.css";
 
 import cashImage from "../assets/icons/cash.png";
@@ -34,17 +35,55 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
         const data = await response.json();
         setSuggestions(data);
       } catch (error) {
-        Swal.fire("Error", "Failed to fetch customer suggestions", "error");
-      }
+        Swal.fire("Error", "Failed to fetch customer suggestions", error);
+      } 
     } else {
       setSuggestions([]);
     }
   };
 
+
   const handleSuggestionClick = (customer) => {
-    setCustomerMobile(customer.mobile1 || customer.mobile2 || customer.id);
-    setSuggestions([]);
+    setCustomerMobile(customer.id); // Display the customer ID in the input field
+    setSuggestions([]); // Clear suggestions
   };
+
+
+  
+
+  const handleBackToEdit = () => {
+    setCustomerMobile(""); // Clear customer mobile input
+    setSuggestions([]); // Clear suggestions
+    setDiscountPercent(""); // Clear discount percent
+    setDiscountAmount(""); // Clear discount amount
+    setCashPayment(""); // Clear cash payment
+    setCardPayment(""); // Clear card payment
+    setNetAmount(totalAmount); // Reset net amount to total amount
+    setBalance(totalAmount); // Reset balance to total amount
+    setPaymentType("Credit Payment"); // Reset payment type
+    onClose(); // Close the modal
+  };
+  
+
+  const handleCloseBill = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This will close the bill and clear the invoice!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, close it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        clearInvoiceTable(); // Clears the invoice table
+        onClose(); // Closes the modal
+        Swal.fire("Closed!", "The invoice has been cleared.", "success");
+      }
+    });
+  };
+  
+  
 
   // Handle discount percentage
   const handleDiscountPercentChange = (e) => {
@@ -131,33 +170,32 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     }
   };
 
-  const handlePayment = () => {
-    if (balance <= 0) {
-      Swal.fire("Success", "Payment completed successfully", "success");
-      onClose();
-    } else {
+  const handlePayment = async () => {
+    if (balance > 0) {
       Swal.fire("Error", "Payment not completed. Balance is due.", "error");
+      return;
+    }
+  
+    const invoiceData = {
+      customerMobile,
+      user: "Guest", // Replace with the actual user from context or props
+      store: "Default Store", // Replace with the actual store
+      totalAmount: parseFloat(totalAmount),
+      totalQuantity: parseInt(totalQuantity, 10),
+      totalDiscount: parseFloat(totalDiscount),
+      sales: tableData, // Pass the table data (sales items)
+    };
+  
+    try {
+      const response = await axios.post("http://localhost:5000/api/invoice", invoiceData);
+      Swal.fire("Success", response.data.message, "success");
+      clearInvoiceTable(); // Clear invoice table after successful payment
+      onClose(); // Close the payment modal
+    } catch (error) {
+      Swal.fire("Error", "Failed to save payment data", "error");
     }
   };
-
-  const handleCloseBill = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This will close the bill and clear the invoice!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, close it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        clearInvoiceTable(); // Clears the invoice table
-        onClose(); // Closes the modal
-        Swal.fire("Closed!", "The invoice has been cleared.", "success");
-      }
-    });
-  };
-
+  
   const getBalanceStyle = () => {
     if (balance < 0) return { backgroundColor: "red", color: "white" };
     if (balance > 0) return { backgroundColor: "yellow", color: "black" };
@@ -168,7 +206,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     show && (
       <div id="payment-modal">
         <div id="payment-container">
-          <h1 id="total-amount">₹ {totalAmount.toFixed(2)}</h1>
+          <h1 id="total-amount-payment-model">RS: {totalAmount.toFixed(2)}</h1>
 
           {/* Customer Mobile */}
           <div id="customer-mobile-group">
@@ -276,11 +314,19 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
           {/* Action Buttons */}
           <div id="action-buttons">
             <button onClick={handlePayment}>Payment</button>
-            <button onClick={onClose}>Back to Edit</button>
+            <button onClick={handleBackToEdit}>Back to Edit</button>
             <button onClick={handleCloseBill}>Close Bill</button>
           </div>
-        </div>
+        </div> 
       </div>
     )
   );
 }
+
+// Add PropTypes validation
+PaymentModel.propTypes = {
+  show: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  totalAmount: PropTypes.number.isRequired,
+  clearInvoiceTable: PropTypes.func.isRequired,
+};

@@ -1,74 +1,77 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import ReactDOM from 'react-dom';
 import "./OtherItemModel.css";
 import PropTypes from "prop-types";
 import Swal from 'sweetalert2';
 
-
 function OtherItemModel({ show, onClose, onAdd }) {
-    const [productName, setProductName] = useState('');
-    const [productCost, setProductCost] = useState('');
-    const [productSale, setProductSale] = useState('');
-    const [qty, setQty] = useState('');
-  
-    if (!show) return null;
-  
-    const isDecimal = (value) => {
-      return /^\d+(\.\d{1,2})?$/.test(value); // Matches values with up to 2 decimal places
-    };
-  
-    const handleAddToList = () => {
-      // Validation
-      if (!productName) {
-        Swal.fire('Error', 'Please enter a product name', 'error');
-        return;
-      }
-      if (!isDecimal(productCost) || productCost <= 0) {
-        Swal.fire('Error', 'Please enter a valid cost price with up to 2 decimals', 'error');
-        return;
-      }
-      if (!isDecimal(productSale) || productSale <= 0) {
-        Swal.fire('Error', 'Please enter a valid sale price with up to 2 decimals', 'error');
-        return;
-      }
-      if (!isDecimal(qty) || qty <= 0) {
-        Swal.fire('Error', 'Please enter a valid quantity with up to 2 decimals', 'error');
-        return;
-      }
-  
-      // Check if sale price is not greater than cost price
-      if (parseFloat(productSale) < parseFloat(productCost)) {
-        Swal.fire('Error', 'Sale price cannot be greater than cost price', 'error');
-        return;
-      }
-  
-      // Calculate discount
-      const discount =  parseFloat(productSale) - parseFloat(productCost);
-  
-      onAdd({
-        productName,
-        productCost,
-        productSale,
-        qty,
-        discount: discount.toFixed(2) // Send the discount value to Invoice component
-      });
-  
-      // Clear fields and close modal
-      setProductName('');
-      setProductCost('');
-      setProductSale('');
-      setQty('');
-      onClose();
-    };
+  const [productName, setProductName] = useState('');
+  const [productCost, setProductCost] = useState('');
+  const [productMRP, setProductMRP] = useState('');
+  const [productRate, setProductRate] = useState('');
+  const [qty, setQty] = useState('');
 
+  if (!show) return null;
 
-    const handleKeyDown = (e) => {
-      if(e.key === 'Enter'){
-        handleAddToList();
-      }
+  const isDecimal = (value) => {
+    return /^\d+(\.\d{1,2})?$/.test(value); // Matches values with up to 2 decimal places
+  };
+
+  const handleAddToList = () => {
+    // Validation
+    if (!productName) {
+      Swal.fire('Error', 'Please enter a product name', 'error');
+      return;
+    }
+    if (!isDecimal(productCost) || productCost <= 0) {
+      Swal.fire('Error', 'Please enter a valid cost price with up to 2 decimals', 'error');
+      return;
+    }
+    if (!isDecimal(productMRP) || productMRP <= 0) {
+      Swal.fire('Error', 'Please enter a valid MRP price with up to 2 decimals', 'error');
+      return;
+    }
+    if (!isDecimal(productRate) || productRate <= 0) {
+      Swal.fire('Error', 'Please enter a valid rate with up to 2 decimals', 'error');
+      return;
+    }
+    if (!isDecimal(qty) || qty <= 0) {
+      Swal.fire('Error', 'Please enter a valid quantity with up to 2 decimals', 'error');
+      return;
     }
 
+    // Check if rate is not greater than MRP
+    if (parseFloat(productRate) > parseFloat(productMRP)) {
+      Swal.fire('Error', 'Rate cannot be greater than MRP', 'error');
+      return;
+    }
 
+    // Calculate discount
+    const discount = parseFloat(productMRP) - parseFloat(productRate);
+
+    onAdd({
+      productName,
+      productCost,
+      productMRP,
+      productRate,
+      qty,
+      discount: discount.toFixed(2), // Send the discount value to Invoice component
+    });
+
+    // Clear fields and close modal
+    setProductName('');
+    setProductCost('');
+    setProductMRP('');
+    setProductRate('');
+    setQty('');
+    onClose();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleAddToList();
+    }
+  };
 
   return ReactDOM.createPortal(
     <div id='modal-overlay-other-item'>
@@ -89,9 +92,15 @@ function OtherItemModel({ show, onClose, onAdd }) {
         />
         <input
           type="text"
-          placeholder="Product Sale"
-          value={productSale}
-          onChange={(e) => setProductSale(e.target.value)}
+          placeholder="Product MRP"
+          value={productMRP}
+          onChange={(e) => setProductMRP(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Rate"
+          value={productRate}
+          onChange={(e) => setProductRate(e.target.value)}
         />
         <input
           type="text"
@@ -113,6 +122,5 @@ OtherItemModel.propTypes = {
   onClose: PropTypes.func.isRequired,
   onAdd: PropTypes.func.isRequired,
 };
-
 
 export default OtherItemModel;

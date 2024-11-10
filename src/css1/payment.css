@@ -5,6 +5,7 @@
   left: 0;
   width: 100%;
   height: 100%;
+  font-size: 12px;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -12,10 +13,21 @@
   z-index: 1000;
 }
 
+#total-amount-payment-model {
+  background-color: #424242;
+  font-size: 2rem;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  color: #fff;
+  text-align: center;
+}
+
 #payment-container {
   background: #fff;
   border-radius: 8px;
   padding: 20px;
+  font-size: 12px;
   width: 600px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   font-family: Arial, sans-serif;
@@ -23,7 +35,10 @@
 
 /* Input Group */
 [id$="-group"] {
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
 }
 
 [id$="-group"] label {
@@ -31,6 +46,7 @@
   align-items: center;
   gap: 10px;
   font-weight: bold;
+  flex: 1;
 }
 
 [id$="-group"] img {
@@ -39,11 +55,12 @@
 }
 
 [id$="-group"] input {
-  width: calc(100% - 50px);
-  padding: 8px;
+  flex: 2;
+  padding: 6px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 12px;
+  box-sizing: border-box;
 }
 
 /* Suggestions Dropdown */
@@ -52,8 +69,11 @@
   background: #fff;
   border: 1px solid #ccc;
   z-index: 10;
+  margin-top: 80px;
+  margin-left: 200px;
   max-height: 150px;
   overflow-y: auto;
+  width: calc(20% - 50px);
 }
 
 #suggestion-item {
@@ -66,18 +86,27 @@
   background-color: #f0f0f0;
 }
 
+/* Balance */
+#balance-group input {
+  font-weight: bold;
+  text-align: right;
+}
+
 /* Action Buttons */
 #action-buttons {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
 }
 
 #action-buttons button {
+  flex: 1;
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+  text-align: center;
 }
 
 #action-buttons button:nth-child(1) {
@@ -86,7 +115,7 @@
 }
 
 #action-buttons button:nth-child(2) {
-  background: #28a745;
+  background: #075319;
   color: white;
 }
 

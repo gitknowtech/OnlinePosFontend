@@ -55,13 +55,11 @@ function ReturnModel({ show, onClose, onAdd }) {
     setProductMRP('');
   };
 
-
   const handleKeyDown = (e) => {
-    if(e.key === 'Enter'){
+    if (e.key === 'Enter') {
       handleAddToList();
     }
-  }
-
+  };
 
   const handleAddToList = () => {
     if (!productName) {
@@ -80,27 +78,25 @@ function ReturnModel({ show, onClose, onAdd }) {
       Swal.fire('Error', 'Please enter a valid quantity with up to 2 decimals', 'error');
       return;
     }
-  
-    // Calculate the discount based on the original MRP
+
+    // Ensure quantity is positive and calculate values for return
+    const quantity = Math.abs(parseFloat(qty));
     const discount = parseFloat(productMRP) - parseFloat(productSale);
-    const negativeQty = -Math.abs(parseFloat(qty));
-    const negativeAmount = -Math.abs(parseFloat(productSale) * negativeQty);
-  
+    const amount = -(parseFloat(productSale) * quantity); // Negative for return amount
+
     onAdd({
       productName,
       productCost: (-Math.abs(productCost)).toFixed(2),
       productSale: (-Math.abs(productSale)).toFixed(2),
-      qty: negativeQty.toFixed(2),
+      qty: quantity.toFixed(2), // Positive quantity value
       discount: (-Math.abs(discount)).toFixed(2),
-      amount: negativeAmount.toFixed(2),
+      amount: amount.toFixed(2),
       mrp: parseFloat(productMRP).toFixed(2), // Ensure MRP remains unchanged
     });
-  
+
     clearInputs();
     onClose();
   };
-  
-  
 
   const clearInputs = () => {
     setProductName('');
@@ -145,7 +141,7 @@ function ReturnModel({ show, onClose, onAdd }) {
           type="text"
           placeholder="Quantity"
           value={qty}
-          onChange={(e) => setQty(e.target.value)} 
+          onChange={(e) => setQty(e.target.value)}
           onKeyDown={handleKeyDown}
         />
         <button className="add-button-return-item" onClick={handleAddToList}>Add to Return</button>
