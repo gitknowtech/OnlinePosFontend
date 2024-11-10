@@ -170,32 +170,16 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     }
   };
 
-  const handlePayment = async () => {
-    if (balance > 0) {
+  const handlePayment = () => {
+    if (balance <= 0) {
+      Swal.fire("Success", "Payment completed successfully", "success");
+      onClose();
+    } else {
       Swal.fire("Error", "Payment not completed. Balance is due.", "error");
-      return;
-    }
-  
-    const invoiceData = {
-      customerMobile,
-      user: "Guest", // Replace with the actual user from context or props
-      store: "Default Store", // Replace with the actual store
-      totalAmount: parseFloat(totalAmount),
-      totalQuantity: parseInt(totalQuantity, 10),
-      totalDiscount: parseFloat(totalDiscount),
-      sales: tableData, // Pass the table data (sales items)
-    };
-  
-    try {
-      const response = await axios.post("http://localhost:5000/api/invoice", invoiceData);
-      Swal.fire("Success", response.data.message, "success");
-      clearInvoiceTable(); // Clear invoice table after successful payment
-      onClose(); // Close the payment modal
-    } catch (error) {
-      Swal.fire("Error", "Failed to save payment data", "error");
     }
   };
-  
+
+
   const getBalanceStyle = () => {
     if (balance < 0) return { backgroundColor: "red", color: "white" };
     if (balance > 0) return { backgroundColor: "yellow", color: "black" };
