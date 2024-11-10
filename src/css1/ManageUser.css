@@ -1,7 +1,8 @@
 .manage-user {
-    background-color: #e0f7fa; /* Light blue background */
+    background-color: #e2e0fa; /* Light blue background */
     padding: 20px;
     border-radius: 8px;
+    height: 600px;
   }
   
   #user-table-manage-user {
@@ -10,27 +11,31 @@
     background-color: white; /* White table background */
     margin-top: 10px;
   }
+
+  #user-table-manage-user{
+    border-radius: 10px;
+  }
   
   #user-table-manage-user th,
   #user-table-manage-user td {
-    padding: 12px;
+    padding: 6px;
     border: 1px solid #ddd;
     text-align: left;
   }
+
+#user-table-manage-user td{
+  font-size: 14px;
+  font-weight: 700;
+  padding: 5px;
+  }
   
   #user-table-manage-user th {
-    background-color: #007bb5; /* Dark blue header */
+    background-color: #6d6e6e; /* Dark blue header */
     color: white;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 14px;
   }
   
-  #user-table-manage-user tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  #user-table-manage-user tr:hover {
-    background-color: #d9f4ff; /* Light hover effect */
-  }
   
   .icon-manage-user {
     width: 24px;
@@ -57,5 +62,110 @@
   .action-icons-manage-user {
     display: flex;
     gap: 10px;
+  }
+  
+
+  #edit-user-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensures it appears above all other elements */
+  }
+  
+  #modal-content-edit-user {
+    background-color: #fff;
+    width: 400px;
+    max-width: 90%;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out; /* Subtle fade-in effect */
+  }
+  
+  #modal-content-edit-user h3 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  #modal-content-edit-user label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  
+  #modal-content-edit-user input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  #modal-content-edit-user input:focus {
+    outline: none;
+    border-color: #007bff; /* Highlighted border color */
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+  }
+  
+  #modal-buttons-edit-user {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  #submit-button-edit-user,
+  #cancel-button-edit-user {
+    flex: 1;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  #submit-button-edit-user {
+    background-color: #28a745; /* Green for submit */
+    color: #fff;
+    margin-right: 10px;
+  }
+  
+  #submit-button-edit-user:hover {
+    background-color: #218838;
+  }
+  
+  #cancel-button-edit-user {
+    background-color: #dc3545; /* Red for cancel */
+    color: #fff;
+  }
+  
+  #cancel-button-edit-user:hover {
+    background-color: #c82333;
+  }
+  
+  /* Fade-in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
   

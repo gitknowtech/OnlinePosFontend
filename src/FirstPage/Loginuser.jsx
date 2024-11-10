@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import "../css/CompanySetup.css";
 
 const UserLogin = () => {
@@ -9,8 +9,8 @@ const UserLogin = () => {
     UserName: "",
     Password: "",
   });
-  const [loading, setLoading] = useState(false); 
-  const navigate = useNavigate(); 
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Function to handle input change
   const handleChange = (e) => {
@@ -35,7 +35,7 @@ const UserLogin = () => {
   // Function to handle login form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
+    setLoading(true);
 
     try {
       if (!loginData.UserName || !loginData.Password) {
@@ -58,14 +58,14 @@ const UserLogin = () => {
         const { UserName, Image, Store, Type, Email, LastLogin } = response.data.user;
 
         Toast.fire({
-  icon: "success",
-  title: "Signed in successfully"
-}).then(() => {
-  // Pass Username, Image, Store, and Type as state to Dashboard
-  navigate("/dashboard", { 
-    state: { UserName, Image, Store, Type, Email, LastLogin } 
-  });
-});
+          icon: "success",
+          title: "Signed in successfully"
+        }).then(() => {
+          // Pass Username, Image, Store, and Type as state to Dashboard
+          navigate("/dashboard", {
+            state: { UserName, Image, Store, Type, Email, LastLogin }
+          });
+        });
       } else {
         throw new Error(response.data.message || "Login failed. Please try again.");
       }
@@ -77,7 +77,7 @@ const UserLogin = () => {
         confirmButtonText: "OK",
       });
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 

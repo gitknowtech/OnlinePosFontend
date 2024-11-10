@@ -7,6 +7,7 @@ import ReturnModel from "../models/ReturnModel";
 import StockModel from "../models/StockModel";
 import ExpensesModel from "../models/ExpensesModel";
 import "../css1/invoice.css";
+import PaymentModel from "./PaymentModel";
 
 // Ensure these image paths are correct in your project structure
 import productimage from "../assets/images/products.png";
@@ -54,7 +55,7 @@ export default function Invoice() {
   const qtyInputRef = useRef(null);
   const barcodeInputRef = useRef(null);
 
-  
+
   // OtherItem model related contents
   const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);
   const handleOtherItemClick = () => setIsOtherItemModalOpen(true);
@@ -64,9 +65,25 @@ export default function Invoice() {
   const handleExpensesClick = () => setIsExpensesModalOpen(true);
   const handleCloseExpensesModal = () => setIsExpensesModalOpen(false);
   // State to control the visibility of the ReturnModel
-  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);// State to control the visibility of the StockModel
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  // State to control the visibility of the StockModel
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
+
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+
+
   
+  const handleOpenPaymentModal = () => {
+    // Check if there is any data in the table
+    if (tableData.length === 0) {
+      Swal.fire("Error", "Please add products to the table before proceeding to payment.", "error");
+      return;
+    }
+  
+    setIsPaymentModalOpen(true);
+  };
+const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
+
   // Function to open the StockModel
   const handleStockClick = () => {
     setIsStockModalOpen(true);
@@ -83,7 +100,7 @@ export default function Invoice() {
       Swal.fire('Error', 'Invalid product data', 'error');
       return;
     }
-  
+
     // Set only the barcode state
     setBarcode(product.barcode);
     setCostPrice(product.costPrice);
@@ -91,57 +108,62 @@ export default function Invoice() {
     setPrice(product.salePrice);
     setSuggestedPrice(product.mrpPrice);
     setLockedPrice(product.lockedPrice);
-  
+
     // Refocus on barcode input after selection
     barcodeInputRef.current.focus();
   };
-  
-  
+
+
 
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       switch (e.key) {
         case "F1":
-          e.preventDefault(); // Prevent default browser action for F1
-          barcodeInputRef.current?.focus(); // Focus the barcode input
+          e.preventDefault();
+          barcodeInputRef.current?.focus();
           break;
         case "F4":
-          e.preventDefault(); // Prevent default browser action for F4
-          setIsOtherItemModalOpen((prev) => !prev); // Toggle OtherItemModel visibility
+          e.preventDefault();
+          setIsOtherItemModalOpen((prev) => !prev);
           break;
         case "F7":
-          e.preventDefault(); // Prevent default browser action for F7
-          handleReturnClick(); // Run the handleReturnClick function
+          e.preventDefault();
+          handleReturnClick();
           break;
         case "F3":
-          e.preventDefault(); // Prevent default browser action for F6
-          setIsExpensesModalOpen((prev) => !prev); // Toggle ExpensesModel visibility
+          e.preventDefault();
+          setIsExpensesModalOpen((prev) => !prev);
           break;
         case "F6":
           e.preventDefault();
           setIsStockModalOpen((prev) => !prev);
           break;
+        case "F9":
+          e.preventDefault();
+          handleOpenPaymentModal();
+          break;
         case "Escape":
-          e.preventDefault(); // Prevent default browser action for Escape
-          // Close all modals by setting their state to false
+          e.preventDefault();
           setIsOtherItemModalOpen(false);
           setIsExpensesModalOpen(false);
           setIsReturnModalOpen(false);
           setIsStockModalOpen(false);
+          setIsPaymentModalOpen(false);
           break;
         default:
-          // Do nothing for other keys, allowing them to work as usual
           break;
       }
     };
-  
+
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []); // No dependencies needed unless states/functions change
-  
+  }, []);
+
+
+
 
   useEffect(() => {
     if (location.state) {
@@ -159,13 +181,13 @@ export default function Invoice() {
     setStartTime(formattedTime);
   }, [location.state]);
 
-  
+
 
   useEffect(() => {
     calculateTotals();
   }, [tableData]);
 
-  
+
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -183,14 +205,14 @@ export default function Invoice() {
         }
       }
     };
-  
+
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isWholesale, isDiscount]); // Add dependencies to keep the hook up-to-date
-  
-  
+
+
 
 
   const handleAddOtherItem = (item) => {
@@ -230,7 +252,7 @@ export default function Invoice() {
   const handleAddReturnItem = (item) => {
     // Adjust the data to have negative values
     const amount = -Math.abs(parseFloat(item.productSale) * parseFloat(item.qty));
-  
+
     setTableData((prevData) => [
       ...prevData,
       {
@@ -244,12 +266,12 @@ export default function Invoice() {
         type: 'return', // Add a 'type' field to mark this as a return
       },
     ]);
-  
+
     setIsReturnModalOpen(false);
   };
-  
 
-  
+
+
 
   const handleQuantityChange = (e, index) => {
     const newQuantity = e.target.value;
@@ -333,7 +355,7 @@ export default function Invoice() {
   };
 
 
-  
+
   const handleBarcodeEnter = async () => {
     try {
       const response = await axios.get(
@@ -408,29 +430,29 @@ export default function Invoice() {
     const validItems = tableData.filter(
       (item) => parseFloat(item.discount) >= 0 && parseFloat(item.quantity) >= 0
     );
-  
+
     const totalAmount = tableData.reduce(
       (total, item) => total + parseFloat(item.amount),
       0
     );
-  
+
     const totalQuantity = validItems.reduce(
       (total, item) => total + parseFloat(item.quantity),
       0
     );
-  
+
     const totalDiscount = validItems.reduce(
       (total, item) =>
         total + parseFloat(item.discount) * parseFloat(item.quantity),
       0
     );
-  
+
     setTotalAmount(totalAmount.toFixed(2));
     setTotalQuantity(totalQuantity);
     setTotalDiscount(totalDiscount.toFixed(2));
     setItemCount(validItems.length);
   };
-  
+
 
   const handleVirtualEnter = () => {
     if (document.activeElement === barcodeInputRef.current) {
@@ -588,23 +610,23 @@ export default function Invoice() {
             <tbody>
               {tableData.map((item, index) => (
                 <tr
-                key={index}
-                className={
-                  item.type === "return"
-                    ? "return-row"
-                    : item.type === "new"
-                    ? "new-row"
-                    : ""
-                }
-                style={
-                  item.type === "return"
-                    ? { backgroundColor: "#fcd8d8" } // Light red for return
-                    : item.type === "new"
-                    ? { backgroundColor: "#d8fcdb" } // Light green for new items
-                    : {}
-                }
-              >
-              
+                  key={index}
+                  className={
+                    item.type === "return"
+                      ? "return-row"
+                      : item.type === "new"
+                        ? "new-row"
+                        : ""
+                  }
+                  style={
+                    item.type === "return"
+                      ? { backgroundColor: "#fcd8d8" } // Light red for return
+                      : item.type === "new"
+                        ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                        : {}
+                  }
+                >
+
                   <td>{item.name}</td>
                   <td style={{ textAlign: "center" }}>{item.cost}</td>
                   <td style={{ textAlign: "center" }}>{item.mrp}</td>
@@ -618,7 +640,7 @@ export default function Invoice() {
                     }
                   >
                     {editingCell.rowIndex === index &&
-                    editingCell.field === "quantity" ? (
+                      editingCell.field === "quantity" ? (
                       <input
                         type="text"
                         value={item.quantity}
@@ -754,13 +776,14 @@ export default function Invoice() {
                 <span>Day End</span>
               </label>
             </div>
-            <div className="option-box">
+            <div className="option-box" onClick={handleOpenPaymentModal}>
               <label htmlFor="payment">
-                <img src={payment} alt="Payment" style={{ marginLeft: "15   px" }} />
+                <img src={payment} alt="Payment" style={{ marginLeft: "5px" }} />
                 <br />
                 <span>Payment (F9)</span>
               </label>
             </div>
+
           </div>
         </div>
       </div>
@@ -931,7 +954,7 @@ export default function Invoice() {
           onClose={handleCloseExpensesModal}
           user={user}
           store={store}
-          onAdd={() => {}}
+          onAdd={() => { }}
         />
 
         {/* Render the OtherItemModel */}
@@ -954,6 +977,13 @@ export default function Invoice() {
           onClose={handleCloseStockModal}
           onProductSelect={handleProductSelect}
         />
+
+<PaymentModel
+        show={isPaymentModalOpen}
+        onClose={handleClosePaymentModal}
+        totalAmount={parseFloat(totalAmount || 0)}
+      />
+
       </div>
     </div>
   );

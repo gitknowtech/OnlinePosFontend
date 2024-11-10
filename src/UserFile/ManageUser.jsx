@@ -8,7 +8,11 @@ import "../css1/ManageUser.css";
 
 const ManageUser = () => {
   const [users, setUsers] = useState([]); // User data
-  const [visiblePasswords, setVisiblePasswords] = useState({}); // Track visibility of passwords
+  const [editUser, setEditUser] = useState(null); // User being edited
+  const [updatedData, setUpdatedData] = useState({
+    Email: "",
+    Password: "",
+  }); // Updated email and password
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -27,6 +31,21 @@ const ManageUser = () => {
         text: "Failed to fetch users.",
       });
     }
+  };
+
+  // Open edit modal and populate the fields
+  const handleEdit = (user) => {
+    setEditUser(user);
+    setUpdatedData({
+      Email: user.Email,
+      Password: "",
+    });
+  };
+
+  // Handle input change in the edit modal
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedData((prev) => ({ ...prev, [name]: value }));
   };
 
   const togglePasswordVisibility = async (user) => {
@@ -50,31 +69,31 @@ const ManageUser = () => {
     }
   };
 
-  const handleDelete = async (userName) => {
-    const confirm = await Swal.fire({
-      title: "Are you sure?",
-      text: `This will permanently delete the user "${userName}".`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-    });
 
-    if (!confirm.isConfirmed) return;
-
+  // Submit updated data
+  const handleUpdate = async (e) => {
+    e.preventDefault();
     try {
-      await axios.delete(`http://localhost:5000/api/users/delete_user/${userName}`);
-      Swal.fire({
-        icon: "success",
-        title: "Deleted",
-        text: "User deleted successfully.",
-      });
-      fetchUsers(); // Refresh user list
+      const response = await axios.put(
+        `http://localhost:5000/api/users/update_user/${editUser.UserName}`,
+        updatedData
+      );
+
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Updated",
+          text: "User updated successfully.",
+        });
+        fetchUsers(); // Refresh user list
+        setEditUser(null); // Close modal
+      }
     } catch (error) {
-      console.error("Error deleting user:", error);
+      console.error("Error updating user:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error.response?.data?.message || "Failed to delete user.",
+        text: error.response?.data?.message || "Failed to update user.",
       });
     }
   };
@@ -111,12 +130,12 @@ const ManageUser = () => {
               </td>
               <td>{user.Type}</td>
               <td>{user.Store}</td>
-              <td>
+              <td style={{width:"70px"}}>
                 <div className="action-icons-manage-user">
                   <button
                     className="edit-button-manage-user"
                     title="Edit User"
-                    onClick={() => console.log(`Edit user: ${user.id}`)}
+                    onClick={() => handleEdit(user)}
                   >
                     <img src={editImage} alt="Edit User" className="icon-manage-user" />
                   </button>
@@ -133,6 +152,46 @@ const ManageUser = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Edit User Modal */}
+      {editUser && (
+        <div id="edit-user-modal">
+          <div id="modal-content-edit-user">
+            <h3>Edit User</h3>
+            <form onSubmit={handleUpdate}>
+              <label>Email</label>
+              <input
+                type="email"
+                name="Email"
+                value={updatedData.Email}
+                onChange={handleInputChange}
+                required
+              />
+
+              <label>New Password</label>
+              <input
+                type="password"
+                name="Password"
+                value={updatedData.Password}
+                onChange={handleInputChange}
+              />
+
+              <div id="modal-buttons-edit-user">
+                <button type="submit" id="submit-button-edit-user">
+                  Update
+                </button>
+                <button
+                  type="button"
+                  id="cancel-button-edit-user"
+                  onClick={() => setEditUser(null)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
