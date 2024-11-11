@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types"; // Import PropTypes for validation
 import "../css1/payment.css";
@@ -22,6 +22,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
   const [balance, setBalance] = useState(totalAmount);
   const [paymentType, setPaymentType] = useState("Credit Payment");
 
+
+
   // Handle customer mobile input and fetch suggestions
   const handleCustomerMobileChange = async (e) => {
     const input = e.target.value;
@@ -36,7 +38,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
         setSuggestions(data);
       } catch (error) {
         Swal.fire("Error", "Failed to fetch customer suggestions", error);
-      } 
+      }
     } else {
       setSuggestions([]);
     }
@@ -49,7 +51,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
   };
 
 
-  
+
 
   const handleBackToEdit = () => {
     setCustomerMobile(""); // Clear customer mobile input
@@ -63,12 +65,12 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     setPaymentType("Credit Payment"); // Reset payment type
     onClose(); // Close the modal
   };
-  
+
 
   const handleCloseBill = () => {
     Swal.fire({
       title: "Are you sure?",
-      text: "This will close the bill and clear the invoice!",
+      text: "This will clear the bill and reset all fields!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -76,14 +78,26 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       confirmButtonText: "Yes, close it!",
     }).then((result) => {
       if (result.isConfirmed) {
+        // Clear all fields
+        setCustomerMobile("");
+        setSuggestions([]);
+        setDiscountPercent("");
+        setDiscountAmount("");
+        setCashPayment("");
+        setCardPayment("");
+        setNetAmount(totalAmount);
+        setBalance(totalAmount);
+        setPaymentType("Credit Payment");
+
         clearInvoiceTable(); // Clears the invoice table
         onClose(); // Closes the modal
         Swal.fire("Closed!", "The invoice has been cleared.", "success");
       }
     });
   };
-  
-  
+
+
+
 
   // Handle discount percentage
   const handleDiscountPercentChange = (e) => {
@@ -124,24 +138,56 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     updatePaymentType(net, 0);
   };
 
-  // Handle cash payment
-  const handleCashPaymentChange = (e) => {
-    const cash = parseFloat(e.target.value) || 0;
-    const card = parseFloat(cardPayment) || 0;
 
-    if (cash + card > netAmount) {
-      Swal.fire("Error", "The total payment cannot exceed the net amount!", "error");
+
+  const handleCashPaymentChange = (e) => {
+    const inputValue = e.target.value;
+
+    // Validate input to ensure it's a numeric value
+    if (!/^\d*\.?\d*$/.test(inputValue)) {
+      return; // Ignore invalid input
+    }
+
+    const cash = parseFloat(inputValue) || 0; // Cash payment value entered by the user
+    const net = parseFloat(netAmount) || 0; // Net amount from the state
+    const card = net - cash; // Calculate card payment dynamically
+
+    // Ensure cash does not exceed the net amount
+    if (cash > net) {
+      Swal.fire("Error", "Cash payment cannot exceed the net amount!", "error");
+      setCashPayment(""); // Reset cash payment
+      setCardPayment(net.toFixed(2)); // Reset card payment to full net amount
+      setBalance(net.toFixed(2)); // Reset balance
+      setPaymentType("Credit Payment"); // Set payment type as credit
       return;
     }
 
-    setCashPayment(e.target.value);
+    // Update cash payment field
+    setCashPayment(inputValue);
 
-    const totalPaid = cash + card;
-    const remainingBalance = netAmount - totalPaid;
+    // Update card payment field dynamically
+    setCardPayment(card.toFixed(2));
 
-    setBalance(remainingBalance.toFixed(2));
-    updatePaymentType(netAmount, totalPaid);
+    // Update balance
+    setBalance("0.00"); // Balance should be zero after full payment
+
+    // Determine the payment type
+    if (cash + card < netAmount) {
+      setPaymentType("Credit Payment"); // Insufficient payment made
+    } else if (cash === 0 && card === 0) {
+      setPaymentType("Credit Payment"); // No payment made
+    } else if (cash > 0 && card > 0) {
+      setPaymentType("Cash and Card Payment"); // Mixed payment
+    } else if (cash > 0 && card === 0) {
+      setPaymentType("Cash Payment"); // Fully paid in cash
+    } else if (cash === 0 && card > 0) {
+      setPaymentType("Card Payment"); // Fully paid by card
+    }
+
   };
+
+
+
 
   // Handle card payment
   const handleCardPaymentChange = (e) => {
@@ -162,6 +208,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     updatePaymentType(netAmount, totalPaid);
   };
 
+
   const updatePaymentType = (net, paid) => {
     if (net - paid > 0) {
       setPaymentType("Credit Payment");
@@ -170,14 +217,62 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     }
   };
 
-  const handlePayment = () => {
-    if (balance <= 0) {
-      Swal.fire("Success", "Payment completed successfully", "success");
-      onClose();
-    } else {
-      Swal.fire("Error", "Payment not completed. Balance is due.", "error");
+
+  const handlePayment = async () => {
+    if (balance < 0) {
+      Swal.fire("Error", "Balance cannot be negative. Please check the payment details.", "error");
+      return;
+    }
+  
+    const paymentData = {
+      GrossTotal: totalAmount,
+      CustomerId: customerMobile || "Unknown", // Default to 'Unknown' if no customer
+      discountPercent: discountPercent,
+      discountAmount: discountAmount,
+      netAmount: netAmount,
+      CashPay: cashPayment,
+      CardPay: cardPayment,
+      PaymentType: paymentType,
+      Balance: balance, // Allow saving with a remaining balance
+    };
+  
+    try {
+      const response = await fetch("http://localhost:5000/api/invoices/add_sales", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        Swal.fire("Success", `Payment saved successfully! Invoice ID: ${result.invoiceId}`, "success");
+  
+        // Clear fields and reset state
+        setCustomerMobile("");
+        setSuggestions([]);
+        setDiscountPercent("");
+        setDiscountAmount("");
+        setCashPayment("");
+        setCardPayment("");
+        setNetAmount(totalAmount);
+        setBalance(totalAmount);
+        setPaymentType("Credit Payment");
+  
+        clearInvoiceTable();
+        onClose();
+      } else {
+        const error = await response.json();
+        Swal.fire("Error", `Failed to save payment: ${error.message}`, "error");
+      }
+    } catch (err) {
+      Swal.fire("Error", "An unexpected error occurred.", "error");
     }
   };
+  
+
+
 
 
   const getBalanceStyle = () => {
@@ -261,7 +356,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
               Cash Payment
             </label>
             <input
-              type="number"
+              type="text"
               placeholder="Enter Cash Payment"
               value={cashPayment}
               onChange={handleCashPaymentChange}
@@ -297,11 +392,11 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
 
           {/* Action Buttons */}
           <div id="action-buttons">
-            <button onClick={handlePayment}>Payment</button>
+            <button onClick={handlePayment}>Complete Payment</button>
             <button onClick={handleBackToEdit}>Back to Edit</button>
             <button onClick={handleCloseBill}>Close Bill</button>
           </div>
-        </div> 
+        </div>
       </div>
     )
   );
@@ -313,4 +408,5 @@ PaymentModel.propTypes = {
   onClose: PropTypes.func.isRequired,
   totalAmount: PropTypes.number.isRequired,
   clearInvoiceTable: PropTypes.func.isRequired,
+  tableData: PropTypes.array.isRequired, // Pass table data for invoice
 };

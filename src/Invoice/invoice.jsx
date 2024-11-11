@@ -210,7 +210,7 @@ export default function Invoice() {
   const handleAddOtherItem = (item) => {
     const { productName, productCost, productMRP, productRate, qty, discount } = item;
     const amount = parseFloat(productRate) * parseFloat(qty); // Calculate amount based on Rate and Quantity
-  
+
     setTableData((prevData) => [
       ...prevData,
       {
@@ -223,10 +223,10 @@ export default function Invoice() {
         amount: amount.toFixed(2),               // Total amount (Rate * Quantity)
       },
     ]);
-  
+
     setIsOtherItemModalOpen(false); // Close the modal after adding the item
   };
-  
+
 
   // Function to handle when the "Return" button is clicked
   const handleReturnClick = () => {
@@ -634,15 +634,15 @@ export default function Invoice() {
                     item.type === "return"
                       ? "return-row"
                       : item.type === "new"
-                      ? "new-row"
-                      : ""
+                        ? "new-row"
+                        : ""
                   }
                   style={
                     item.type === "return"
                       ? { backgroundColor: "#fcd8d8" } // Light red for return
                       : item.type === "new"
-                      ? { backgroundColor: "#d8fcdb" } // Light green for new items
-                      : {}
+                        ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                        : {}
                   }
                 >
                   <td>{item.name}</td>
@@ -658,7 +658,7 @@ export default function Invoice() {
                     }
                   >
                     {editingCell.rowIndex === index &&
-                    editingCell.field === "quantity" ? (
+                      editingCell.field === "quantity" ? (
                       <input
                         type="text"
                         value={item.quantity}
@@ -975,7 +975,7 @@ export default function Invoice() {
           onClose={handleCloseExpensesModal}
           user={user}
           store={store}
-          onAdd={() => {}}
+          onAdd={() => { }}
         />
 
         {/* Render the OtherItemModel */}
@@ -999,12 +999,13 @@ export default function Invoice() {
           onProductSelect={handleProductSelect}
         />
 
-        <PaymentModel
-          show={isPaymentModalOpen}
-          onClose={handleClosePaymentModal}
-          totalAmount={parseFloat(totalAmount || 0)}
-          clearInvoiceTable={clearInvoiceTable}
-        />
+<PaymentModel
+  show={isPaymentModalOpen}
+  onClose={handleClosePaymentModal}
+  totalAmount={parseFloat(totalAmount || 0)}
+  clearInvoiceTable={clearInvoiceTable}
+/>
+
       </div>
     </div>
   );
