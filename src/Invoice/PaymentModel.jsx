@@ -11,7 +11,7 @@ import discountPriceImage from "../assets/icons/discounts.png";
 import paymentTypeImage from "../assets/icons/paymentType.png";
 import netAmountImage from "../assets/icons/netAmount.png"; // Add an appropriate image for Net Amount
 
-export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceTable }) {
+export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceTable, tableData }) {
   const [customerMobile, setCustomerMobile] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [discountPercent, setDiscountPercent] = useState("");
@@ -21,8 +21,6 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
   const [netAmount, setNetAmount] = useState(totalAmount);
   const [balance, setBalance] = useState(totalAmount);
   const [paymentType, setPaymentType] = useState("Credit Payment");
-
-
 
   // Handle customer mobile input and fetch suggestions
   const handleCustomerMobileChange = async (e) => {
@@ -44,14 +42,10 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     }
   };
 
-
   const handleSuggestionClick = (customer) => {
     setCustomerMobile(customer.id); // Display the customer ID in the input field
     setSuggestions([]); // Clear suggestions
   };
-
-
-
 
   const handleBackToEdit = () => {
     setCustomerMobile(""); // Clear customer mobile input
@@ -65,7 +59,6 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     setPaymentType("Credit Payment"); // Reset payment type
     onClose(); // Close the modal
   };
-
 
   const handleCloseBill = () => {
     Swal.fire({
@@ -95,9 +88,6 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       }
     });
   };
-
-
-
 
   // Handle discount percentage
   const handleDiscountPercentChange = (e) => {
@@ -137,8 +127,6 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     setBalance(net.toFixed(2));
     updatePaymentType(net, 0);
   };
-
-
 
   const handleCashPaymentChange = (e) => {
     const inputValue = e.target.value;
@@ -183,11 +171,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     } else if (cash === 0 && card > 0) {
       setPaymentType("Card Payment"); // Fully paid by card
     }
-
   };
-
-
-
 
   // Handle card payment
   const handleCardPaymentChange = (e) => {
@@ -208,7 +192,6 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     updatePaymentType(netAmount, totalPaid);
   };
 
-
   const updatePaymentType = (net, paid) => {
     if (net - paid > 0) {
       setPaymentType("Credit Payment");
@@ -217,13 +200,12 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     }
   };
 
-
   const handlePayment = async () => {
     if (balance < 0) {
       Swal.fire("Error", "Balance cannot be negative. Please check the payment details.", "error");
       return;
     }
-  
+
     const paymentData = {
       GrossTotal: totalAmount,
       CustomerId: customerMobile || "Unknown", // Default to 'Unknown' if no customer
@@ -233,47 +215,49 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       CashPay: cashPayment,
       CardPay: cardPayment,
       PaymentType: paymentType,
-      Balance: balance, // Allow saving with a remaining balance
+      Balance: balance,
+      invoiceItems: tableData, // Include invoice items here
     };
-  
+
     try {
-      const response = await fetch("http://localhost:5000/api/invoices/add_sales", {
+      // Save payment and invoice items in sales and invoices tables
+      const salesResponse = await fetch("http://localhost:5000/api/invoices/add_sales", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(paymentData),
       });
-  
-      if (response.ok) {
-        const result = await response.json();
-        Swal.fire("Success", `Payment saved successfully! Invoice ID: ${result.invoiceId}`, "success");
-  
-        // Clear fields and reset state
-        setCustomerMobile("");
-        setSuggestions([]);
-        setDiscountPercent("");
-        setDiscountAmount("");
-        setCashPayment("");
-        setCardPayment("");
-        setNetAmount(totalAmount);
-        setBalance(totalAmount);
-        setPaymentType("Credit Payment");
-  
-        clearInvoiceTable();
-        onClose();
-      } else {
-        const error = await response.json();
+
+      if (!salesResponse.ok) {
+        const error = await salesResponse.json();
         Swal.fire("Error", `Failed to save payment: ${error.message}`, "error");
+        return;
       }
-    } catch (err) {
-      Swal.fire("Error", "An unexpected error occurred.", "error");
+
+      const salesResult = await salesResponse.json();
+      const { invoiceId } = salesResult;
+
+      // Notify success
+      Swal.fire("Success", `Payment and invoice saved successfully! Invoice ID: ${invoiceId}`, "success");
+
+      // Clear fields and reset state
+      setCustomerMobile("");
+      setSuggestions([]);
+      setDiscountPercent("");
+      setDiscountAmount("");
+      setCashPayment("");
+      setCardPayment("");
+      setNetAmount(totalAmount);
+      setBalance(totalAmount);
+      setPaymentType("Credit Payment");
+
+      clearInvoiceTable();
+      onClose();
+    } catch (error) {
+      Swal.fire("Error", "An unexpected error occurred.", error);
     }
   };
-  
-
-
-
 
   const getBalanceStyle = () => {
     if (balance < 0) return { backgroundColor: "red", color: "white" };
@@ -285,7 +269,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     show && (
       <div id="payment-modal">
         <div id="payment-container">
-          <h1 id="total-amount-payment-model">RS: {totalAmount.toFixed(2)}</h1>
+          <h1 id="total-amount-payment-model">RS: {parseFloat(totalAmount || 0).toFixed(2)}</h1>
 
           {/* Customer Mobile */}
           <div id="customer-mobile-group">
@@ -408,5 +392,15 @@ PaymentModel.propTypes = {
   onClose: PropTypes.func.isRequired,
   totalAmount: PropTypes.number.isRequired,
   clearInvoiceTable: PropTypes.func.isRequired,
-  tableData: PropTypes.array.isRequired, // Pass table data for invoice
+  tableData: PropTypes.arrayOf( // Define tableData as a required prop
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      cost: PropTypes.string.isRequired,
+      mrp: PropTypes.string.isRequired,
+      discount: PropTypes.string.isRequired,
+      rate: PropTypes.string.isRequired,
+      quantity: PropTypes.string.isRequired,
+      amount: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };

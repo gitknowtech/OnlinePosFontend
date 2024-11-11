@@ -208,7 +208,8 @@ export default function Invoice() {
   }, [isWholesale, isDiscount]); // Add dependencies to keep the hook up-to-date
 
   const handleAddOtherItem = (item) => {
-    const { productName, productCost, productMRP, productRate, qty, discount } = item;
+    const { productName, productCost, productMRP, productRate, qty, discount } =
+      item;
     const amount = parseFloat(productRate) * parseFloat(qty); // Calculate amount based on Rate and Quantity
 
     setTableData((prevData) => [
@@ -216,17 +217,16 @@ export default function Invoice() {
       {
         name: productName,
         cost: parseFloat(productCost).toFixed(2), // Cost
-        mrp: parseFloat(productMRP).toFixed(2),   // MRP
+        mrp: parseFloat(productMRP).toFixed(2), // MRP
         discount: parseFloat(discount).toFixed(2), // Discount calculated as MRP - Rate
         rate: parseFloat(productRate).toFixed(2), // Rate
-        quantity: parseFloat(qty).toFixed(2),     // Quantity
-        amount: amount.toFixed(2),               // Total amount (Rate * Quantity)
+        quantity: parseFloat(qty).toFixed(2), // Quantity
+        amount: amount.toFixed(2), // Total amount (Rate * Quantity)
       },
     ]);
 
     setIsOtherItemModalOpen(false); // Close the modal after adding the item
   };
-
 
   // Function to handle when the "Return" button is clicked
   const handleReturnClick = () => {
@@ -252,7 +252,7 @@ export default function Invoice() {
         mrp: -Math.abs(parseFloat(item.mrp).toFixed(2)), // Ensure MRP retains original value
         discount: (-Math.abs(parseFloat(item.discount))).toFixed(2),
         rate: (-Math.abs(parseFloat(item.productSale))).toFixed(2),
-        quantity: (Math.abs(parseFloat(item.qty))).toFixed(2),
+        quantity: (-Math.abs(parseFloat(item.qty))).toFixed(2),
         amount: amount.toFixed(2),
         type: "return", // Add a 'type' field to mark this as a return
       },
@@ -403,33 +403,110 @@ export default function Invoice() {
     }
   };
 
-  const handleQtyEnter = () => {
+
+
+  // Updated function to check stock when entering quantity
+  const handleQtyEnter = async () => {
     if (qty) {
-      const discount = parseFloat(suggestedPrice) - parseFloat(price);
-      const amount = parseFloat(price) * parseFloat(qty);
+      const requestedQuantity = parseFloat(qty);
+      try {
+        // Fetch the available stock quantity for the product
+        const response = await axios.get(
+          `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
+        );
+        const availableStock = response.data.stockQuantity;
 
-      setTableData((prevData) => [
-        ...prevData,
-        {
-          name: productName,
-          cost: costPrice.toFixed(2),
-          mrp: suggestedPrice,
-          discount: discount.toFixed(2),
-          rate: price,
-          quantity: qty,
-          amount: amount.toFixed(2),
-          type: "new", // Mark as a new row
-        },
-      ]);
+        if (requestedQuantity <= availableStock) {
+          // Check if the product is already in tableData
+          setTableData((prevData) => {
+            const existingIndex = prevData.findIndex(
+              (item) => item.barcode === barcode
+            );
+            if (existingIndex !== -1) {
+              // Update existing item
+              const existingItem = prevData[existingIndex];
+              const newQuantity =
+                parseFloat(existingItem.quantity) + requestedQuantity;
 
-      setProductName("");
-      setBarcode("");
-      setPrice("");
-      setQty("");
-      setSuggestedPrice("");
-      barcodeInputRef.current.focus();
+              if (newQuantity <= availableStock) {
+                const rate = parseFloat(existingItem.rate);
+                const newAmount = rate * newQuantity;
+                const updatedItem = {
+                  ...existingItem,
+                  quantity: newQuantity.toFixed(2),
+                  amount: newAmount.toFixed(2),
+                };
+                const newData = [...prevData];
+                newData[existingIndex] = updatedItem;
+                return newData;
+              } else {
+                Swal.fire(
+                  "Insufficient Stock",
+                  `Only ${availableStock} units of ${productName} are available in total.`,
+                  "warning"
+                );
+                return prevData;
+              }
+            } else {
+              // Add new item
+              const discount = parseFloat(suggestedPrice) - parseFloat(price);
+              const amount = parseFloat(price) * requestedQuantity;
+
+              return [
+                ...prevData,
+                {
+                  name: productName,
+                  cost: parseFloat(costPrice).toFixed(2),
+                  mrp: parseFloat(suggestedPrice).toFixed(2),
+                  discount: discount.toFixed(2),
+                  rate: parseFloat(price).toFixed(2),
+                  quantity: requestedQuantity.toFixed(2),
+                  amount: amount.toFixed(2),
+                  type: "new", // Mark as a new row
+                  barcode: barcode, // Include barcode for identification
+                },
+              ];
+            }
+          });
+
+          // Clear input fields
+          setProductName("");
+          setBarcode("");
+          setPrice("");
+          setQty("");
+          setSuggestedPrice("");
+          barcodeInputRef.current.focus();
+        } else if (availableStock > 0) {
+          // Display a message indicating the maximum available quantity
+          Swal.fire(
+            "Insufficient Stock",
+            `Only ${availableStock} units of ${productName} are available.`,
+            "warning"
+          );
+          // Optionally, you can set the quantity to the available stock
+          setQty(availableStock.toString());
+        } else {
+          // No stock available
+          Swal.fire(
+            "Out of Stock",
+            `${productName} is currently out of stock.`,
+            "error"
+          );
+          // Clear input fields
+          setBarcode("");
+          setProductName("");
+          setPrice("");
+          setQty("");
+          setSuggestedPrice("");
+          barcodeInputRef.current.focus();
+        }
+      } catch (error) {
+        Swal.fire("Error", "Failed to fetch stock quantity", "error");
+        console.error("Error fetching stock quantity:", error);
+      }
     }
   };
+
 
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
@@ -634,15 +711,15 @@ export default function Invoice() {
                     item.type === "return"
                       ? "return-row"
                       : item.type === "new"
-                        ? "new-row"
-                        : ""
+                      ? "new-row"
+                      : ""
                   }
                   style={
                     item.type === "return"
                       ? { backgroundColor: "#fcd8d8" } // Light red for return
                       : item.type === "new"
-                        ? { backgroundColor: "#d8fcdb" } // Light green for new items
-                        : {}
+                      ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                      : {}
                   }
                 >
                   <td>{item.name}</td>
@@ -658,7 +735,7 @@ export default function Invoice() {
                     }
                   >
                     {editingCell.rowIndex === index &&
-                      editingCell.field === "quantity" ? (
+                    editingCell.field === "quantity" ? (
                       <input
                         type="text"
                         value={item.quantity}
@@ -975,7 +1052,7 @@ export default function Invoice() {
           onClose={handleCloseExpensesModal}
           user={user}
           store={store}
-          onAdd={() => { }}
+          onAdd={() => {}}
         />
 
         {/* Render the OtherItemModel */}
@@ -999,13 +1076,13 @@ export default function Invoice() {
           onProductSelect={handleProductSelect}
         />
 
-<PaymentModel
-  show={isPaymentModalOpen}
-  onClose={handleClosePaymentModal}
-  totalAmount={parseFloat(totalAmount || 0)}
-  clearInvoiceTable={clearInvoiceTable}
-/>
-
+        <PaymentModel
+          show={isPaymentModalOpen}
+          onClose={handleClosePaymentModal}
+          totalAmount={parseFloat(totalAmount || 0)}
+          clearInvoiceTable={clearInvoiceTable}
+          tableData={tableData} // Pass table data for invoice items
+        />
       </div>
     </div>
   );
