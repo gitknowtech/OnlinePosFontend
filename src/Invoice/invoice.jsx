@@ -682,21 +682,21 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
   };
 
   return (
-    <div className="invoice-container" id="invoice_container_id">
+    <div className="invoice-container">
       <div className="left-panel">
-        <div className="header-info">
+        <div className="header-info" id="header-info-invoice">
           <div>
-            <label>
+            <label id="user-label">
               User: <span id="user_span">{user}</span>
             </label>
           </div>
           <div>
-            <label>
+            <label id="user-label">
               Store: <span id="store_span">{store}</span>
             </label>
           </div>
           <div>
-            <label>
+            <label id="user-label">
               Start Time: <span id="start_time_span">{startTime}</span>
             </label>
           </div>

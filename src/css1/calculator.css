@@ -64,36 +64,67 @@
   #calculator-buttons button {
     font-size: 1.2rem;
     padding: 15px;
-    background: #007bff;
-    color: #fff;
+    background: #87b6e7;
+    color: #000;
     border: none;
     border-radius: 5px;
     cursor: pointer;
   }
   
   #calculator-buttons button:hover {
-    background: #0056b3;
+    background: #013164;
+    color: #fff;
+    transition: 0.3s ease-in-out;
   }
   
-  #calculator-buttons button:nth-child(4),
+ 
   #calculator-buttons button:nth-child(8),
   #calculator-buttons button:nth-child(12),
-  #calculator-buttons button:nth-child(16) {
-    background: #ffc107;
+  #calculator-buttons button:nth-child(16),
+  #calculator-buttons button:nth-child(17),
+  #calculator-buttons button:nth-child(18)  {
+    background: #e7c766;
+    border: 1px solid #000;
+    color: #000;
+    font-weight: 700;
   }
-  
-  #calculator-buttons button:nth-child(4):hover,
+
+    
   #calculator-buttons button:nth-child(8):hover,
   #calculator-buttons button:nth-child(12):hover,
-  #calculator-buttons button:nth-child(16):hover {
-    background: #e0a800;
+  #calculator-buttons button:nth-child(16):hover,
+  #calculator-buttons button:nth-child(17):hover,
+  #calculator-buttons button:nth-child(18):hover  {
+    background: #7a5c01;
+    transition: 0.3s ease-in-out;
+    color: #fff;
   }
+
+  #calculator-buttons button:nth-child(4){
+    background-color: #e67e88;
+    border: 1px solid #000;
+    color: #000;
+    font-weight: 700;
+  }
+
+  #calculator-buttons button:nth-child(4):hover{
+    background-color: #b41424;
+    transition: 0.3s ease-in-out;
+    color: #fff;
+    font-weight: 700;
+  }
+
   
   #calculator-buttons button:nth-child(15) {
-    background: #dc3545;
+    background: #a9e791;
+    color: #000;
+    border: 1px solid #000;
+    font-weight: 1000;
   }
   
   #calculator-buttons button:nth-child(15):hover {
-    background: #c82333;
+    background: #046b12;
+    color: #fff;
+    font-weight: 1000;
+    transition: 0.3s ease-in-out;
   }
-  

@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import "../css1/calculator.css"; // Link your CSS file
 
 export default function Calculator({ show, onClose }) {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState("0");
 
   // Handle button clicks
   const handleButtonClick = (value) => {
     if (value === "C") {
-      setInput("");
+      setInput("0"); // Reset to "0"
     } else if (value === "DEL") {
-      setInput((prev) => prev.slice(0, -1));
+      setInput((prev) => (prev.length > 1 ? prev.slice(0, -1) : "0")); // Reset to "0" if input becomes empty
     } else if (value === "=") {
       try {
         setInput((prev) => eval(prev).toString()); // Evaluate the expression
@@ -17,7 +18,7 @@ export default function Calculator({ show, onClose }) {
         setInput("Error");
       }
     } else {
-      setInput((prev) => prev + value);
+      setInput((prev) => (prev === "0" ? value : prev + value)); // Replace "0" with the new value
     }
   };
 
@@ -33,14 +34,14 @@ export default function Calculator({ show, onClose }) {
         setInput("Error");
       }
     } else if (key === "Backspace") {
-      setInput((prev) => prev.slice(0, -1));
+      setInput((prev) => (prev.length > 1 ? prev.slice(0, -1) : "0")); // Reset to "0" if input becomes empty
     } else if (key === "Escape") {
       onClose(); // Close the calculator
     } else if (
       ["+", "-", "*", "/", ".", "C"].includes(key) || // Allow decimal point
       (!isNaN(key) && key !== " ")
     ) {
-      setInput((prev) => prev + key); // Append valid keys
+      setInput((prev) => (prev === "0" ? key : prev + key)); // Replace "0" with the new value
     }
   };
 
@@ -49,6 +50,7 @@ export default function Calculator({ show, onClose }) {
     if (show) {
       window.addEventListener("keydown", handleKeyDown);
     } else {
+      setInput("0"); // Reset input to "0" when calculator is closed
       window.removeEventListener("keydown", handleKeyDown);
     }
 
@@ -64,7 +66,7 @@ export default function Calculator({ show, onClose }) {
       <div id="calculator-container">
         <div id="calculator-header">
           <h2>Calculator</h2>
-          <button id="close-button" onClick={onClose}>
+          <button id="close-button" onClick={() => { setInput("0"); onClose(); }}>
             &times;
           </button>
         </div>
@@ -84,3 +86,9 @@ export default function Calculator({ show, onClose }) {
     </div>
   );
 }
+
+// Define prop types for the component
+Calculator.propTypes = {
+  show: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
