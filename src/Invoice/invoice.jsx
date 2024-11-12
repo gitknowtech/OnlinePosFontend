@@ -8,6 +8,7 @@ import StockModel from "../models/StockModel";
 import ExpensesModel from "../models/ExpensesModel";
 import "../css1/invoice.css";
 import PaymentModel from "./PaymentModel";
+import Calculator from "../models/Calculator";
 
 // Ensure these image paths are correct in your project structure
 import productimage from "../assets/images/products.png";
@@ -24,6 +25,7 @@ import payment from "../assets/images/payment.png";
 import discount from "../assets/images/discount.png";
 import wholesale from "../assets/images/wholesale.png";
 import removeImage from "../assets/images/remove.png";
+import calculatorImage from "../assets/icons/calculator.png";
 
 export default function Invoice() {
   const location = useLocation();
@@ -70,6 +72,12 @@ export default function Invoice() {
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+
+const handleCalculatorClick = () => setIsCalculatorOpen(true);
+const handleCloseCalculator = () => setIsCalculatorOpen(false);
+
 
   const handleOpenPaymentModal = () => {
     console.log("Payment button clicked");
@@ -277,35 +285,102 @@ export default function Invoice() {
     setTotalDiscount("0.00");
     setItemCount(0);
   };
-
-  const handleQuantityEnterKeyPress = (e, index) => {
+  
+  const handleQuantityEditEnterKeyPress = async (e, index) => {
     if (e.key === "Enter") {
-      let quantity = parseFloat(tableData[index].quantity);
-      if (isNaN(quantity) || quantity <= 0) {
-        Swal.fire(
-          "Invalid Quantity",
-          "Please enter a valid quantity",
-          "warning"
-        );
+      const updatedQuantity = parseFloat(tableData[index].quantity);
+      const barcode = tableData[index].barcode; // Retrieve barcode from row data
+      const productName = tableData[index].name;
+      const rate = parseFloat(tableData[index].rate);
+  
+      // Save the old values before proceeding
+      const previousQuantity = tableData[index].previousQuantity || tableData[index].quantity;
+      const previousAmount = tableData[index].previousAmount || tableData[index].amount;
+  
+      // Validate quantity
+      if (isNaN(updatedQuantity)) {
+        Swal.fire("Invalid Quantity", "Please enter a valid quantity", "warning");
         return;
       }
-      const rate = parseFloat(tableData[index].rate) || 0;
-      const amount = quantity * rate;
-
-      setTableData((prevData) => {
-        const newData = [...prevData];
-        newData[index].quantity = quantity.toString();
-        newData[index].amount = amount.toFixed(2);
-        return newData;
-      });
-
-      // Exit edit mode
-      setEditingCell({ rowIndex: null, field: null });
-
-      // Refocus on the barcode input
-      barcodeInputRef.current.focus();
+  
+      // If the rate is negative, assume it's a return and skip stock checking
+      if (rate < 0) {
+        // Calculate the amount with positive quantity first
+        const positiveAmount = rate * Math.abs(updatedQuantity);
+  
+        // Ensure both quantity and amount are negative
+        setTableData((prevData) => {
+          const newData = [...prevData];
+          newData[index] = {
+            ...newData[index],
+            quantity: (-Math.abs(updatedQuantity)).toFixed(2), // Make quantity negative and format
+            amount: (-Math.abs(positiveAmount)).toFixed(2), // Make amount negative and format
+          };
+          return newData;
+        });
+  
+        // Exit editing mode
+        setEditingCell({ rowIndex: null, field: null });
+        return; // Skip further checks
+      }
+  
+      // For non-negative rates, proceed with stock checking
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
+        );
+        const availableStock = response.data.stockQuantity;
+  
+        if (updatedQuantity <= availableStock) {
+          // Calculate the new amount
+          const newAmount = rate * updatedQuantity;
+  
+          // Update the quantity and amount
+          setTableData((prevData) => {
+            const newData = [...prevData];
+            newData[index] = {
+              ...newData[index],
+              quantity: updatedQuantity.toFixed(2), // Ensure float with two decimals
+              amount: newAmount.toFixed(2), // Ensure float with two decimals
+              previousQuantity: updatedQuantity, // Save as new previous value
+              previousAmount: newAmount,
+            };
+            return newData;
+          });
+  
+          // Exit editing mode
+          setEditingCell({ rowIndex: null, field: null });
+        } else {
+          Swal.fire(
+            "Insufficient Stock",
+            `Only ${availableStock} units of ${productName} are available.`,
+            "warning"
+          ).then(() => {
+            // Restore the previous quantity and amount
+            setTableData((prevData) => {
+              const newData = [...prevData];
+              newData[index] = {
+                ...newData[index],
+                quantity: previousQuantity.toFixed(2),
+                amount: previousAmount.toFixed(2),
+              };
+              return newData;
+            });
+  
+            // Exit editing mode
+            setEditingCell({ rowIndex: null, field: null });
+          });
+        }
+      } catch (error) {
+        Swal.fire("Error", "Failed to fetch stock quantity", "error");
+        console.error("Error fetching stock quantity:", error);
+      }
     }
   };
+  
+  
+  
+  
 
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
@@ -737,16 +812,14 @@ export default function Invoice() {
                     {editingCell.rowIndex === index &&
                     editingCell.field === "quantity" ? (
                       <input
-                        type="text"
-                        value={item.quantity}
-                        onChange={(e) => handleQuantityChange(e, index)}
-                        onKeyDown={(e) => handleQuantityEnterKeyPress(e, index)}
-                        onBlur={() =>
-                          setEditingCell({ rowIndex: null, field: null })
-                        }
-                        style={{ width: "50px", textAlign: "center" }}
-                        autoFocus
-                      />
+                      type="text"
+                      value={item.quantity}
+                      onChange={(e) => handleQuantityChange(e, index)}
+                      onKeyDown={(e) => handleQuantityEditEnterKeyPress(e, index)} // Call the async function here
+                      onBlur={() => setEditingCell({ rowIndex: null, field: null })}
+                      style={{ width: "50px", textAlign: "center" }}
+                      autoFocus
+                    />
                     ) : (
                       item.quantity
                     )}
@@ -1038,6 +1111,13 @@ export default function Invoice() {
             />
             Today Sale
           </button>
+          <button  onClick={handleCalculatorClick}>
+            <img
+              src={calculatorImage}
+              style={{ width: "20px", height: "20px", marginRight: "5px" }}
+            />
+            Calculater
+          </button>
           <button>
             <img
               src={monthsales}
@@ -1083,6 +1163,12 @@ export default function Invoice() {
           clearInvoiceTable={clearInvoiceTable}
           tableData={tableData} // Pass table data for invoice items
         />
+
+<Calculator
+  show={isCalculatorOpen}
+  onClose={handleCloseCalculator}
+/>
+
       </div>
     </div>
   );
