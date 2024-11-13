@@ -128,7 +128,6 @@ export default function DueSummary() {
     }
   };
 
-  // Handle delete action for entire purchase-related data
   const handleDelete = async (generatedId) => {
     try {
       const confirm = await Swal.fire({
@@ -138,15 +137,22 @@ export default function DueSummary() {
         showCancelButton: true,
         confirmButtonText: "Yes, delete it!",
       });
-
+  
       if (!confirm.isConfirmed) return;
-
+  
       const response = await axios.delete(
         `http://localhost:5000/api/purchases/delete_whole_data/${generatedId}`
       );
-
+  
       if (response.status === 200) {
         Swal.fire("Deleted!", "All related data has been deleted.", "success");
+        
+        // Remove the deleted item from the local state
+        setSummaries((prevSummaries) => 
+          prevSummaries.filter((summary) => summary.generatedid !== generatedId)
+        );
+  
+        // Fetch data again to ensure the state is consistent
         fetchSummaries();
       } else {
         Swal.fire("Error", "Failed to delete the data.", "error");
@@ -156,6 +162,7 @@ export default function DueSummary() {
       Swal.fire("Error", "Failed to delete the data.", "error");
     }
   };
+  
 
   // Handle payment history action
   const handleHistory = async (generatedId) => {
@@ -171,7 +178,6 @@ export default function DueSummary() {
     }
   };
 
-  // Handle delete payment history
   const handleDeleteHistory = async (historyId, payment, savedTime) => {
     try {
       const confirm = await Swal.fire({
@@ -183,15 +189,21 @@ export default function DueSummary() {
         showCancelButton: true,
         confirmButtonText: "Yes, delete it!",
       });
-
+  
       if (!confirm.isConfirmed) return;
-
+  
       const response = await axios.delete(
-        `http://localhost:5000/api/purchases/delete_payment_history/${historyId}`
+        `http://localhost:5000/api/purchases/delete_payment/${historyId}`,
+        {
+          data: { payment }, // Pass `payment` in the request body
+        }
       );
-
+  
       if (response.status === 200) {
         Swal.fire("Deleted!", "Payment history entry has been deleted.", "success");
+        
+        // Fetch data again to ensure the state is consistent
+        fetchSummaries();
         setPaymentHistory((prev) => prev.filter((item) => item.id !== historyId));
       } else {
         Swal.fire("Error", "Failed to delete payment history.", "error");
@@ -201,7 +213,7 @@ export default function DueSummary() {
       Swal.fire("Error", "Failed to delete payment history.", "error");
     }
   };
-
+  
   const handleCashAmountChange = (e) => {
     let newCashAmount = parseFloat(e.target.value) || 0;
     if (newCashAmount < 0) newCashAmount = 0;

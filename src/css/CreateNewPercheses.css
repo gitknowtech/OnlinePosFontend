@@ -126,7 +126,10 @@
   color: #000;
   background-color: rgb(245, 122, 122);
   font-weight: 600;
+  padding: 5px;
 }
+
+
 
 #delete-button-perchase-table:hover{
   color: #fff;

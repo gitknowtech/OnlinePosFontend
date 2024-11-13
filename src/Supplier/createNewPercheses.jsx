@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Swal from "sweetalert2"; // Import SweetAlert2
 import "../css/CreateNewPercheses.css"; // Assuming a CSS file for styling
+import PropTypes from "prop-types";
 
-export default function CreateNewPurchases() {
+export default function CreateNewPurchases({ store }) {
   // State variables
   const [productCode, setProductCode] = useState("");
   const [productName, setProductName] = useState("");
@@ -14,7 +15,7 @@ export default function CreateNewPurchases() {
   const [total, setTotal] = useState(0);
   const [purchases, setPurchases] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
-  const [selectedSupplier, setSelectedSupplier] = useState("");   
+  const [selectedSupplier, setSelectedSupplier] = useState("");
   const [invoiceId, setInvoiceId] = useState("");
   const [invoiceDate, setInvoiceDate] = useState("");
   const [cashAmount, setCashAmount] = useState(0);
@@ -39,7 +40,8 @@ export default function CreateNewPurchases() {
         );
         setSuppliers(response.data);
       } catch (error) {
-        Swal.fire("Error", "Error fetching suppliers.", error);
+        console.error("Error fetching suppliers:", error);
+        Swal.fire("Error", "Error fetching suppliers.", "error");
       }
     };
     fetchSuppliers();
@@ -65,13 +67,19 @@ export default function CreateNewPurchases() {
         productName,
         unitPrice: parseFloat(unitPrice),
         quantity: parseFloat(quantity),
-        total: parseFloat((parseFloat(unitPrice) * parseFloat(quantity)).toFixed(2)),
+        total: parseFloat(
+          (parseFloat(unitPrice) * parseFloat(quantity)).toFixed(2)
+        ),
       };
       setPurchases([...purchases, newPurchase]);
 
       // Update totals based on the new purchase
-      setGrossTotal((prev) => parseFloat((prev + newPurchase.total).toFixed(2)));
-      setTotalQuantity((prev) => parseFloat((prev + newPurchase.quantity).toFixed(4)));
+      setGrossTotal((prev) =>
+        parseFloat((prev + newPurchase.total).toFixed(2))
+      );
+      setTotalQuantity((prev) =>
+        parseFloat((prev + newPurchase.quantity).toFixed(4))
+      );
       setTotalItems((prev) => prev + 1);
 
       // Clear input fields
@@ -81,15 +89,23 @@ export default function CreateNewPurchases() {
       setQuantity("");
       setTotal(0);
     } else {
-      Swal.fire("Warning", "Please fill in all fields before adding.", "warning");
+      Swal.fire(
+        "Warning",
+        "Please fill in all fields before adding.",
+        "warning"
+      );
     }
   };
 
   // Handle deleting a purchase item
   const handleDelete = (index) => {
     const itemToDelete = purchases[index];
-    setGrossTotal((prev) => parseFloat((prev - itemToDelete.total).toFixed(2)));
-    setTotalQuantity((prev) => parseFloat((prev - itemToDelete.quantity).toFixed(4)));
+    setGrossTotal((prev) =>
+      parseFloat((prev - itemToDelete.total).toFixed(2))
+    );
+    setTotalQuantity((prev) =>
+      parseFloat((prev - itemToDelete.quantity).toFixed(4))
+    );
     setTotalItems((prev) => prev - 1);
 
     setPurchases(purchases.filter((_, i) => i !== index));
@@ -103,7 +119,11 @@ export default function CreateNewPurchases() {
   // Upload documents to backend
   const handleUploadDocument = async () => {
     if (documentFiles.length === 0) {
-      Swal.fire("Warning", "Please choose at least one document to upload.", "warning");
+      Swal.fire(
+        "Warning",
+        "Please choose at least one document to upload.",
+        "warning"
+      );
       return;
     }
 
@@ -120,13 +140,21 @@ export default function CreateNewPurchases() {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      Swal.fire("Success", "Documents uploaded and combined into PDF successfully!", "success");
+      Swal.fire(
+        "Success",
+        "Documents uploaded and combined into PDF successfully!",
+        "success"
+      );
 
       // Save the document link
       setDocumentLink(response.data.fileLink);
       setDocumentFiles([]); // Clear the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = null;
+      }
     } catch (error) {
-      Swal.fire("Error", "Failed to upload documents.", error);
+      console.error("Error uploading documents:", error);
+      Swal.fire("Error", "Failed to upload documents.", "error");
     }
   };
 
@@ -144,25 +172,39 @@ export default function CreateNewPurchases() {
 
   // Handle saving purchases
   const handleSave = async () => {
+    console.log("Store in frontend:", store);
+
     if (!invoiceId || !invoiceDate || !selectedSupplier) {
-      Swal.fire("Warning", "Please complete the Invoice ID, Date, and select a Supplier.", "warning");
+      Swal.fire(
+        "Warning",
+        "Please complete the Invoice ID, Date, and select a Supplier.",
+        "warning"
+      );
       return;
     }
 
     if (purchases.length === 0) {
-      Swal.fire("Warning", "Please add at least one purchase item.", "warning");
+      Swal.fire(
+        "Warning",
+        "Please add at least one purchase item.",
+        "warning"
+      );
       return;
     }
 
     if (!documentLink) {
-      Swal.fire("Warning", "Please upload the document before saving.", "warning");
+      Swal.fire(
+        "Warning",
+        "Please upload the document before saving.",
+        "warning"
+      );
       return;
     }
 
     const saveData = {
       purchases: purchases.map((purchase) => ({
         InvoiceId: invoiceId,
-        ProCode: purchase.productCode, 
+        ProCode: purchase.productCode,
         ProName: purchase.productName,
         UnitPrice: purchase.unitPrice,
         Quantity: purchase.quantity,
@@ -177,12 +219,20 @@ export default function CreateNewPurchases() {
         creditAmount,
         invoiceDate,
         documentLink,
+        store, // Include the store here
       },
     };
 
     try {
-      const response = await axios.post(`${BASE_URL}/save_Purchase_Supplier`, saveData);
-      Swal.fire("Success", `Data saved successfully! Generated ID: ${response.data.generatedid}`, "success");
+      const response = await axios.post(
+        `${BASE_URL}/save_Purchase_Supplier`,
+        saveData
+      );
+      Swal.fire(
+        "Success",
+        `Data saved successfully! Generated ID: ${response.data.generatedid}`,
+        "success"
+      );
 
       setGeneratedId(response.data.generatedid); // Optionally display or use the generated ID
 
@@ -202,7 +252,8 @@ export default function CreateNewPurchases() {
         fileInputRef.current.value = null;
       }
     } catch (error) {
-      Swal.fire("Error", "Failed to save data.", error);
+      console.error("Error saving data:", error);
+      Swal.fire("Error", "Failed to save data.", "error");
     }
   };
 
@@ -283,33 +334,22 @@ export default function CreateNewPurchases() {
               <th>Unit Price</th>
               <th>Quantity</th>
               <th>Total</th>
-              <th>Document</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {purchases.map((purchase, index) => (
               <tr key={purchase.id}>
-                 <td>{purchase.productCode}</td>
+                <td>{purchase.productCode}</td>
                 <td>{purchase.productName}</td>
                 <td style={{ textAlign: "center" }}>
                   {purchase.unitPrice.toFixed(2)}
                 </td>
-                <td style={{ textAlign: "center" }}>{purchase.quantity.toFixed(4)}</td>
+                <td style={{ textAlign: "center" }}>
+                  {purchase.quantity.toFixed(4)}
+                </td>
                 <td style={{ textAlign: "center" }}>
                   {purchase.total.toFixed(2)}
-                </td>
-                <td>
-                  {purchase.documentLink ? (
-                    <a href={purchase.documentLink} target="_blank" rel="noopener noreferrer">
-                      View Document
-                    </a>
-                  ) : (
-                    <div>
-                      {/* Since document is uploaded separately, no per-purchase upload */}
-                      <em>No Document</em>
-                    </div>
-                  )}
                 </td>
                 <td style={{ textAlign: "center" }}>
                   <button
@@ -408,7 +448,10 @@ export default function CreateNewPurchases() {
       </button>
 
       {/* Document Upload Section */}
-      <div id="document-upload-section" className="input-group-purhase-supplier">
+      <div
+        id="document-upload-section"
+        className="input-group-purhase-supplier"
+      >
         <label htmlFor="document-upload">Upload Documents:</label>
         <input
           id="document-upload"
@@ -416,10 +459,16 @@ export default function CreateNewPurchases() {
           multiple
           accept="image/*,application/pdf"
           onChange={handleDocumentChange}
+          ref={fileInputRef}
         />
         <button onClick={handleUploadDocument}>Upload Documents</button>
         {documentLink && (
-          <a href={documentLink} target="_blank" rel="noopener noreferrer">
+          <a
+            href={documentLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ marginLeft: "10px" }}
+          >
             View Uploaded Document
           </a>
         )}
@@ -434,3 +483,7 @@ export default function CreateNewPurchases() {
     </div>
   );
 }
+
+CreateNewPurchases.propTypes = {
+  store: PropTypes.string.isRequired,
+};

@@ -141,7 +141,8 @@ export default function StockOut({ store }) {
                 productId,
                 productName,
                 barcode,
-                quantity: parsedQuantity, // Directly passing parsedQuantity as the backend handles deduction
+                quantity: parsedQuantity,
+                store, // Directly passing parsedQuantity as the backend handles deduction
             });
 
             Swal.fire({
@@ -224,7 +225,7 @@ export default function StockOut({ store }) {
                         type="text"
                         ref={inputRef}
                         placeholder="Scan Barcode or Enter Product Code, Name"
-                        className="input-field"
+                        className="input-field-minus"
                         value={searchQuery}
                         onChange={handleSearchInputChange}
                         onKeyDown={handleKeyDown}

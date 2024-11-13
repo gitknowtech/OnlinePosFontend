@@ -146,6 +146,7 @@ export default function StockIn({ store }) {
                 productName,
                 barcode,
                 quantity: parsedQuantity,
+                store,
             });
 
             Swal.fire({
