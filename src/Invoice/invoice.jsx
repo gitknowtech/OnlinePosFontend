@@ -10,6 +10,8 @@ import "../css1/invoice.css";
 import PaymentModel from "./PaymentModel";
 import Calculator from "../models/Calculator";
 
+
+
 // Ensure these image paths are correct in your project structure
 import productimage from "../assets/images/products.png";
 import bill from "../assets/images/bill.png";
@@ -26,6 +28,8 @@ import discount from "../assets/images/discount.png";
 import wholesale from "../assets/images/wholesale.png";
 import removeImage from "../assets/images/remove.png";
 import calculatorImage from "../assets/icons/calculator.png";
+
+
 
 export default function Invoice() {
   const location = useLocation();
@@ -54,9 +58,12 @@ export default function Invoice() {
   });
   const [percentage, setPercentage] = useState(""); // State for percentage input
 
+
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
   const barcodeInputRef = useRef(null);
+
+
 
   // OtherItem model related contents
   const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);
@@ -77,6 +84,7 @@ export default function Invoice() {
 
   const handleCalculatorClick = () => setIsCalculatorOpen(true);
   const handleCloseCalculator = () => setIsCalculatorOpen(false);
+
 
 
   const handleOpenPaymentModal = () => {
@@ -172,6 +180,7 @@ export default function Invoice() {
     };
   }, []);
 
+
   useEffect(() => {
     if (location.state) {
       const { UserName, Store } = location.state;
@@ -188,9 +197,11 @@ export default function Invoice() {
     setStartTime(formattedTime);
   }, [location.state]);
 
+
   useEffect(() => {
     calculateTotals();
   }, [tableData]);
+
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -215,6 +226,8 @@ export default function Invoice() {
     };
   }, [isWholesale, isDiscount]); // Add dependencies to keep the hook up-to-date
 
+
+
   const handleAddOtherItem = (item) => {
     const { productName, productCost, productMRP, productRate, qty, discount } =
       item;
@@ -236,15 +249,18 @@ export default function Invoice() {
     setIsOtherItemModalOpen(false); // Close the modal after adding the item
   };
 
+
   // Function to handle when the "Return" button is clicked
   const handleReturnClick = () => {
     console.log("Return button clicked"); // Debugging log
     setIsReturnModalOpen(true);
   };
 
+
   const handleCloseReturnModal = () => {
     setIsReturnModalOpen(false);
   };
+
 
   const handleAddReturnItem = (item) => {
     // Adjust the data to have negative values
@@ -269,6 +285,7 @@ export default function Invoice() {
     setIsReturnModalOpen(false);
   };
 
+
   const handleQuantityChange = (e, index) => {
     const newQuantity = e.target.value;
     setTableData((prevData) => {
@@ -278,6 +295,7 @@ export default function Invoice() {
     });
   };
 
+
   const clearInvoiceTable = () => {
     setTableData([]); // Clears the table data
     setTotalAmount("0.00");
@@ -285,6 +303,7 @@ export default function Invoice() {
     setTotalDiscount("0.00");
     setItemCount(0);
   };
+
 
   const handleQuantityEditEnterKeyPress = async (e, index) => {
     if (e.key === "Enter") {
@@ -381,7 +400,6 @@ export default function Invoice() {
 
 
 
-
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
@@ -400,9 +418,11 @@ export default function Invoice() {
     }
   };
 
+
   const handlePercentageChange = (value) => {
     setPercentage(value);
   };
+
 
   const handlePercentageEnter = () => {
     const enteredPercentage = parseFloat(percentage);
@@ -423,6 +443,7 @@ export default function Invoice() {
     qtyInputRef.current.focus(); // Move focus to the quantity input
   };
 
+
   const handlePriceEnter = () => {
     const enteredPrice = parseFloat(price);
     const originalPrice = parseFloat(suggestedPrice);
@@ -441,6 +462,7 @@ export default function Invoice() {
     setQty("1");
     qtyInputRef.current.focus();
   };
+
 
   const handleBarcodeEnter = async () => {
     try {
@@ -583,9 +605,12 @@ export default function Invoice() {
   };
 
 
+
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
+
+
 
   const calculateTotals = () => {
     // Filter out items with negative discount or quantity
@@ -615,6 +640,7 @@ export default function Invoice() {
     setItemCount(validItems.length);
   };
 
+  
   const handleVirtualEnter = () => {
     if (document.activeElement === barcodeInputRef.current) {
       handleBarcodeEnter();

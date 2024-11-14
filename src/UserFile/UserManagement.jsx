@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation } from "react-router-dom"; // For accessing state
-import {
-  faUserPlus,
-  faClipboardList,
-} from "@fortawesome/free-solid-svg-icons";
+import { faUserPlus, faClipboardList } from "@fortawesome/free-solid-svg-icons";
 import "../css1/User.css";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -32,6 +29,7 @@ const UserManagement = () => {
     const fetchStores = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/stores/get_stores");
+        console.log("Fetched Stores:", response.data); // Log the stores
         setStoreList(response.data);
       } catch (error) {
         console.error("Error fetching stores:", error);
@@ -42,9 +40,10 @@ const UserManagement = () => {
         });
       }
     };
-
+  
     fetchStores();
   }, []);
+  
 
   // Toggle ManageUser Panel
   const toggleManageUser = () => {
@@ -72,15 +71,10 @@ const UserManagement = () => {
     }));
   };
 
-
-
-
-
-  // Handle Add User form submission
-  // Handle Add User form submission
+  //handle submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!formData.Store) {
       Swal.fire({
         icon: "error",
@@ -90,57 +84,40 @@ const UserManagement = () => {
       });
       return;
     }
-
-    try {
-      // Check for duplicate email or username
-      const checkResponse = await axios.get("http://localhost:5000/check-duplicate", {
-        params: { Email: formData.Email, UserName: formData.UserName },
+  
+    // Retrieve the store name
+    const selectedStore = storeList.find((store) => store.id.toString() === formData.Store); // Convert to string for comparison
+    const storeName = selectedStore ? selectedStore.storeName : "";
+  
+    if (!storeName) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Store",
+        text: "Selected store is invalid.",
+        confirmButtonText: "OK",
       });
-
-      if (checkResponse.data.emailExists) {
-        Swal.fire({
-          icon: "error",
-          title: "Email Already Exists",
-          text: "This email address is already registered.",
-          confirmButtonText: "OK",
-          timer: 3000,
-        });
-        return;
-      }
-
-      if (checkResponse.data.usernameExists) {
-        Swal.fire({
-          icon: "error",
-          title: "Username Already Exists",
-          text: "This username is already taken. Please choose another.",
-          confirmButtonText: "OK",
-          timer: 3000,
-        });
-        return;
-      }
-
-      // Map the selected store ID to storeName
-      const selectedStore = storeList.find((store) => store.id === formData.Store);
-      const storeName = selectedStore ? selectedStore.storeName : "";
-
-      // If no duplicates, proceed with saving the user
+      return;
+    }
+  
+    try {
+      // Proceed with form submission
       const form = new FormData();
       form.append("Name", formData.Name);
       form.append("Email", formData.Email);
       form.append("UserName", formData.UserName);
       form.append("Password", formData.Password);
       form.append("Type", formData.Type);
-      form.append("Store", storeName); // Append the store name
+      form.append("Store", storeName); // Send storeName directly
       if (formData.Image) {
         form.append("Image", formData.Image);
       }
-
+  
       const response = await axios.post("http://localhost:5000/create-user", form, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
+  
       if (response.status === 200) {
         Swal.fire({
           icon: "success",
@@ -171,6 +148,7 @@ const UserManagement = () => {
       });
     }
   };
+  
 
   return (
     <div className="user-management-panel">
@@ -255,8 +233,8 @@ const UserManagement = () => {
               <select
                 id="store-select-user-management"
                 name="Store"
-                value={formData.Store}
-                onChange={handleInputChange}
+                value={formData.Store} // Ensure this holds the selected store ID
+                onChange={handleInputChange} // Updates the formData.Store value
                 required
               >
                 <option value="" disabled>
@@ -264,10 +242,12 @@ const UserManagement = () => {
                 </option>
                 {storeList.map((store) => (
                   <option key={store.id} value={store.id}>
+                    {" "}
+                    {/* Pass store.id here */}
                     {store.storeName}
                   </option>
                 ))}
-              </select>;
+              </select>
 
               <label htmlFor="image-input">Profile Image</label>
               <input
