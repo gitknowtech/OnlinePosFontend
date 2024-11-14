@@ -75,8 +75,8 @@ export default function Invoice() {
 
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
-const handleCalculatorClick = () => setIsCalculatorOpen(true);
-const handleCloseCalculator = () => setIsCalculatorOpen(false);
+  const handleCalculatorClick = () => setIsCalculatorOpen(true);
+  const handleCloseCalculator = () => setIsCalculatorOpen(false);
 
 
   const handleOpenPaymentModal = () => {
@@ -285,29 +285,29 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
     setTotalDiscount("0.00");
     setItemCount(0);
   };
-  
+
   const handleQuantityEditEnterKeyPress = async (e, index) => {
     if (e.key === "Enter") {
       const updatedQuantity = parseFloat(tableData[index].quantity);
       const barcode = tableData[index].barcode; // Retrieve barcode from row data
       const productName = tableData[index].name;
       const rate = parseFloat(tableData[index].rate);
-  
+
       // Save the old values before proceeding
       const previousQuantity = tableData[index].previousQuantity || tableData[index].quantity;
       const previousAmount = tableData[index].previousAmount || tableData[index].amount;
-  
+
       // Validate quantity
       if (isNaN(updatedQuantity)) {
         Swal.fire("Invalid Quantity", "Please enter a valid quantity", "warning");
         return;
       }
-  
+
       // If the rate is negative, assume it's a return and skip stock checking
       if (rate < 0) {
         // Calculate the amount with positive quantity first
         const positiveAmount = rate * Math.abs(updatedQuantity);
-  
+
         // Ensure both quantity and amount are negative
         setTableData((prevData) => {
           const newData = [...prevData];
@@ -318,23 +318,23 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
           };
           return newData;
         });
-  
+
         // Exit editing mode
         setEditingCell({ rowIndex: null, field: null });
         return; // Skip further checks
       }
-  
+
       // For non-negative rates, proceed with stock checking
       try {
         const response = await axios.get(
           `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
         );
         const availableStock = response.data.stockQuantity;
-  
+
         if (updatedQuantity <= availableStock) {
           // Calculate the new amount
           const newAmount = rate * updatedQuantity;
-  
+
           // Update the quantity and amount
           setTableData((prevData) => {
             const newData = [...prevData];
@@ -347,7 +347,7 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
             };
             return newData;
           });
-  
+
           // Exit editing mode
           setEditingCell({ rowIndex: null, field: null });
         } else {
@@ -366,7 +366,7 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
               };
               return newData;
             });
-  
+
             // Exit editing mode
             setEditingCell({ rowIndex: null, field: null });
           });
@@ -377,10 +377,10 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
       }
     }
   };
-  
-  
-  
-  
+
+
+
+
 
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
@@ -786,15 +786,15 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
                     item.type === "return"
                       ? "return-row"
                       : item.type === "new"
-                      ? "new-row"
-                      : ""
+                        ? "new-row"
+                        : ""
                   }
                   style={
                     item.type === "return"
                       ? { backgroundColor: "#fcd8d8" } // Light red for return
                       : item.type === "new"
-                      ? { backgroundColor: "#d8fcdb" } // Light green for new items
-                      : {}
+                        ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                        : {}
                   }
                 >
                   <td>{item.name}</td>
@@ -810,16 +810,16 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
                     }
                   >
                     {editingCell.rowIndex === index &&
-                    editingCell.field === "quantity" ? (
+                      editingCell.field === "quantity" ? (
                       <input
-                      type="text"
-                      value={item.quantity}
-                      onChange={(e) => handleQuantityChange(e, index)}
-                      onKeyDown={(e) => handleQuantityEditEnterKeyPress(e, index)} // Call the async function here
-                      onBlur={() => setEditingCell({ rowIndex: null, field: null })}
-                      style={{ width: "50px", textAlign: "center" }}
-                      autoFocus
-                    />
+                        type="text"
+                        value={item.quantity}
+                        onChange={(e) => handleQuantityChange(e, index)}
+                        onKeyDown={(e) => handleQuantityEditEnterKeyPress(e, index)} // Call the async function here
+                        onBlur={() => setEditingCell({ rowIndex: null, field: null })}
+                        style={{ width: "50px", textAlign: "center" }}
+                        autoFocus
+                      />
                     ) : (
                       item.quantity
                     )}
@@ -1111,7 +1111,7 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
             />
             Today Sale
           </button>
-          <button  onClick={handleCalculatorClick}>
+          <button onClick={handleCalculatorClick}>
             <img
               src={calculatorImage}
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
@@ -1132,7 +1132,7 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
           onClose={handleCloseExpensesModal}
           user={user}
           store={store}
-          onAdd={() => {}}
+          onAdd={() => { }}
         />
 
         {/* Render the OtherItemModel */}
@@ -1162,12 +1162,15 @@ const handleCloseCalculator = () => setIsCalculatorOpen(false);
           totalAmount={parseFloat(totalAmount || 0)}
           clearInvoiceTable={clearInvoiceTable}
           tableData={tableData} // Pass table data for invoice items
+          user={user} // Pass UserName
+          store={store} // Pass Store
         />
 
-<Calculator
-  show={isCalculatorOpen}
-  onClose={handleCloseCalculator}
-/>
+
+        <Calculator
+          show={isCalculatorOpen}
+          onClose={handleCloseCalculator}
+        />
 
       </div>
     </div>

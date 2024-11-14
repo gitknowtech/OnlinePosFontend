@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation } from "react-router-dom"; // For accessing state
 import {
@@ -23,7 +23,28 @@ const UserManagement = () => {
     Password: "",
     Image: null,
     Type: "user", // Default user type
+    Store: "", // Selected store
   }); // User form data
+  const [storeList, setStoreList] = useState([]); // List of stores
+
+  // Fetch stores when the component mounts
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/stores/get_stores");
+        setStoreList(response.data);
+      } catch (error) {
+        console.error("Error fetching stores:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to fetch stores. Please try again later.",
+        });
+      }
+    };
+
+    fetchStores();
+  }, []);
 
   // Toggle ManageUser Panel
   const toggleManageUser = () => {
@@ -51,9 +72,24 @@ const UserManagement = () => {
     }));
   };
 
+
+
+
+
+  // Handle Add User form submission
   // Handle Add User form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.Store) {
+      Swal.fire({
+        icon: "error",
+        title: "Store Required",
+        text: "Please select a store for the user.",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
 
     try {
       // Check for duplicate email or username
@@ -83,13 +119,18 @@ const UserManagement = () => {
         return;
       }
 
+      // Map the selected store ID to storeName
+      const selectedStore = storeList.find((store) => store.id === formData.Store);
+      const storeName = selectedStore ? selectedStore.storeName : "";
+
       // If no duplicates, proceed with saving the user
       const form = new FormData();
       form.append("Name", formData.Name);
       form.append("Email", formData.Email);
       form.append("UserName", formData.UserName);
       form.append("Password", formData.Password);
-      form.append("Type", formData.Type); // Append the user type
+      form.append("Type", formData.Type);
+      form.append("Store", storeName); // Append the store name
       if (formData.Image) {
         form.append("Image", formData.Image);
       }
@@ -109,7 +150,15 @@ const UserManagement = () => {
           timer: 3000,
         });
         setShowAddUserModal(false); // Close modal on success
-        setFormData({ Name: "", Email: "", UserName: "", Password: "", Image: null, Type: "user" }); // Reset form
+        setFormData({
+          Name: "",
+          Email: "",
+          UserName: "",
+          Password: "",
+          Image: null,
+          Type: "user",
+          Store: "",
+        }); // Reset form
       }
     } catch (error) {
       console.error("Error creating user:", error);
@@ -163,6 +212,7 @@ const UserManagement = () => {
                 id="name-input"
                 type="text"
                 name="Name"
+                autoComplete="off"
                 value={formData.Name}
                 onChange={handleInputChange}
                 required
@@ -172,6 +222,7 @@ const UserManagement = () => {
               <input
                 id="email-input"
                 type="email"
+                autoComplete="off"
                 name="Email"
                 value={formData.Email}
                 onChange={handleInputChange}
@@ -182,6 +233,7 @@ const UserManagement = () => {
               <input
                 id="username-input"
                 type="text"
+                autoComplete="off"
                 name="UserName"
                 value={formData.UserName}
                 onChange={handleInputChange}
@@ -193,10 +245,29 @@ const UserManagement = () => {
                 id="password-input"
                 type="password"
                 name="Password"
+                autoComplete="off"
                 value={formData.Password}
                 onChange={handleInputChange}
                 required
               />
+
+              <label htmlFor="store-select">Store</label>
+              <select
+                id="store-select-user-management"
+                name="Store"
+                value={formData.Store}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="" disabled>
+                  Select a Store
+                </option>
+                {storeList.map((store) => (
+                  <option key={store.id} value={store.id}>
+                    {store.storeName}
+                  </option>
+                ))}
+              </select>;
 
               <label htmlFor="image-input">Profile Image</label>
               <input

@@ -98,6 +98,45 @@ const ManageUser = () => {
     }
   };
 
+
+  // Delete user
+  const handleDelete = async (userName) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action will permanently delete the user.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.delete(
+            `http://localhost:5000/delete_user/${userName}`
+          );
+
+          if (response.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Deleted",
+              text: "User has been deleted successfully.",
+            });
+            fetchUsers(); // Refresh user list
+          }
+        } catch (error) {
+          console.error("Error deleting user:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.response?.data?.message || "Failed to delete user.",
+          });
+        }
+      }
+    });
+  };
+
+
   return (
     <div className="manage-user">
       <table id="user-table-manage-user">

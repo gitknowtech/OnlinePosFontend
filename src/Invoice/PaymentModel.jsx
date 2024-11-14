@@ -11,7 +11,7 @@ import discountPriceImage from "../assets/icons/discounts.png";
 import paymentTypeImage from "../assets/icons/paymentType.png";
 import netAmountImage from "../assets/icons/netAmount.png"; // Add an appropriate image for Net Amount
 
-export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceTable, tableData }) {
+export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceTable, tableData,user,store }) {
   const [customerMobile, setCustomerMobile] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [discountPercent, setDiscountPercent] = useState("");
@@ -34,7 +34,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
         );
         const data = await response.json();
         setSuggestions(data);
-      } catch (error) {
+      } catch (error) { 
         Swal.fire("Error", "Failed to fetch customer suggestions", error);
       }
     } else {
@@ -105,6 +105,9 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     }
   };
 
+
+
+
   // Handle discount amount
   const handleDiscountAmountChange = (e) => {
     const value = e.target.value;
@@ -121,12 +124,16 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     }
   };
 
+
+
   const calculateNetAmount = (discountValue) => {
     const net = totalAmount - discountValue;
     setNetAmount(net.toFixed(2));
     setBalance(net.toFixed(2));
     updatePaymentType(net, 0);
   };
+
+
 
   const handleCashPaymentChange = (e) => {
     const inputValue = e.target.value;
@@ -150,6 +157,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       return;
     }
 
+
+
     // Update cash payment field
     setCashPayment(inputValue);
 
@@ -158,6 +167,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
 
     // Update balance
     setBalance("0.00"); // Balance should be zero after full payment
+
+
 
     // Determine the payment type
     if (cash + card < netAmount) {
@@ -172,6 +183,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       setPaymentType("Card Payment"); // Fully paid by card
     }
   };
+
+
 
   // Handle card payment
   const handleCardPaymentChange = (e) => {
@@ -192,6 +205,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     updatePaymentType(netAmount, totalPaid);
   };
 
+
+  
   const updatePaymentType = (net, paid) => {
     if (net - paid > 0) {
       setPaymentType("Credit Payment");
@@ -217,6 +232,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       PaymentType: paymentType,
       Balance: balance,
       invoiceItems: tableData, // Include invoice items here
+      user, // Include user
+      store, // Include store
     };
 
     try {
@@ -403,4 +420,6 @@ PaymentModel.propTypes = {
       amount: PropTypes.string.isRequired,
     })
   ).isRequired,
+  user: PropTypes.string.isRequired, // Add user
+  store: PropTypes.string.isRequired, // Add store
 };
