@@ -237,12 +237,13 @@ const Dashboard = () => {
                 </li>
                 <li>
                   <div className="icon-link">
-                    <a href="#">
-                      <FontAwesomeIcon className="nav-icon" icon={faSignal} />
+                  <Link 
+                      to="sales"
+                      state={{ UserName: username, Store:store, Type: type, Email: email, LastLogin}}>
+                      <FontAwesomeIcon className="nav-icon" icon={faReceipt} />
                       <span className="link-name">SALES</span>
-                    </a>
+                    </Link>
                   </div>
-                  <hr />
                 </li>
                 <li>
                   <div className="icon-link">

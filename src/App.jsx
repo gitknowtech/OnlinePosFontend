@@ -10,11 +10,11 @@ import Stock from './Stock/Stock'; //Import Stock
 import Invoice from './Invoice/invoice';
 import Customer from './CustomerFile/Customer';
 import ManageCustomer from './CustomerFile/ManageCustomer';
-import CreatePerches from  './Supplier/createNewPercheses';
+import CreatePerches from './Supplier/createNewPercheses';
 import PerchasingDetails from './Supplier/PurchasingDetails';
-import DueSummery  from "./Supplier/DueSummary";
+import DueSummery from "./Supplier/DueSummary";
 import UserManage from "./UserFile/UserManagement";
-
+import SalesManage from "./Sales/sales";
 
 
 function App() {
@@ -32,14 +32,15 @@ function App() {
         <Route path="/dashboard/*" element={<Dashboard />}>
           <Route path="products" element={<Product />} /> {/* Product route */}
           <Route path="purchasing" element={<Supplier />} /> {/* Supplier route */}
-          <Route path="stock" element={<Stock/>}/>{/* Stock Route*/}
-          <Route path="invoice" element={<Invoice/>}/>{/*Invoice Route */}
-          <Route path="customer" element={<Customer/>}/>{/* customer router*/}
-          <Route path="manageCustomer" element={<ManageCustomer/>}/>{/* manage customer route*/}
-          <Route path="createNewPerches" element={<CreatePerches/>}/>
-          <Route path="purchasingDetails" element={<PerchasingDetails/>}/>
-          <Route path="DueSummery" element={<DueSummery/>}/>
-          <Route path="ManageUser" element={<UserManage/>}/>          {/* You can add other nested routes under Dashboard */}
+          <Route path="stock" element={<Stock />} />{/* Stock Route*/}
+          <Route path="invoice" element={<Invoice />} />{/*Invoice Route */}
+          <Route path="customer" element={<Customer />} />{/* customer router*/}
+          <Route path="manageCustomer" element={<ManageCustomer />} />{/* manage customer route*/}
+          <Route path="createNewPerches" element={<CreatePerches />} />
+          <Route path="purchasingDetails" element={<PerchasingDetails />} />
+          <Route path="DueSummery" element={<DueSummery />} />
+          <Route path="ManageUser" element={<UserManage />} />
+          <Route path="Sales" element={<SalesManage/>} />      {/* You can add other nested routes under Dashboard */}
         </Route>
 
       </Routes>

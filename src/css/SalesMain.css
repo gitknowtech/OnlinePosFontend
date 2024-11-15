@@ -1,0 +1,59 @@
+/* Main Sales Panel */
+#sales_panel {
+    padding: 20px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  /* User Info Panel */
+  #sales_user_info_panel {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  #sales_user_info_username,
+  #sales_user_info_store {
+    font-size: 16px;
+    color: #555;
+  }
+  
+  /* Button List */
+  #sales_button_list {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+  }
+  
+  #sales_button_invoice_list {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  #sales_button_invoice_list:hover {
+    background-color: #0056b3;
+  }
+  
+  #sales_button_icon {
+    margin-right: 10px;
+  }
+  
+  /* Sales Content */
+  #sales_content {
+    padding: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  

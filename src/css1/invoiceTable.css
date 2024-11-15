@@ -1,0 +1,93 @@
+/* Invoices Table Container */
+.invoices-table-container_invoiceTable {
+    padding: 20px;
+    margin: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Table Title */
+  .table-title_invoiceTable {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+  }
+  
+  /* Table Styling */
+  .invoices-table_invoiceTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  
+  .invoices-table_invoiceTable th,
+  .invoices-table_invoiceTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .invoices-table_invoiceTable th {
+    background-color: #6b6969;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .invoices-table_invoiceTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .invoices-table_invoiceTable tr:hover {
+    background-color: #f1f1f1;
+  }
+
+
+  .user-info-invoiceTable {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #333;
+    font-size: 16px;
+  }
+  
+  .user-info-invoiceTable p {
+    margin: 5px 0;
+    font-weight: bold;
+    color: #333;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .invoices-table-container_invoiceTable {
+      padding: 10px;
+    }
+  
+    .table-title_invoiceTable {
+      font-size: 18px;
+    }
+  
+    .invoices-table_invoiceTable {
+      font-size: 14px;
+    }
+  }
+  
