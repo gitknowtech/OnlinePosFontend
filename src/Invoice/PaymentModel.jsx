@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import PropTypes from "prop-types"; // Import PropTypes for validation
+import PropTypes from "prop-types";
 import "../css1/payment.css";
 
 import cashImage from "../assets/icons/cash.png";
@@ -9,20 +9,37 @@ import customerPaymentImage from "../assets/icons/customerPayment.png";
 import discountPercentageImage from "../assets/icons/discountPer.png";
 import discountPriceImage from "../assets/icons/discounts.png";
 import paymentTypeImage from "../assets/icons/paymentType.png";
-import netAmountImage from "../assets/icons/netAmount.png"; // Add an appropriate image for Net Amount
+import netAmountImage from "../assets/icons/netAmount.png";
 
-export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceTable, tableData,user,store }) {
+export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceTable, tableData, user, store }) {
   const [customerMobile, setCustomerMobile] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  const [discountPercent, setDiscountPercent] = useState("");
-  const [discountAmount, setDiscountAmount] = useState("");
-  const [cashPayment, setCashPayment] = useState("");
-  const [cardPayment, setCardPayment] = useState("");
+  const [discountPercent, setDiscountPercent] = useState("0");
+  const [discountAmount, setDiscountAmount] = useState("0");
+  const [cashPayment, setCashPayment] = useState("0");
+  const [cardPayment, setCardPayment] = useState("0");
   const [netAmount, setNetAmount] = useState(totalAmount);
   const [balance, setBalance] = useState(totalAmount);
   const [paymentType, setPaymentType] = useState("Credit Payment");
 
-  // Handle customer mobile input and fetch suggestions
+  // Reset values when modal loads
+  useEffect(() => {
+    if (show) {
+      setDiscountPercent("0");
+      setDiscountAmount("0");
+      setCashPayment("0");
+      setCardPayment("0");
+      setNetAmount(totalAmount);
+      setBalance(totalAmount);
+
+      if (totalAmount < 0) {
+        setCashPayment("0");
+        setCardPayment("0");
+        setPaymentType("Return Payment");
+      }
+    }
+  }, [show, totalAmount]);
+
   const handleCustomerMobileChange = async (e) => {
     const input = e.target.value;
     setCustomerMobile(input);
@@ -34,8 +51,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
         );
         const data = await response.json();
         setSuggestions(data);
-      } catch (error) { 
-        Swal.fire("Error", "Failed to fetch customer suggestions", error);
+      } catch (error) {
+        Swal.fire("Error", "Failed to fetch customer suggestions", error.message);
       }
     } else {
       setSuggestions([]);
@@ -43,21 +60,21 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
   };
 
   const handleSuggestionClick = (customer) => {
-    setCustomerMobile(customer.id); // Display the customer ID in the input field
-    setSuggestions([]); // Clear suggestions
+    setCustomerMobile(customer.id);
+    setSuggestions([]);
   };
 
   const handleBackToEdit = () => {
-    setCustomerMobile(""); // Clear customer mobile input
-    setSuggestions([]); // Clear suggestions
-    setDiscountPercent(""); // Clear discount percent
-    setDiscountAmount(""); // Clear discount amount
-    setCashPayment(""); // Clear cash payment
-    setCardPayment(""); // Clear card payment
-    setNetAmount(totalAmount); // Reset net amount to total amount
-    setBalance(totalAmount); // Reset balance to total amount
-    setPaymentType("Credit Payment"); // Reset payment type
-    onClose(); // Close the modal
+    setCustomerMobile("");
+    setSuggestions([]);
+    setDiscountPercent("0");
+    setDiscountAmount("0");
+    setCashPayment("0");
+    setCardPayment("0");
+    setNetAmount(totalAmount);
+    setBalance(totalAmount);
+    setPaymentType("Credit Payment");
+    onClose();
   };
 
   const handleCloseBill = () => {
@@ -71,173 +88,109 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       confirmButtonText: "Yes, close it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        // Clear all fields
         setCustomerMobile("");
         setSuggestions([]);
-        setDiscountPercent("");
-        setDiscountAmount("");
-        setCashPayment("");
-        setCardPayment("");
+        setDiscountPercent("0");
+        setDiscountAmount("0");
+        setCashPayment("0");
+        setCardPayment("0");
         setNetAmount(totalAmount);
         setBalance(totalAmount);
         setPaymentType("Credit Payment");
 
-        clearInvoiceTable(); // Clears the invoice table
-        onClose(); // Closes the modal
+        clearInvoiceTable();
+        onClose();
         Swal.fire("Closed!", "The invoice has been cleared.", "success");
       }
     });
   };
 
-  // Handle discount percentage
-  const handleDiscountPercentChange = (e) => {
-    const value = e.target.value;
-    setDiscountPercent(value);
-
-    const percent = parseFloat(value);
-    if (!isNaN(percent) && percent >= 0) {
-      const discountValue = (totalAmount * percent) / 100;
-      setDiscountAmount(discountValue.toFixed(2));
-      calculateNetAmount(discountValue);
-    } else {
-      setDiscountAmount("");
-      calculateNetAmount(0);
-    }
-  };
-
-
-
-
-  // Handle discount amount
-  const handleDiscountAmountChange = (e) => {
-    const value = e.target.value;
-    setDiscountAmount(value);
-
-    const amount = parseFloat(value);
-    if (!isNaN(amount) && amount >= 0 && amount <= totalAmount) {
-      const percent = (amount / totalAmount) * 100;
-      setDiscountPercent(percent.toFixed(2));
-      calculateNetAmount(amount);
-    } else {
-      setDiscountPercent("");
-      calculateNetAmount(0);
-    }
-  };
-
-
-
   const calculateNetAmount = (discountValue) => {
     const net = totalAmount - discountValue;
     setNetAmount(net.toFixed(2));
-    setBalance(net.toFixed(2));
-    updatePaymentType(net, 0);
+
+    if (net < 0) {
+      setCashPayment("0");
+      setCardPayment("0");
+      setPaymentType("Return Payment");
+    } else {
+      setBalance(net.toFixed(2));
+      setPaymentType("Credit Payment");
+    }
   };
-
-
 
   const handleCashPaymentChange = (e) => {
     const inputValue = e.target.value;
 
-    // Validate input to ensure it's a numeric value
     if (!/^\d*\.?\d*$/.test(inputValue)) {
       return; // Ignore invalid input
     }
 
-    const cash = parseFloat(inputValue) || 0; // Cash payment value entered by the user
-    const net = parseFloat(netAmount) || 0; // Net amount from the state
-    const card = net - cash; // Calculate card payment dynamically
+    const cash = parseFloat(inputValue) || 0;
+    const net = parseFloat(netAmount) || 0;
 
-    // Ensure cash does not exceed the net amount
-    if (cash > net) {
-      Swal.fire("Error", "Cash payment cannot exceed the net amount!", "error");
-      setCashPayment(""); // Reset cash payment
-      setCardPayment(net.toFixed(2)); // Reset card payment to full net amount
-      setBalance(net.toFixed(2)); // Reset balance
-      setPaymentType("Credit Payment"); // Set payment type as credit
-      return;
-    }
-
-
-
-    // Update cash payment field
     setCashPayment(inputValue);
 
-    // Update card payment field dynamically
-    setCardPayment(card.toFixed(2));
+    // Calculate balance and update payment type
+    const balanceAmount = cash - net;
+    setBalance(balanceAmount.toFixed(2)); // Balance = cashPayment - netAmount
 
-    // Update balance
-    setBalance("0.00"); // Balance should be zero after full payment
-
-
-
-    // Determine the payment type
-    if (cash + card < netAmount) {
-      setPaymentType("Credit Payment"); // Insufficient payment made
-    } else if (cash === 0 && card === 0) {
-      setPaymentType("Credit Payment"); // No payment made
-    } else if (cash > 0 && card > 0) {
-      setPaymentType("Cash and Card Payment"); // Mixed payment
-    } else if (cash > 0 && card === 0) {
-      setPaymentType("Cash Payment"); // Fully paid in cash
-    } else if (cash === 0 && card > 0) {
-      setPaymentType("Card Payment"); // Fully paid by card
-    }
-  };
-
-
-
-  // Handle card payment
-  const handleCardPaymentChange = (e) => {
-    const card = parseFloat(e.target.value) || 0;
-    const cash = parseFloat(cashPayment) || 0;
-
-    if (cash + card > netAmount) {
-      Swal.fire("Error", "The total payment cannot exceed the net amount!", "error");
-      return;
-    }
-
-    setCardPayment(e.target.value);
-
-    const totalPaid = cash + card;
-    const remainingBalance = netAmount - totalPaid;
-
-    setBalance(remainingBalance.toFixed(2));
-    updatePaymentType(netAmount, totalPaid);
-  };
-
-
-  
-  const updatePaymentType = (net, paid) => {
-    if (net - paid > 0) {
-      setPaymentType("Credit Payment");
+    if (cash >= net) {
+      setPaymentType("Cash Payment"); // Fully paid or overpaid
     } else {
-      setPaymentType("Cash Payment");
+      setPaymentType("Credit Payment"); // Underpaid
     }
   };
+
+  const handleCardPaymentChange = (e) => {
+    const inputValue = e.target.value;
+  
+    if (!/^\d*\.?\d*$/.test(inputValue)) {
+      return; // Ignore invalid input
+    }
+  
+    const card = parseFloat(inputValue) || 0;
+    const cash = parseFloat(cashPayment) || 0;
+    const net = parseFloat(netAmount) || 0;
+  
+    setCardPayment(inputValue);
+  
+    // Calculate balance and update payment type
+    const balanceAmount = cash + card - net;
+    setBalance(balanceAmount.toFixed(2)); // Balance = (cash + card) - netAmount
+  
+    if (cash + card >= net) {
+      if (cash > 0 && card > 0) {
+        setPaymentType("Cash and Card Payment");
+      } else if (cash > 0) {
+        setPaymentType("Cash Payment");
+      } else if (card > 0) {
+        setPaymentType("Card Payment");
+      }
+    } else {
+      setPaymentType("Credit Payment"); // Underpaid
+    }
+  };
+  
 
   const handlePayment = async () => {
-    if (balance < 0) {
-      Swal.fire("Error", "Balance cannot be negative. Please check the payment details.", "error");
-      return;
-    }
-
+    // Remove negative balance restriction
     const paymentData = {
       GrossTotal: totalAmount,
-      CustomerId: customerMobile || "Unknown", // Default to 'Unknown' if no customer
-      discountPercent: discountPercent,
-      discountAmount: discountAmount,
-      netAmount: netAmount,
+      CustomerId: customerMobile || "Unknown",
+      discountPercent,
+      discountAmount,
+      netAmount,
       CashPay: cashPayment,
       CardPay: cardPayment,
       PaymentType: paymentType,
-      Balance: balance,
-      invoiceItems: tableData, // Include invoice items here
-      user, // Include user
-      store, // Include store
+      Balance: balance, // Allow negative balance
+      invoiceItems: tableData,
+      user,
+      store,
     };
-
+  
     try {
-      // Save payment and invoice items in sales and invoices tables
       const salesResponse = await fetch("http://localhost:5000/api/invoices/add_sales", {
         method: "POST",
         headers: {
@@ -245,36 +198,35 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
         },
         body: JSON.stringify(paymentData),
       });
-
+  
       if (!salesResponse.ok) {
         const error = await salesResponse.json();
         Swal.fire("Error", `Failed to save payment: ${error.message}`, "error");
         return;
       }
-
+  
       const salesResult = await salesResponse.json();
       const { invoiceId } = salesResult;
-
-      // Notify success
+  
       Swal.fire("Success", `Payment and invoice saved successfully! Invoice ID: ${invoiceId}`, "success");
-
-      // Clear fields and reset state
+  
       setCustomerMobile("");
       setSuggestions([]);
-      setDiscountPercent("");
-      setDiscountAmount("");
-      setCashPayment("");
-      setCardPayment("");
+      setDiscountPercent("0");
+      setDiscountAmount("0");
+      setCashPayment("0");
+      setCardPayment("0");
       setNetAmount(totalAmount);
       setBalance(totalAmount);
       setPaymentType("Credit Payment");
-
+  
       clearInvoiceTable();
       onClose();
     } catch (error) {
-      Swal.fire("Error", "An unexpected error occurred.", error);
+      Swal.fire("Error", "An unexpected error occurred.", error.message);
     }
   };
+  
 
   const getBalanceStyle = () => {
     if (balance < 0) return { backgroundColor: "red", color: "white" };
@@ -325,7 +277,14 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
               type="text"
               placeholder="Enter Discount (%)"
               value={discountPercent}
-              onChange={handleDiscountPercentChange}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDiscountPercent(value);
+                const percent = parseFloat(value);
+                const discountValue = isNaN(percent) ? 0 : (totalAmount * percent) / 100;
+                setDiscountAmount(discountValue.toFixed(2));
+                calculateNetAmount(discountValue);
+              }}
             />
           </div>
           <div id="discount-amount-group">
@@ -337,7 +296,14 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
               type="text"
               placeholder="Enter Discount Amount"
               value={discountAmount}
-              onChange={handleDiscountAmountChange}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDiscountAmount(value);
+                const amount = parseFloat(value);
+                const percent = isNaN(amount) || amount > totalAmount ? 0 : (amount / totalAmount) * 100;
+                setDiscountPercent(percent.toFixed(2));
+                calculateNetAmount(amount);
+              }}
             />
           </div>
 
@@ -369,7 +335,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
               Card Payment
             </label>
             <input
-              type="number"
+              type="text"
               placeholder="Enter Card Payment"
               value={cardPayment}
               onChange={handleCardPaymentChange}
@@ -403,13 +369,12 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
   );
 }
 
-// Add PropTypes validation
 PaymentModel.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   totalAmount: PropTypes.number.isRequired,
   clearInvoiceTable: PropTypes.func.isRequired,
-  tableData: PropTypes.arrayOf( // Define tableData as a required prop
+  tableData: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
       cost: PropTypes.string.isRequired,
@@ -420,6 +385,6 @@ PaymentModel.propTypes = {
       amount: PropTypes.string.isRequired,
     })
   ).isRequired,
-  user: PropTypes.string.isRequired, // Add user
-  store: PropTypes.string.isRequired, // Add store
+  user: PropTypes.string.isRequired,
+  store: PropTypes.string.isRequired,
 };

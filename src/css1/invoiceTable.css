@@ -64,7 +64,42 @@
 
 
 
+  /* Date Range Filters */
+.date-range-filters {
+  display: flex;
+  gap: 30px;
+}
 
+.date-picker {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  cursor: pointer;
+}
+
+.date-picker label {
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+/* Filters Container */
+.filters-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+
+
+/* Search Box */
+.search-box-invoiceTable .search-input {
+  padding: 10px;
+  width: 250px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
 
 
 

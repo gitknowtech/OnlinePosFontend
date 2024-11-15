@@ -33,8 +33,9 @@
   }
   
   .sales-table_salesTable th {
-    background-color: #f4f4f4;
+    background-color: #797979;
     font-weight: bold;
+    color: #fff;
   }
   
   .sales-table_salesTable tr:nth-child(even) {
