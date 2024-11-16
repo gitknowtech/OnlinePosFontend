@@ -1,6 +1,6 @@
 
 #manage-customer-container{
-  background-color: #d2d9f7;
+  background-color: #b7c2f3;
   padding: 20px;
   font-size: 14px;
   font-weight: 600;
@@ -35,7 +35,7 @@
   }
   
   #manage-customer-table th {
-    background-color: #949494;
+    background-color: #696767;
     color: #ffffff;
     font-weight: 700;
     font-size: 12px;

@@ -10,8 +10,6 @@ import "../css1/invoice.css";
 import PaymentModel from "./PaymentModel";
 import Calculator from "../models/Calculator";
 
-
-
 // Ensure these image paths are correct in your project structure
 import productimage from "../assets/images/products.png";
 import bill from "../assets/images/bill.png";
@@ -28,8 +26,6 @@ import discount from "../assets/images/discount.png";
 import wholesale from "../assets/images/wholesale.png";
 import removeImage from "../assets/images/remove.png";
 import calculatorImage from "../assets/icons/calculator.png";
-
-
 
 export default function Invoice() {
   const location = useLocation();
@@ -58,12 +54,9 @@ export default function Invoice() {
   });
   const [percentage, setPercentage] = useState(""); // State for percentage input
 
-
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
   const barcodeInputRef = useRef(null);
-
-
 
   // OtherItem model related contents
   const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);
@@ -84,8 +77,6 @@ export default function Invoice() {
 
   const handleCalculatorClick = () => setIsCalculatorOpen(true);
   const handleCloseCalculator = () => setIsCalculatorOpen(false);
-
-
 
   const handleOpenPaymentModal = () => {
     console.log("Payment button clicked");
@@ -122,15 +113,11 @@ export default function Invoice() {
       return;
     }
 
-    // Set only the barcode state
     setBarcode(product.barcode);
-    setCostPrice(product.costPrice);
-    setProductName(product.productName);
     setPrice(product.salePrice);
     setSuggestedPrice(product.mrpPrice);
     setLockedPrice(product.lockedPrice);
 
-    // Refocus on barcode input after selection
     barcodeInputRef.current.focus();
   };
 
@@ -180,7 +167,6 @@ export default function Invoice() {
     };
   }, []);
 
-
   useEffect(() => {
     if (location.state) {
       const { UserName, Store } = location.state;
@@ -197,11 +183,9 @@ export default function Invoice() {
     setStartTime(formattedTime);
   }, [location.state]);
 
-
   useEffect(() => {
     calculateTotals();
   }, [tableData]);
-
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -226,8 +210,6 @@ export default function Invoice() {
     };
   }, [isWholesale, isDiscount]); // Add dependencies to keep the hook up-to-date
 
-
-
   const handleAddOtherItem = (item) => {
     const { productName, productCost, productMRP, productRate, qty, discount } =
       item;
@@ -249,18 +231,15 @@ export default function Invoice() {
     setIsOtherItemModalOpen(false); // Close the modal after adding the item
   };
 
-
   // Function to handle when the "Return" button is clicked
   const handleReturnClick = () => {
     console.log("Return button clicked"); // Debugging log
     setIsReturnModalOpen(true);
   };
 
-
   const handleCloseReturnModal = () => {
     setIsReturnModalOpen(false);
   };
-
 
   const handleAddReturnItem = (item) => {
     // Adjust the data to have negative values
@@ -286,7 +265,6 @@ export default function Invoice() {
     setIsReturnModalOpen(false);
   };
 
-
   const handleQuantityChange = (e, index) => {
     const newQuantity = e.target.value;
     setTableData((prevData) => {
@@ -296,7 +274,6 @@ export default function Invoice() {
     });
   };
 
-
   const clearInvoiceTable = () => {
     setTableData([]); // Clears the table data
     setTotalAmount("0.00");
@@ -304,7 +281,6 @@ export default function Invoice() {
     setTotalDiscount("0.00");
     setItemCount(0);
   };
-
 
   const handleQuantityEditEnterKeyPress = async (e, index) => {
     if (e.key === "Enter") {
@@ -314,12 +290,18 @@ export default function Invoice() {
       const rate = parseFloat(tableData[index].rate);
 
       // Save the old values before proceeding
-      const previousQuantity = tableData[index].previousQuantity || tableData[index].quantity;
-      const previousAmount = tableData[index].previousAmount || tableData[index].amount;
+      const previousQuantity =
+        tableData[index].previousQuantity || tableData[index].quantity;
+      const previousAmount =
+        tableData[index].previousAmount || tableData[index].amount;
 
       // Validate quantity
       if (isNaN(updatedQuantity)) {
-        Swal.fire("Invalid Quantity", "Please enter a valid quantity", "warning");
+        Swal.fire(
+          "Invalid Quantity",
+          "Please enter a valid quantity",
+          "warning"
+        );
         return;
       }
 
@@ -398,13 +380,10 @@ export default function Invoice() {
     }
   };
 
-
-
-
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
-  
+
     if (input.length > 1) {
       try {
         const response = await axios.get(
@@ -418,13 +397,10 @@ export default function Invoice() {
       setSuggestions([]);
     }
   };
-  
-
 
   const handlePercentageChange = (value) => {
     setPercentage(value);
   };
-
 
   const handlePercentageEnter = () => {
     const enteredPercentage = parseFloat(percentage);
@@ -444,7 +420,6 @@ export default function Invoice() {
     setPercentage(""); // Clear the percentage input
     qtyInputRef.current.focus(); // Move focus to the quantity input
   };
-
 
   const handlePriceEnter = () => {
     const enteredPrice = parseFloat(price);
@@ -466,18 +441,17 @@ export default function Invoice() {
   };
 
 
+
   const handleBarcodeEnter = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/products/search?query=${barcode}`
+        `http://localhost:5000/api/products/search_by_barcode?query=${barcode}`
       );
   
       if (response.data.length > 0) {
         const product = response.data[0];
         setBarcode(product.barcode);
-        setCostPrice(product.costPrice);
         setLockedPrice(product.lockedPrice);
-        setProductName(product.productName);
         setSuggestedPrice(product.mrpPrice);
   
         if (isWholesale) {
@@ -494,10 +468,10 @@ export default function Invoice() {
           );
   
           if (existingIndex !== -1) {
-            // Update existing item
             const existingItem = prevData[existingIndex];
             const updatedQuantity = parseFloat(existingItem.quantity) + 1;
-            const updatedAmount = updatedQuantity * parseFloat(existingItem.rate);
+            const updatedAmount =
+              updatedQuantity * parseFloat(existingItem.rate);
   
             const updatedItem = {
               ...existingItem,
@@ -509,17 +483,15 @@ export default function Invoice() {
             updatedData[existingIndex] = updatedItem;
             return updatedData;
           } else {
-            // Add new item
             return [
               ...prevData,
               {
-                productId: product.productId, // Fetch and store productId
+                productId: product.productId, // Fetched directly from backend
                 name: product.productName,
-                cost: parseFloat(product.costPrice).toFixed(2),
                 mrp: parseFloat(product.mrpPrice).toFixed(2),
-                discount: 0, // Default discount
+                discount: 0,
                 rate: parseFloat(product.mrpPrice).toFixed(2),
-                quantity: "1.00", // Default quantity
+                quantity: "1.00",
                 amount: parseFloat(product.mrpPrice).toFixed(2),
                 barcode: product.barcode,
                 type: "new",
@@ -538,105 +510,84 @@ export default function Invoice() {
         );
       }
     } catch (error) {
-      Swal.fire("Error", "Failed to fetch product by barcode", error);
+      Swal.fire("Error", "Failed to fetch product by barcode", error.message);
     }
   };
   
 
-  // Updated function to check stock when entering quantity
-  const handleQtyEnter = async () => {
+  const handleQtyEnter = () => {
     if (!qty || isNaN(parseFloat(qty)) || parseFloat(qty) <= 0) {
       Swal.fire("Invalid Quantity", "Please enter a valid quantity.", "error");
       return;
     }
   
     const requestedQuantity = parseFloat(qty);
-    const enteredPrice = parseFloat(price); // Use the user-entered price
+    const enteredPrice = parseFloat(price);
   
     if (!enteredPrice || enteredPrice <= 0) {
       Swal.fire("Invalid Price", "Please enter a valid price.", "error");
       return;
     }
   
-    try {
-      // Fetch product and stock details using barcode
-      const response = await axios.get(
-        `http://localhost:5000/api/products/search?query=${barcode}`
+    setTableData((prevData) => {
+      const existingIndex = prevData.findIndex(
+        (item) => item.barcode === barcode
       );
   
-      if (!response.data.length) {
-        Swal.fire("Not Found", "Product not found in the database.", "warning");
-        return;
+      if (existingIndex !== -1) {
+        // Update existing product in the table
+        const existingItem = prevData[existingIndex];
+        const updatedQuantity =
+          parseFloat(existingItem.quantity) + requestedQuantity;
+        const updatedAmount = updatedQuantity * parseFloat(existingItem.rate);
+  
+        const updatedItem = {
+          ...existingItem,
+          quantity: updatedQuantity.toFixed(2),
+          amount: updatedAmount.toFixed(2),
+        };
+  
+        const updatedData = [...prevData];
+        updatedData[existingIndex] = updatedItem;
+        return updatedData;
+      } else {
+        // Add a new product to the table
+        return [
+          ...prevData,
+          {
+            productId: tableData.find((item) => item.barcode === barcode)
+              ?.productId || "Unknown", // Get from tableData if exists
+            name: productName,
+            cost: parseFloat(costPrice || 0).toFixed(2),
+            mrp: parseFloat(suggestedPrice || 0).toFixed(2),
+            discount: (parseFloat(suggestedPrice || 0) - enteredPrice).toFixed(2),
+            rate: enteredPrice.toFixed(2),
+            quantity: requestedQuantity.toFixed(2),
+            amount: (requestedQuantity * enteredPrice).toFixed(2),
+            barcode: barcode,
+            type: "new",
+          },
+        ];
       }
+    });
   
-      const product = response.data[0]; // Extract the first product result
-      const availableStock = product.stockQuantity; // Available stock from API response
-  
-      // Additional query to validate latest stock from the backend
-      const stockResponse = await axios.get(
-        `http://localhost:5000/api/invoices/check_stock?productId=${product.productId}`
-      );
-  
-      const latestStock = stockResponse.data.stockQuantity;
-  
-      // Calculate the current positive quantity sum for this product ID in the table
-      const currentPositiveQuantitySum = tableData
-        .filter(
-          (item) =>
-            item.productId === product.productId && parseFloat(item.quantity) > 0 // Only positive quantities
-        )
-        .reduce((sum, item) => sum + parseFloat(item.quantity), 0);
-  
-      const totalRequestedQuantity =
-        currentPositiveQuantitySum + requestedQuantity;
-  
-      // Validate stock availability across all rows
-      if (totalRequestedQuantity > latestStock) {
-        Swal.fire(
-          "Insufficient Stock",
-          `Only ${latestStock} units of ${product.productName} are available. Current total in table (positive quantities): ${currentPositiveQuantitySum}, Requested: ${requestedQuantity}.`,
-          "error"
-        );
-        return; // Exit if stock is insufficient
-      }
-  
-      // Add or update the product in the table data
-      setTableData((prevData) => [
-        ...prevData,
-        {
-          productId: product.productId, // Include productId
-          name: product.productName,
-          cost: parseFloat(product.costPrice).toFixed(2),
-          mrp: parseFloat(product.mrpPrice).toFixed(2),
-          discount: (parseFloat(product.mrpPrice) - enteredPrice).toFixed(2),
-          rate: enteredPrice.toFixed(2), // Use entered price as rate
-          quantity: requestedQuantity.toFixed(2),
-          amount: (requestedQuantity * enteredPrice).toFixed(2),
-          barcode: product.barcode, // Include barcode
-          type: "new", // Mark as new item
-        },
-      ]);
-  
-      // Clear input fields after adding/updating item
-      setProductName("");
-      setBarcode("");
-      setPrice("");
-      setQty("");
-      setSuggestedPrice("");
-      barcodeInputRef.current.focus();
-    } catch (error) {
-      console.error("Error fetching product or stock details:", error);
-      Swal.fire("Error", "Failed to fetch product or stock details.", "error");
-    }
+    // Clear input fields after adding/updating item
+    setProductName("");
+    setBarcode("");
+    setPrice("");
+    setQty("");
+    setSuggestedPrice("");
+    barcodeInputRef.current.focus();
   };
+
   
-  
+
+
+
 
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
-
-
 
   const calculateTotals = () => {
     // Filter out items with negative discount or quantity
@@ -666,7 +617,6 @@ export default function Invoice() {
     setItemCount(validItems.length);
   };
 
-  
   const handleVirtualEnter = () => {
     if (document.activeElement === barcodeInputRef.current) {
       handleBarcodeEnter();
@@ -821,7 +771,7 @@ export default function Invoice() {
           <table className="product-table" id="product-table-invoice">
             <thead>
               <tr>
-              <th>Product ID</th> {/* Add Product ID Column */}
+                <th>Product ID</th> {/* Add Product ID Column */}
                 <th>Name</th>
                 <th style={{ textAlign: "center" }}>Cost</th>
                 <th>MRP</th>
@@ -839,18 +789,18 @@ export default function Invoice() {
                     item.type === "return"
                       ? "return-row"
                       : item.type === "new"
-                        ? "new-row"
-                        : ""
+                      ? "new-row"
+                      : ""
                   }
                   style={
                     item.type === "return"
                       ? { backgroundColor: "#fcd8d8" } // Light red for return
                       : item.type === "new"
-                        ? { backgroundColor: "#d8fcdb" } // Light green for new items
-                        : {}
+                      ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                      : {}
                   }
                 >
-      <td>{item.productId}</td> {/* Render Product ID */}
+                  <td>{item.productId}</td> {/* Render Product ID */}
                   <td>{item.name}</td>
                   <td style={{ textAlign: "center" }}>{item.cost}</td>
                   <td style={{ textAlign: "center" }}>{item.mrp}</td>
@@ -864,13 +814,17 @@ export default function Invoice() {
                     }
                   >
                     {editingCell.rowIndex === index &&
-                      editingCell.field === "quantity" ? (
+                    editingCell.field === "quantity" ? (
                       <input
                         type="text"
                         value={item.quantity}
                         onChange={(e) => handleQuantityChange(e, index)}
-                        onKeyDown={(e) => handleQuantityEditEnterKeyPress(e, index)} // Call the async function here
-                        onBlur={() => setEditingCell({ rowIndex: null, field: null })}
+                        onKeyDown={(e) =>
+                          handleQuantityEditEnterKeyPress(e, index)
+                        } // Call the async function here
+                        onBlur={() =>
+                          setEditingCell({ rowIndex: null, field: null })
+                        }
                         style={{ width: "50px", textAlign: "center" }}
                         autoFocus
                       />
@@ -914,6 +868,19 @@ export default function Invoice() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="product-info" style={{ display: "none" }}>
+          {productName && (
+            <div>
+              <strong>Product Name:</strong> {productName}
+            </div>
+          )}
+          {costPrice && (
+            <div>
+              <strong>Cost Price:</strong> {costPrice}
+            </div>
+          )}
         </div>
 
         <div className="total-display">
@@ -1186,7 +1153,7 @@ export default function Invoice() {
           onClose={handleCloseExpensesModal}
           user={user}
           store={store}
-          onAdd={() => { }}
+          onAdd={() => {}}
         />
 
         {/* Render the OtherItemModel */}
@@ -1220,12 +1187,7 @@ export default function Invoice() {
           store={store} // Pass Store
         />
 
-
-        <Calculator
-          show={isCalculatorOpen}
-          onClose={handleCloseCalculator}
-        />
-
+        <Calculator show={isCalculatorOpen} onClose={handleCloseCalculator} />
       </div>
     </div>
   );

@@ -12,79 +12,69 @@ export default function AddCustomer({ UserName, store }) {
   const [mobile1, setMobile1] = useState("");
   const [mobile2, setMobile2] = useState("");
   const [idNumber, setIdNumber] = useState("");
+  const [creditLimit, setCreditLimit] = useState("");
 
-  // Function to validate form data
+  // Validate form data
   const validateFormData = () => {
-    console.log("Validating form data...");
     if (cusId.trim() === "" || cusName.trim() === "") {
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: "Customer ID and Customer Name are required!",
       });
-      console.error("Validation failed: Customer ID or Customer Name is empty");
       return false;
     }
-
     if (mobile1.length !== 10 || isNaN(mobile1)) {
       Swal.fire({
         icon: "error",
         title: "Invalid Mobile Number",
         text: "Mobile number must be 10 digits!",
       });
-      console.error("Validation failed: Mobile number is invalid");
       return false;
     }
-
+    if (creditLimit && isNaN(creditLimit)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Credit Limit",
+        text: "Credit limit must be a valid number!",
+      });
+      return false;
+    }
     return true;
   };
 
-  // Function to check for duplicate data
+  // Check for duplicates
   const checkForDuplicates = async () => {
-    console.log("Checking for duplicate data...");
     try {
       const response = await axios.post(
         "http://localhost:5000/api/customer/customer_check_duplicate",
-        {
-          cusId,
-          mobile1,
-          mobile2,
-          idNumber,
-        }
+        { cusId, mobile1, mobile2, idNumber }
       );
-
       if (response.status === 409) {
-        console.log("Duplicate found:", response.data.message);
         Swal.fire({
           icon: "error",
           title: "Duplicate Found",
-          text: response.data.message, // Display detailed message from the server
+          text: response.data.message,
         });
-        return true; // Indicate a duplicate was found
+        return true;
       }
-      console.log("No duplicates found");
-      return false; // No duplicates found
+      return false;
     } catch (error) {
-      console.error("Error checking for duplicates:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error.response?.data?.message || "An error occurred while checking for duplicates.",
+        text: error.response?.data?.message || "Error checking duplicates.",
       });
       return false;
     }
   };
 
-  // Function to handle save
+  
+  // Save customer
   const handleSave = async () => {
-    console.log("Handle save initiated...");
     if (!validateFormData()) return;
-
     const isDuplicate = await checkForDuplicates();
-    if (isDuplicate) {
-      console.log("Save aborted due to duplicate data");
-      return; // Stop the process if a duplicate is found
-    }
+    if (isDuplicate) return;
 
     const customerData = {
       cusId,
@@ -94,33 +84,27 @@ export default function AddCustomer({ UserName, store }) {
       mobile1,
       mobile2,
       idNumber,
+      creditLimit,
       user: UserName,
       store,
     };
-
-    console.log("Customer data prepared for saving:", customerData);
 
     try {
       const response = await axios.post(
         "http://localhost:5000/api/customer/add_customer",
         customerData
       );
-
-      console.log("Response received from server:", response);
-
       if (response.status === 201) {
-        console.log("Customer added successfully");
         resetFormFields();
         Swal.fire({
           icon: "success",
           title: "Customer Added",
-          text: "Customer has been added successfully!",
+          text: "Customer added successfully!",
         });
       } else {
         throw new Error("Failed to save customer");
       }
     } catch (error) {
-      console.error("Error saving customer:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -129,8 +113,8 @@ export default function AddCustomer({ UserName, store }) {
     }
   };
 
+  // Reset form fields
   const resetFormFields = () => {
-    console.log("Resetting form fields...");
     setCusId("");
     setCusName("");
     setAddress1("");
@@ -138,13 +122,14 @@ export default function AddCustomer({ UserName, store }) {
     setMobile1("");
     setMobile2("");
     setIdNumber("");
+    setCreditLimit("");
   };
 
   return (
     <div id="customer-model">
       <div id="customer-form">
         <div id="cusId-group">
-          <label htmlFor="cusId">Customer ID</label>
+          <label htmlFor="cusId" id="cusId-label">Customer ID</label>
           <input
             type="text"
             id="cusId"
@@ -153,9 +138,8 @@ export default function AddCustomer({ UserName, store }) {
             placeholder="Enter Customer ID"
           />
         </div>
-
         <div id="cusName-group">
-          <label htmlFor="cusName">Customer Name</label>
+          <label htmlFor="cusName" id="cusName-label">Customer Name</label>
           <input
             type="text"
             id="cusName"
@@ -164,9 +148,8 @@ export default function AddCustomer({ UserName, store }) {
             placeholder="Enter Customer Name"
           />
         </div>
-
         <div id="address1-group">
-          <label htmlFor="address1">Address 1</label>
+          <label htmlFor="address1" id="address1-label">Address 1</label>
           <input
             type="text"
             id="address1"
@@ -175,9 +158,8 @@ export default function AddCustomer({ UserName, store }) {
             placeholder="Enter Address 1"
           />
         </div>
-
         <div id="address2-group">
-          <label htmlFor="address2">Address 2</label>
+          <label htmlFor="address2" id="address2-label">Address 2</label>
           <input
             type="text"
             id="address2"
@@ -186,9 +168,8 @@ export default function AddCustomer({ UserName, store }) {
             placeholder="Enter Address 2"
           />
         </div>
-
         <div id="mobile1-group">
-          <label htmlFor="mobile1">Mobile 1</label>
+          <label htmlFor="mobile1" id="mobile1-label">Mobile 1</label>
           <input
             type="text"
             id="mobile1"
@@ -197,9 +178,8 @@ export default function AddCustomer({ UserName, store }) {
             placeholder="Enter Mobile 1"
           />
         </div>
-
         <div id="mobile2-group">
-          <label htmlFor="mobile2">Mobile 2</label>
+          <label htmlFor="mobile2" id="mobile2-label">Mobile 2</label>
           <input
             type="text"
             id="mobile2"
@@ -208,9 +188,8 @@ export default function AddCustomer({ UserName, store }) {
             placeholder="Enter Mobile 2"
           />
         </div>
-
         <div id="idNumber-group">
-          <label htmlFor="idNumber">ID Number</label>
+          <label htmlFor="idNumber" id="idNumber-label">ID Number</label>
           <input
             type="text"
             id="idNumber"
@@ -219,7 +198,16 @@ export default function AddCustomer({ UserName, store }) {
             placeholder="Enter ID Number"
           />
         </div>
-
+        <div id="creditLimit-group">
+          <label htmlFor="creditLimit" id="creditLimit-label">Credit Limit</label>
+          <input
+            type="text"
+            id="creditLimit"
+            value={creditLimit}
+            onChange={(e) => setCreditLimit(e.target.value)}
+            placeholder="Enter Credit Limit"
+          />
+        </div>
         <div id="button-group">
           <button id="saveButton" onClick={handleSave}>
             Save

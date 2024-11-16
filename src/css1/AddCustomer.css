@@ -1,84 +1,103 @@
 #customer-model {
-    background-color: #e4e7ff;
-    border-radius: 10px;
-    padding: 60px;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    box-sizing: border-box;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    max-width: 900px;
-    margin: auto;
-  }
-  
-  #customer-header,
-  #location-header,
-  #contact-header {
-    font-size: 18px;
-    font-weight: bold;
-    color: #06045f;
-    margin-bottom: 15px;
-    text-decoration: underline;
-  }
-  
+  background-color: #b1b8f1;
+  border-radius: 10px;
+  padding: 40px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: auto;
+}
+
+#customer-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+#cusId-group,
+#cusName-group,
+#address1-group,
+#address2-group,
+#mobile1-group,
+#mobile2-group,
+#idNumber-group,
+#creditLimit-group {
+  flex: 0 1 calc(50% - 20px); /* Two columns */
+  display: flex;
+  flex-direction: column;
+}
+
+#cusId-label,
+#cusName-label,
+#address1-label,
+#address2-label,
+#mobile1-label,
+#mobile2-label,
+#idNumber-label,
+#creditLimit-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #000000;
+  margin-bottom: 5px;
+}
+
+#cusId,
+#cusName,
+#address1,
+#address2,
+#mobile1,
+#mobile2,
+#idNumber,
+#creditLimit {
+  font-size: 12px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+#cusId:focus,
+#cusName:focus,
+#address1:focus,
+#address2:focus,
+#mobile1:focus,
+#mobile2:focus,
+#idNumber:focus,
+#creditLimit:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+#button-group {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+#saveButton {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#saveButton:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
   #customer-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px 30px; /* Row gap and column gap */
-  }
-  
-  #customer-form > div {
-    display: flex;
     flex-direction: column;
   }
-  
-  label {
-    margin-bottom: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #555;
-  }
-  
-  input {
-    padding: 6px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 12px;
-    outline: none;
-    transition: border-color 0.3s ease;
-  }
-  
-  input:focus {
-    border-color: #80bdff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
-  }
-  
-  #button-group {
-    grid-column: span 2; /* Span the button across both columns */
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  
-  #saveButton {
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    width: 20%;
-    padding: 6px 15px;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  #saveButton:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Responsive Design */
-  @media screen and (max-width: 768px) {
-    #customer-form {
-      grid-template-columns: 1fr; /* One column on smaller screens */
-    }
-  }
-  
+}
