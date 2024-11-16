@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 function ReturnModel({ show, onClose, onAdd }) {
+  const [productId, setProductId] = useState(''); // Added state for productId
   const [productName, setProductName] = useState('');
   const [productCost, setProductCost] = useState('');
   const [productSale, setProductSale] = useState('');
@@ -31,6 +32,7 @@ function ReturnModel({ show, onClose, onAdd }) {
         );
         if (response.data.length > 0) {
           const product = response.data[0];
+          setProductId(product.productId); // Set productId
           setProductName(product.productName);
           setProductCost(parseFloat(product.costPrice).toFixed(2));
           setProductSale(parseFloat(product.mrpPrice).toFixed(2));
@@ -49,6 +51,7 @@ function ReturnModel({ show, onClose, onAdd }) {
   };
 
   const clearProductDetails = () => {
+    setProductId(''); // Clear productId
     setProductName('');
     setProductCost('');
     setProductSale('');
@@ -62,8 +65,8 @@ function ReturnModel({ show, onClose, onAdd }) {
   };
 
   const handleAddToList = () => {
-    if (!productName) {
-      Swal.fire('Error', 'Please enter a product name', 'error');
+    if (!productId || !productName) {
+      Swal.fire('Error', 'Please enter a valid product', 'error');
       return;
     }
     if (!isDecimal(productCost) || productCost <= 0) {
@@ -85,6 +88,7 @@ function ReturnModel({ show, onClose, onAdd }) {
     const amount = -(parseFloat(productSale) * quantity); // Negative for return amount
 
     onAdd({
+      productId, // Include productId in the data
       productName,
       productCost: (-Math.abs(productCost)).toFixed(2),
       productSale: (-Math.abs(productSale)).toFixed(2),
@@ -99,6 +103,7 @@ function ReturnModel({ show, onClose, onAdd }) {
   };
 
   const clearInputs = () => {
+    setProductId(''); // Clear productId
     setProductName('');
     setProductCost('');
     setProductSale('');

@@ -271,6 +271,7 @@ export default function Invoice() {
     setTableData((prevData) => [
       ...prevData,
       {
+        productId: item.productId, // Add productId
         name: item.productName,
         cost: (-Math.abs(parseFloat(item.productCost))).toFixed(2),
         mrp: -Math.abs(parseFloat(item.mrp).toFixed(2)), // Ensure MRP retains original value
@@ -403,11 +404,11 @@ export default function Invoice() {
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
-
+  
     if (input.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/products/search?query=${input}`
+          `http://localhost:5000/api/products/search?query=${input}&store=${store}`
         );
         setSuggestions(response.data);
       } catch (error) {
@@ -417,6 +418,7 @@ export default function Invoice() {
       setSuggestions([]);
     }
   };
+  
 
 
   const handlePercentageChange = (value) => {
@@ -469,7 +471,7 @@ export default function Invoice() {
       const response = await axios.get(
         `http://localhost:5000/api/products/search?query=${barcode}`
       );
-
+  
       if (response.data.length > 0) {
         const product = response.data[0];
         setBarcode(product.barcode);
@@ -477,7 +479,7 @@ export default function Invoice() {
         setLockedPrice(product.lockedPrice);
         setProductName(product.productName);
         setSuggestedPrice(product.mrpPrice);
-
+  
         if (isWholesale) {
           setPrice(product.wholesalePrice);
         } else if (isDiscount) {
@@ -485,7 +487,47 @@ export default function Invoice() {
         } else {
           setPrice(product.mrpPrice);
         }
-
+  
+        setTableData((prevData) => {
+          const existingIndex = prevData.findIndex(
+            (item) => item.barcode === product.barcode
+          );
+  
+          if (existingIndex !== -1) {
+            // Update existing item
+            const existingItem = prevData[existingIndex];
+            const updatedQuantity = parseFloat(existingItem.quantity) + 1;
+            const updatedAmount = updatedQuantity * parseFloat(existingItem.rate);
+  
+            const updatedItem = {
+              ...existingItem,
+              quantity: updatedQuantity.toFixed(2),
+              amount: updatedAmount.toFixed(2),
+            };
+  
+            const updatedData = [...prevData];
+            updatedData[existingIndex] = updatedItem;
+            return updatedData;
+          } else {
+            // Add new item
+            return [
+              ...prevData,
+              {
+                productId: product.productId, // Fetch and store productId
+                name: product.productName,
+                cost: parseFloat(product.costPrice).toFixed(2),
+                mrp: parseFloat(product.mrpPrice).toFixed(2),
+                discount: 0, // Default discount
+                rate: parseFloat(product.mrpPrice).toFixed(2),
+                quantity: "1.00", // Default quantity
+                amount: parseFloat(product.mrpPrice).toFixed(2),
+                barcode: product.barcode,
+                type: "new",
+              },
+            ];
+          }
+        });
+  
         setSuggestions([]);
         priceInputRef.current.focus();
       } else {
@@ -499,112 +541,96 @@ export default function Invoice() {
       Swal.fire("Error", "Failed to fetch product by barcode", error);
     }
   };
-
-
+  
 
   // Updated function to check stock when entering quantity
   const handleQtyEnter = async () => {
-    if (qty) {
-      const requestedQuantity = parseFloat(qty);
-      try {
-        // Fetch the available stock quantity for the product
-        const response = await axios.get(
-          `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
-        );
-        const availableStock = response.data.stockQuantity;
-
-        if (requestedQuantity <= availableStock) {
-          // Check if the product is already in tableData
-          setTableData((prevData) => {
-            const existingIndex = prevData.findIndex(
-              (item) => item.barcode === barcode
-            );
-            if (existingIndex !== -1) {
-              // Update existing item
-              const existingItem = prevData[existingIndex];
-              const newQuantity =
-                parseFloat(existingItem.quantity) + requestedQuantity;
-
-              if (newQuantity <= availableStock) {
-                const rate = parseFloat(existingItem.rate);
-                const newAmount = rate * newQuantity;
-                const updatedItem = {
-                  ...existingItem,
-                  quantity: newQuantity.toFixed(2),
-                  amount: newAmount.toFixed(2),
-                };
-                const newData = [...prevData];
-                newData[existingIndex] = updatedItem;
-                return newData;
-              } else {
-                Swal.fire(
-                  "Insufficient Stock",
-                  `Only ${availableStock} units of ${productName} are available in total.`,
-                  "warning"
-                );
-                return prevData;
-              }
-            } else {
-              // Add new item
-              const discount = parseFloat(suggestedPrice) - parseFloat(price);
-              const amount = parseFloat(price) * requestedQuantity;
-
-              return [
-                ...prevData,
-                {
-                  name: productName,
-                  cost: parseFloat(costPrice).toFixed(2),
-                  mrp: parseFloat(suggestedPrice).toFixed(2),
-                  discount: discount.toFixed(2),
-                  rate: parseFloat(price).toFixed(2),
-                  quantity: requestedQuantity.toFixed(2),
-                  amount: amount.toFixed(2),
-                  type: "new", // Mark as a new row
-                  barcode: barcode, // Include barcode for identification
-                },
-              ];
-            }
-          });
-
-          // Clear input fields
-          setProductName("");
-          setBarcode("");
-          setPrice("");
-          setQty("");
-          setSuggestedPrice("");
-          barcodeInputRef.current.focus();
-        } else if (availableStock > 0) {
-          // Display a message indicating the maximum available quantity
-          Swal.fire(
-            "Insufficient Stock",
-            `Only ${availableStock} units of ${productName} are available.`,
-            "warning"
-          );
-          // Optionally, you can set the quantity to the available stock
-          setQty(availableStock.toString());
-        } else {
-          // No stock available
-          Swal.fire(
-            "Out of Stock",
-            `${productName} is currently out of stock.`,
-            "error"
-          );
-          // Clear input fields
-          setBarcode("");
-          setProductName("");
-          setPrice("");
-          setQty("");
-          setSuggestedPrice("");
-          barcodeInputRef.current.focus();
-        }
-      } catch (error) {
-        Swal.fire("Error", "Failed to fetch stock quantity", "error");
-        console.error("Error fetching stock quantity:", error);
+    if (!qty || isNaN(parseFloat(qty)) || parseFloat(qty) <= 0) {
+      Swal.fire("Invalid Quantity", "Please enter a valid quantity.", "error");
+      return;
+    }
+  
+    const requestedQuantity = parseFloat(qty);
+    const enteredPrice = parseFloat(price); // Use the user-entered price
+  
+    if (!enteredPrice || enteredPrice <= 0) {
+      Swal.fire("Invalid Price", "Please enter a valid price.", "error");
+      return;
+    }
+  
+    try {
+      // Fetch product and stock details using barcode
+      const response = await axios.get(
+        `http://localhost:5000/api/products/search?query=${barcode}`
+      );
+  
+      if (!response.data.length) {
+        Swal.fire("Not Found", "Product not found in the database.", "warning");
+        return;
       }
+  
+      const product = response.data[0]; // Extract the first product result
+      const availableStock = product.stockQuantity; // Available stock from API response
+  
+      // Additional query to validate latest stock from the backend
+      const stockResponse = await axios.get(
+        `http://localhost:5000/api/invoices/check_stock?productId=${product.productId}`
+      );
+  
+      const latestStock = stockResponse.data.stockQuantity;
+  
+      // Calculate the current positive quantity sum for this product ID in the table
+      const currentPositiveQuantitySum = tableData
+        .filter(
+          (item) =>
+            item.productId === product.productId && parseFloat(item.quantity) > 0 // Only positive quantities
+        )
+        .reduce((sum, item) => sum + parseFloat(item.quantity), 0);
+  
+      const totalRequestedQuantity =
+        currentPositiveQuantitySum + requestedQuantity;
+  
+      // Validate stock availability across all rows
+      if (totalRequestedQuantity > latestStock) {
+        Swal.fire(
+          "Insufficient Stock",
+          `Only ${latestStock} units of ${product.productName} are available. Current total in table (positive quantities): ${currentPositiveQuantitySum}, Requested: ${requestedQuantity}.`,
+          "error"
+        );
+        return; // Exit if stock is insufficient
+      }
+  
+      // Add or update the product in the table data
+      setTableData((prevData) => [
+        ...prevData,
+        {
+          productId: product.productId, // Include productId
+          name: product.productName,
+          cost: parseFloat(product.costPrice).toFixed(2),
+          mrp: parseFloat(product.mrpPrice).toFixed(2),
+          discount: (parseFloat(product.mrpPrice) - enteredPrice).toFixed(2),
+          rate: enteredPrice.toFixed(2), // Use entered price as rate
+          quantity: requestedQuantity.toFixed(2),
+          amount: (requestedQuantity * enteredPrice).toFixed(2),
+          barcode: product.barcode, // Include barcode
+          type: "new", // Mark as new item
+        },
+      ]);
+  
+      // Clear input fields after adding/updating item
+      setProductName("");
+      setBarcode("");
+      setPrice("");
+      setQty("");
+      setSuggestedPrice("");
+      barcodeInputRef.current.focus();
+    } catch (error) {
+      console.error("Error fetching product or stock details:", error);
+      Swal.fire("Error", "Failed to fetch product or stock details.", "error");
     }
   };
-
-
+  
+  
 
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
@@ -795,6 +821,7 @@ export default function Invoice() {
           <table className="product-table" id="product-table-invoice">
             <thead>
               <tr>
+              <th>Product ID</th> {/* Add Product ID Column */}
                 <th>Name</th>
                 <th style={{ textAlign: "center" }}>Cost</th>
                 <th>MRP</th>
@@ -823,6 +850,7 @@ export default function Invoice() {
                         : {}
                   }
                 >
+      <td>{item.productId}</td> {/* Render Product ID */}
                   <td>{item.name}</td>
                   <td style={{ textAlign: "center" }}>{item.cost}</td>
                   <td style={{ textAlign: "center" }}>{item.mrp}</td>
