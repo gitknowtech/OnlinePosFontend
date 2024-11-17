@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import axios from "axios";
 import "../css1/salesTable.css";
 
-import deleteImage from "../assets/icons/bin.png";
-import viewImage from "../assets/icons/view.png";
-
-const SalesTable = ({ store, UserName }) => {
+const SalesTable = ({ store }) => {
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [startDate, setStartDate] = useState(() => new Date().toISOString().split("T")[0]); // Default to today
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().split("T")[0]); // Default to today
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(10); // Rows per page
+  const [rowsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        console.log("API Request Parameters for Sales:", { Store: store });
+        console.log("API Request Parameters:", { Store: store });
         const response = await axios.get("http://localhost:5000/api/invoices/fetch_sales", {
           params: { Store: store },
         });
@@ -45,29 +45,39 @@ const SalesTable = ({ store, UserName }) => {
     return <p>No sales found for the selected store.</p>;
   }
 
-  const getPaymentColor = (paymentType) => {
-    switch (paymentType) {
-      case "Credit Payment":
-        return "#a10c0c";
-      case "Cash and Card Payment":
-        return "#b2af0a";
-      case "Cash Payment":
-        return "green";
-      default:
-        return "black";
-    }
+  // Ensure the date range is inclusive
+  const isDateInRange = (saleDate, start, end) => {
+    const sale = new Date(saleDate).setHours(0, 0, 0, 0); // Normalize to 00:00
+    const startNormalized = new Date(start).setHours(0, 0, 0, 0);
+    const endNormalized = new Date(end).setHours(23, 59, 59, 999); // Inclusive of the end date
+    return sale >= startNormalized && sale <= endNormalized;
   };
 
-  // Filtered and paginated sales
-  const filteredSales = sales.filter((sale) =>
-    sale.invoiceId.toLowerCase().includes(searchQuery.toLowerCase())
+  // Filter sales based on search query and date range
+  const filteredSales = sales.filter((sale) => {
+    const matchesSearchQuery = sale.invoiceId.toLowerCase().includes(searchQuery.toLowerCase());
+    const withinDateRange = isDateInRange(sale.createdAt, startDate, endDate);
+    return matchesSearchQuery && withinDateRange;
+  });
+
+  // Calculate totals for filtered data
+  const totals = filteredSales.reduce(
+    (acc, sale) => {
+      acc.discountAmount += parseFloat(sale.discountAmount) || 0;
+      acc.netAmount += parseFloat(sale.netAmount) || 0;
+      acc.cardAmount += parseFloat(sale.CardPay) || 0;
+      acc.cashAmount += parseFloat(sale.CashPay) || 0;
+      return acc;
+    },
+    { discountAmount: 0, netAmount: 0, cardAmount: 0, cashAmount: 0 }
   );
+
+  // Pagination logic
   const totalPages = Math.ceil(filteredSales.length / rowsPerPage);
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredSales.slice(indexOfFirstRow, indexOfLastRow);
 
-  // Pagination functions
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const getPaginationNumbers = () => {
@@ -80,20 +90,41 @@ const SalesTable = ({ store, UserName }) => {
 
   return (
     <div className="sales-table-container_salesTable">
-      <div className="user-info-salesTable" style={{ display: "none" }}>
-        <p><strong>User Name:</strong> {UserName || "N/A"}</p>
-        <p><strong>Store:</strong> {store || "N/A"}</p>
-      </div>
+      <div className="filters-container">
+        {/* Search Box */}
+        <div className="search-box-salesTable">
+          <input
+            type="text"
+            placeholder="Search by Invoice ID"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
 
-      {/* Search Box */}
-      <div className="search-box-salesTable">
-        <input
-          type="text"
-          placeholder="Search by Invoice ID"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="search-input"
-        />
+        {/* Date Range Filters */}
+        <div className="date-range-filters">
+          <div className="date-picker">
+            <label htmlFor="start-date">Start Date:</label>
+            <input
+              type="date"
+              id="start-date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="date-input"
+            />
+          </div>
+          <div className="date-picker">
+            <label htmlFor="end-date">End Date:</label>
+            <input
+              type="date"
+              id="end-date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="date-input"
+            />
+          </div>
+        </div>
       </div>
 
       <table className="sales-table_salesTable">
@@ -110,7 +141,6 @@ const SalesTable = ({ store, UserName }) => {
             <th>Payment Type</th>
             <th>Balance</th>
             <th>Created At</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -124,27 +154,20 @@ const SalesTable = ({ store, UserName }) => {
               <td>{sale.netAmount}</td>
               <td>{sale.CashPay}</td>
               <td>{sale.CardPay}</td>
-              <td style={{ color: getPaymentColor(sale.PaymentType) }}>{sale.PaymentType}</td>
+              <td>{sale.PaymentType}</td>
               <td>{sale.Balance}</td>
-              <td style={{ color: "green" }}>{new Date(sale.createdAt).toLocaleString()}</td>
-              <td className="actions-salesTable">
-                <img
-                  src={viewImage}
-                  alt="View"
-                  title="View Details"
-                  onClick={() => alert(`Viewing details for Sales ID: ${sale.id}`)}
-                />
-                <img
-                  src={deleteImage}
-                  alt="Delete"
-                  title="Delete Record"
-                  onClick={() => alert(`Deleting record for Sales ID: ${sale.id}`)}
-                />
-              </td>
+              <td style={{ color: "green" }}>{new Date(sale.createdAt).toLocaleDateString()}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Totals */}
+      <div id="totals-row">
+        <p>Total Net Amount: {totals.netAmount.toFixed(2)}</p>
+        <p>Total Cash Pay: {totals.cashAmount.toFixed(2)}</p>
+        <p>Total Card Pay: {totals.cardAmount.toFixed(2)}</p>
+      </div>
 
       {/* Pagination */}
       <div className="pagination">
@@ -166,6 +189,11 @@ const SalesTable = ({ store, UserName }) => {
       </div>
     </div>
   );
+};
+
+// Add PropTypes for validation
+SalesTable.propTypes = {
+  store: PropTypes.string.isRequired,
 };
 
 export default SalesTable;

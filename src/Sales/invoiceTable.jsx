@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import axios from "axios";
 import "../css1/invoiceTable.css";
 
-const InvoicesTable = ({ store, UserName }) => {
+const InvoicesTable = ({ store }) => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(() => new Date().toISOString().split("T")[0]); // Default to today
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().split("T")[0]); // Default to today
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
 
@@ -44,15 +45,31 @@ const InvoicesTable = ({ store, UserName }) => {
     return <p>No invoices found for the selected store.</p>;
   }
 
+  // Ensure the date range is inclusive of the entire day
+  const isDateInRange = (invoiceDate, start, end) => {
+    const invoice = new Date(invoiceDate).setHours(0, 0, 0, 0); // Normalize to start of the day
+    const startNormalized = new Date(start).setHours(0, 0, 0, 0);
+    const endNormalized = new Date(end).setHours(23, 59, 59, 999); // Include the entire end date
+    return invoice >= startNormalized && invoice <= endNormalized;
+  };
+
   // Filter invoices based on search query and date range
   const filteredInvoices = invoices.filter((invoice) => {
     const matchesSearchQuery = invoice.invoiceId.toLowerCase().includes(searchQuery.toLowerCase());
-    const invoiceDate = new Date(invoice.createdAt);
-    const withinDateRange =
-      (!startDate || invoiceDate >= new Date(startDate)) &&
-      (!endDate || invoiceDate <= new Date(endDate));
+    const withinDateRange = isDateInRange(invoice.createdAt, startDate, endDate);
     return matchesSearchQuery && withinDateRange;
   });
+
+  // Calculate totals for filtered data
+  const totals = filteredInvoices.reduce(
+    (acc, invoice) => {
+      acc.totalDiscount += parseFloat(invoice.discount) || 0; // Total Discount
+      acc.totalAmount += parseFloat(invoice.totalAmount) || 0; // Total Amount
+      return acc;
+    },
+    { totalDiscount: 0, totalAmount: 0 }
+  );
+
 
   // Pagination logic
   const totalPages = Math.ceil(filteredInvoices.length / rowsPerPage);
@@ -111,15 +128,13 @@ const InvoicesTable = ({ store, UserName }) => {
         <thead>
           <tr>
             <th>Invoice ID</th>
+            <th>Product ID</th>
             <th>Name</th>
             <th>MRP</th>
             <th>Discount</th>
             <th>Rate</th>
             <th>Quantity</th>
             <th>Total Amount</th>
-            <th>Profit</th>
-            <th>Profit %</th>
-            <th>Discount %</th>
             <th>Created At</th>
           </tr>
         </thead>
@@ -127,20 +142,24 @@ const InvoicesTable = ({ store, UserName }) => {
           {currentRows.map((invoice, index) => (
             <tr key={index}>
               <td>{invoice.invoiceId}</td>
+              <td>{invoice.productId}</td>
               <td>{invoice.name}</td>
               <td style={{ textAlign: "center" }}>{invoice.mrp}</td>
               <td style={{ textAlign: "center" }}>{invoice.discount}</td>
               <td style={{ textAlign: "center" }}>{invoice.rate}</td>
               <td style={{ textAlign: "center" }}>{invoice.quantity}</td>
               <td style={{ textAlign: "center" }}>{invoice.totalAmount}</td>
-              <td style={{ textAlign: "center" }}>{invoice.profit}</td>
-              <td style={{ textAlign: "center" }}>{invoice.profitPercentage}%</td>
-              <td style={{ textAlign: "center" }}>{invoice.discPercentage}%</td>
               <td style={{ color: "green" }}>{new Date(invoice.createdAt).toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Totals Section */}
+      <div id="totals-row">
+        <p>Total Discount: {totals.totalDiscount.toFixed(2)}</p>
+        <p>Total Amount: {totals.totalAmount.toFixed(2)}</p>
+      </div>
 
       {/* Pagination */}
       <div className="pagination">
@@ -162,6 +181,11 @@ const InvoicesTable = ({ store, UserName }) => {
       </div>
     </div>
   );
+};
+
+// Add PropTypes for validation
+InvoicesTable.propTypes = {
+  store: PropTypes.string.isRequired, // Validate store as required string
 };
 
 export default InvoicesTable;

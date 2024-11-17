@@ -9,13 +9,14 @@ import ExpensesModel from "../models/ExpensesModel";
 import "../css1/invoice.css";
 import PaymentModel from "./PaymentModel";
 import Calculator from "../models/Calculator";
+import TodaySales from "./TodaySales"
+import TodayIssueBillCheck from "./TodayIssueBillCheck";
 
 // Ensure these image paths are correct in your project structure
 import productimage from "../assets/images/products.png";
 import bill from "../assets/images/bill.png";
 import customer from "../assets/images/customer.png";
 import expensesImage from "../assets/images/expenses.png";
-import monthsales from "../assets/images/month.png";
 import otheritem from "../assets/images/otheritem.png";
 import quatation from "../assets/images/quotation.png";
 import returnimage from "../assets/images/return.png";
@@ -58,6 +59,27 @@ export default function Invoice() {
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
   const barcodeInputRef = useRef(null);
+
+
+  const [isTodaySalesOpen, setIsTodaySalesOpen] = useState(false); // State for modal
+
+  const handleTodaySalesClick = () => {
+    setIsTodaySalesOpen(true);
+  };
+
+  const [isTodayIssueBillCheckOpen, setIsTodayIssueBillCheckOpen] = useState(false); // State for the modal
+
+  const handleTodayIssueBillCheckClick = () => {
+    setIsTodayIssueBillCheckOpen(true);
+  };
+
+  const handleCloseTodayIssueBillCheck = () => {
+    setIsTodayIssueBillCheckOpen(false);
+  };
+
+  const handleCloseTodaySales = () => {
+    setIsTodaySalesOpen(false);
+  };
 
   // OtherItem model related contents
   const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);
@@ -1198,7 +1220,7 @@ export default function Invoice() {
             />
             Customer Balance
           </button>
-          <button>
+          <button onClick={handleTodayIssueBillCheckClick}>
             <img
               src={bill}
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
@@ -1212,7 +1234,7 @@ export default function Invoice() {
             />
             My Expenses (F3)
           </button>
-          <button>
+          <button onClick={handleTodaySalesClick}>
             <img
               src={salesimage}
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
@@ -1225,13 +1247,6 @@ export default function Invoice() {
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
             Calculater
-          </button>
-          <button>
-            <img
-              src={monthsales}
-              style={{ width: "20px", height: "20px", marginRight: "5px" }}
-            />
-            Monthly Sale
           </button>
         </div>
 
@@ -1275,6 +1290,20 @@ export default function Invoice() {
         />
 
         <Calculator show={isCalculatorOpen} onClose={handleCloseCalculator} />
+
+         {/* Include the TodaySales modal */}
+      <TodaySales
+        show={isTodaySalesOpen}
+        onClose={handleCloseTodaySales}
+        store={store} // Pass the store prop
+      />
+
+      {/* Include the TodayIssueBillCheck modal */}
+      <TodayIssueBillCheck
+        show={isTodayIssueBillCheckOpen}
+        onClose={handleCloseTodayIssueBillCheck}
+        store={store} // Pass the store prop
+      />
       </div>
     </div>
   );

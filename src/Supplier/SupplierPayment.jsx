@@ -3,14 +3,18 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "../css/SupplierPayment.css"; // Separate CSS file for styling
-import addLoanImage from "../assets/icons/addLoan.png"; // Replace with actual image path
-import addCashImage from "../assets/icons/addCash.png"; // Replace with actual image path
+
+// Import the images
+import addLoanImage from "../assets/icons/addLoan.png";
+import addCashImage from "../assets/icons/addCash.png";
 
 export default function SupplierPayment({ store }) {
   const [suppliers, setSuppliers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
+
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
 
@@ -45,6 +49,40 @@ export default function SupplierPayment({ store }) {
     return <p id="no_data_supplier_payment">No supplier data found for the selected store.</p>;
   }
 
+  // Filter suppliers based on the search term
+  const filteredSuppliers = suppliers.filter((supplier) => {
+    const searchTermLower = searchTerm.toLowerCase();
+    return (
+      supplier.Supid.toLowerCase().includes(searchTermLower) ||
+      supplier.Supname.toLowerCase().includes(searchTermLower)
+    );
+  });
+
+  // Pagination Logic
+  const indexOfLastSupplier = currentPage * rowsPerPage;
+  const indexOfFirstSupplier = indexOfLastSupplier - rowsPerPage;
+  const currentSuppliers = filteredSuppliers.slice(
+    indexOfFirstSupplier,
+    indexOfLastSupplier
+  );
+  const totalPages = Math.ceil(filteredSuppliers.length / rowsPerPage);
+
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+
+  const getPaginationNumbers = () => {
+    const numbers = [];
+
+    let startPage = Math.max(1, currentPage - 1);
+    let endPage = Math.min(totalPages, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      numbers.push(i);
+    }
+    return numbers;
+  };
+
+  // Action handlers
   const handleAddLoan = (supplierId) => {
     Swal.fire({
       title: `Add Loan for Supplier "${supplierId}"`,
@@ -99,41 +137,19 @@ export default function SupplierPayment({ store }) {
     });
   };
 
-  const filteredSuppliers = suppliers.filter(
-    (supplier) =>
-      supplier.Supid.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      supplier.Supname.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Pagination Logic
-  const indexOfLastSupplier = currentPage * rowsPerPage;
-  const indexOfFirstSupplier = indexOfLastSupplier - rowsPerPage;
-  const currentSuppliers = filteredSuppliers.slice(
-    indexOfFirstSupplier,
-    indexOfLastSupplier
-  );
-  const totalPages = Math.ceil(filteredSuppliers.length / rowsPerPage);
-
-  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  const getPaginationNumbers = () => {
-    const numbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-      numbers.push(i);
-    }
-    return numbers;
-  };
-
   return (
     <div id="supplier_payment_container">
-      <div id="search_supplier_payment">
+      {/* Search box */}
+      <div id="search_box_supplier_payment">
         <input
           type="text"
           placeholder="Search by Supplier ID or Name"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+
+      {/* Supplier table */}
       <div id="supplier_table_supplier_payment">
         <table id="table_supplier_payment">
           <thead>
@@ -162,16 +178,14 @@ export default function SupplierPayment({ store }) {
                 <td>{supplier.company || "N/A"}</td>
                 <td>
                   <button
-                    title="Add Loan"
-                    onClick={() => handleAddLoan(supplier.Supid)}
                     className="icon-button"
+                    onClick={() => handleAddLoan(supplier.Supid)}
                   >
                     <img src={addLoanImage} alt="Add Loan" />
                   </button>
                   <button
-                    title="Add Cash"
-                    onClick={() => handleAddCash(supplier.Supid)}
                     className="icon-button"
+                    onClick={() => handleAddCash(supplier.Supid)}
                   >
                     <img src={addCashImage} alt="Add Cash" />
                   </button>
@@ -181,6 +195,7 @@ export default function SupplierPayment({ store }) {
           </tbody>
         </table>
       </div>
+
       {/* Pagination */}
       <div className="pagination">
         <button onClick={handlePrevPage} disabled={currentPage === 1}>

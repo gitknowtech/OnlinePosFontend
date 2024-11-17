@@ -1,0 +1,97 @@
+/* Container Styling */
+#supplier_payment_container {
+    padding: 20px;
+    background-color: #bccff0;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Search Bar */
+#search_box_supplier_payment input {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.3s ease-in-out;
+}
+
+#search_box_supplier_payment input:focus {
+    border-color: #007bff;
+}
+
+/* Table Styling */
+#table_supplier_payment {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#table_supplier_payment th,
+#table_supplier_payment td {
+    padding: 12px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+    vertical-align: middle;
+}
+
+#table_supplier_payment th {
+    background-color: #6d6d6d;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#table_supplier_payment tr:hover {
+    background-color: #f1f3f5;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#table_supplier_payment tr:nth-child(even) {
+    background-color: #f8faff;
+}
+
+/* Icon Button Styling */
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.icon-button img {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.icon-button:hover {
+    transform: scale(1.1);
+}
+
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    #table_supplier_payment th,
+    #table_supplier_payment td {
+        font-size: 12px;
+        padding: 10px;
+    }
+
+    #search_box_supplier_payment input {
+        max-width: 100%;
+        padding: 8px;
+    }
+
+    .pagination button {
+        padding: 8px 12px;
+    }
+}

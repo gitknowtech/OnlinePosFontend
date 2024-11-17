@@ -36,9 +36,21 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
         setCashPayment("0");
         setCardPayment("0");
         setPaymentType("Return Payment");
+      } else {
+        updatePaymentTypeForZeroValues(); // Check payment type on reset
       }
     }
   }, [show, totalAmount]);
+
+  const updatePaymentTypeForZeroValues = () => {
+    if (
+      parseFloat(netAmount) === 0 &&
+      parseFloat(cashPayment) === 0 &&
+      parseFloat(cardPayment) === 0
+    ) {
+      setPaymentType("Cash Payment");
+    }
+  };
 
   const handleCustomerMobileChange = async (e) => {
     const input = e.target.value;
@@ -117,6 +129,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       setBalance(net.toFixed(2));
       setPaymentType("Credit Payment");
     }
+
+    updatePaymentTypeForZeroValues(); // Re-check payment type
   };
 
   const handleCashPaymentChange = (e) => {
@@ -133,32 +147,34 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
 
     // Calculate balance and update payment type
     const balanceAmount = cash - net;
-    setBalance(balanceAmount.toFixed(2)); // Balance = cashPayment - netAmount
+    setBalance(balanceAmount.toFixed(2));
 
     if (cash >= net) {
-      setPaymentType("Cash Payment"); // Fully paid or overpaid
+      setPaymentType("Cash Payment");
     } else {
-      setPaymentType("Credit Payment"); // Underpaid
+      setPaymentType("Credit Payment");
     }
+
+    updatePaymentTypeForZeroValues(); // Re-check payment type
   };
 
   const handleCardPaymentChange = (e) => {
     const inputValue = e.target.value;
-  
+
     if (!/^\d*\.?\d*$/.test(inputValue)) {
       return; // Ignore invalid input
     }
-  
+
     const card = parseFloat(inputValue) || 0;
     const cash = parseFloat(cashPayment) || 0;
     const net = parseFloat(netAmount) || 0;
-  
+
     setCardPayment(inputValue);
-  
+
     // Calculate balance and update payment type
     const balanceAmount = cash + card - net;
-    setBalance(balanceAmount.toFixed(2)); // Balance = (cash + card) - netAmount
-  
+    setBalance(balanceAmount.toFixed(2));
+
     if (cash + card >= net) {
       if (cash > 0 && card > 0) {
         setPaymentType("Cash and Card Payment");
@@ -168,24 +184,34 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
         setPaymentType("Card Payment");
       }
     } else {
-      setPaymentType("Credit Payment"); // Underpaid
+      setPaymentType("Credit Payment");
     }
+
+    updatePaymentTypeForZeroValues(); // Re-check payment type
   };
-  
 
   const handlePayment = async () => {
-    // Remove negative balance restriction
     const paymentData = {
-      GrossTotal: totalAmount,
+      GrossTotal: parseFloat(totalAmount) || 0,
       CustomerId: customerMobile || "Unknown",
-      discountPercent,
-      discountAmount,
-      netAmount,
-      CashPay: cashPayment,
-      CardPay: cardPayment,
-      PaymentType: paymentType,
-      Balance: balance, // Allow negative balance
-      invoiceItems: tableData,
+      discountPercent: parseFloat(discountPercent) || 0,
+      discountAmount: parseFloat(discountAmount) || 0,
+      netAmount: parseFloat(netAmount) || 0,
+      CashPay: parseFloat(cashPayment) || 0,
+      CardPay: parseFloat(cardPayment) || 0,
+      PaymentType: paymentType || "Cash Payment",
+      Balance: parseFloat(balance) || 0,
+      invoiceItems: tableData.map((item) => ({
+        productId: item.productId || "Unknown",
+        name: item.name || "Unnamed Product",
+        cost: parseFloat(item.cost) || 0,
+        mrp: parseFloat(item.mrp) || 0,
+        discount: parseFloat(item.discount) || 0,
+        rate: parseFloat(item.rate) || 0,
+        quantity: parseFloat(item.quantity) || 0,
+        amount: parseFloat(item.amount) || 0,
+        barcode: item.barcode || null,
+      })),
       user,
       store,
     };
@@ -210,6 +236,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
   
       Swal.fire("Success", `Payment and invoice saved successfully! Invoice ID: ${invoiceId}`, "success");
   
+      // Reset fields
       setCustomerMobile("");
       setSuggestions([]);
       setDiscountPercent("0");
@@ -376,7 +403,7 @@ PaymentModel.propTypes = {
   clearInvoiceTable: PropTypes.func.isRequired,
   tableData: PropTypes.arrayOf(
     PropTypes.shape({
-      productId: PropTypes.string.isRequired, // Add productId validation
+      productId: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       cost: PropTypes.string.isRequired,
       mrp: PropTypes.string.isRequired,
@@ -384,7 +411,7 @@ PaymentModel.propTypes = {
       rate: PropTypes.string.isRequired,
       quantity: PropTypes.string.isRequired,
       amount: PropTypes.string.isRequired,
-      barcode: PropTypes.string, // Include barcode if necessary (optional)
+      barcode: PropTypes.string,
     })
   ).isRequired,
   user: PropTypes.string.isRequired,
