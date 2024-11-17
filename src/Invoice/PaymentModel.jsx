@@ -376,6 +376,7 @@ PaymentModel.propTypes = {
   clearInvoiceTable: PropTypes.func.isRequired,
   tableData: PropTypes.arrayOf(
     PropTypes.shape({
+      productId: PropTypes.string.isRequired, // Add productId validation
       name: PropTypes.string.isRequired,
       cost: PropTypes.string.isRequired,
       mrp: PropTypes.string.isRequired,
@@ -383,6 +384,7 @@ PaymentModel.propTypes = {
       rate: PropTypes.string.isRequired,
       quantity: PropTypes.string.isRequired,
       amount: PropTypes.string.isRequired,
+      barcode: PropTypes.string, // Include barcode if necessary (optional)
     })
   ).isRequired,
   user: PropTypes.string.isRequired,

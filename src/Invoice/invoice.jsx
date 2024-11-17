@@ -45,6 +45,7 @@ export default function Invoice() {
   const [isWholesale, setIsWholesale] = useState(false);
   const [isDiscount, setIsDiscount] = useState(false);
   const [totalQuantity, setTotalQuantity] = useState(0);
+  const [productId, setProductId] = useState(""); // State to store productId
   const [totalDiscount, setTotalDiscount] = useState("0.00");
   const [itemCount, setItemCount] = useState(0);
   const [activeKeyboard, setActiveKeyboard] = useState("numeric");
@@ -210,6 +211,12 @@ export default function Invoice() {
     };
   }, [isWholesale, isDiscount]); // Add dependencies to keep the hook up-to-date
 
+
+
+
+
+
+
   const handleAddOtherItem = (item) => {
     const { productName, productCost, productMRP, productRate, qty, discount } =
       item;
@@ -231,15 +238,22 @@ export default function Invoice() {
     setIsOtherItemModalOpen(false); // Close the modal after adding the item
   };
 
+
+
+
   // Function to handle when the "Return" button is clicked
   const handleReturnClick = () => {
     console.log("Return button clicked"); // Debugging log
     setIsReturnModalOpen(true);
   };
 
+
+
   const handleCloseReturnModal = () => {
     setIsReturnModalOpen(false);
   };
+
+
 
   const handleAddReturnItem = (item) => {
     // Adjust the data to have negative values
@@ -265,6 +279,8 @@ export default function Invoice() {
     setIsReturnModalOpen(false);
   };
 
+
+
   const handleQuantityChange = (e, index) => {
     const newQuantity = e.target.value;
     setTableData((prevData) => {
@@ -274,6 +290,8 @@ export default function Invoice() {
     });
   };
 
+
+
   const clearInvoiceTable = () => {
     setTableData([]); // Clears the table data
     setTotalAmount("0.00");
@@ -282,19 +300,22 @@ export default function Invoice() {
     setItemCount(0);
   };
 
+
+
   const handleQuantityEditEnterKeyPress = async (e, index) => {
     if (e.key === "Enter") {
       const updatedQuantity = parseFloat(tableData[index].quantity);
       const barcode = tableData[index].barcode; // Retrieve barcode from row data
+      const productId = tableData[index].productId; // Retrieve productId from row data
       const productName = tableData[index].name;
       const rate = parseFloat(tableData[index].rate);
-
+  
       // Save the old values before proceeding
       const previousQuantity =
         tableData[index].previousQuantity || tableData[index].quantity;
       const previousAmount =
         tableData[index].previousAmount || tableData[index].amount;
-
+  
       // Validate quantity
       if (isNaN(updatedQuantity)) {
         Swal.fire(
@@ -304,12 +325,12 @@ export default function Invoice() {
         );
         return;
       }
-
+  
       // If the rate is negative, assume it's a return and skip stock checking
       if (rate < 0) {
         // Calculate the amount with positive quantity first
         const positiveAmount = rate * Math.abs(updatedQuantity);
-
+  
         // Ensure both quantity and amount are negative
         setTableData((prevData) => {
           const newData = [...prevData];
@@ -320,42 +341,38 @@ export default function Invoice() {
           };
           return newData;
         });
-
+  
         // Exit editing mode
         setEditingCell({ rowIndex: null, field: null });
         return; // Skip further checks
       }
-
+  
       // For non-negative rates, proceed with stock checking
       try {
+        // Fetch available stock for the product
         const response = await axios.get(
           `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
         );
         const availableStock = response.data.stockQuantity;
-
-        if (updatedQuantity <= availableStock) {
-          // Calculate the new amount
-          const newAmount = rate * updatedQuantity;
-
-          // Update the quantity and amount
-          setTableData((prevData) => {
-            const newData = [...prevData];
-            newData[index] = {
-              ...newData[index],
-              quantity: updatedQuantity.toFixed(2), // Ensure float with two decimals
-              amount: newAmount.toFixed(2), // Ensure float with two decimals
-              previousQuantity: updatedQuantity, // Save as new previous value
-              previousAmount: newAmount,
-            };
-            return newData;
-          });
-
-          // Exit editing mode
-          setEditingCell({ rowIndex: null, field: null });
-        } else {
+  
+        // Calculate the total quantity across all rows for the same productId
+        const totalQuantityInTable = tableData
+          .filter((item) => item.productId === productId)
+          .reduce((total, item, idx) => {
+            if (idx === index) {
+              return total; // Exclude the current row's quantity
+            }
+            return total + parseFloat(item.quantity);
+          }, 0);
+  
+        // Total quantity after updating the current row
+        const totalQuantity = totalQuantityInTable + updatedQuantity;
+  
+        // Check if the total quantity exceeds the available stock
+        if (totalQuantity > availableStock) {
           Swal.fire(
             "Insufficient Stock",
-            `Only ${availableStock} units of ${productName} are available.`,
+            `Only ${availableStock} units of ${productName} are available in stock. Currently in table: ${totalQuantityInTable} units.`,
             "warning"
           ).then(() => {
             // Restore the previous quantity and amount
@@ -368,39 +385,76 @@ export default function Invoice() {
               };
               return newData;
             });
-
+  
             // Exit editing mode
             setEditingCell({ rowIndex: null, field: null });
           });
+          return;
         }
+  
+        // Calculate the new amount
+        const newAmount = rate * updatedQuantity;
+  
+        // Update the quantity and amount
+        setTableData((prevData) => {
+          const newData = [...prevData];
+          newData[index] = {
+            ...newData[index],
+            quantity: updatedQuantity.toFixed(2), // Ensure float with two decimals
+            amount: newAmount.toFixed(2), // Ensure float with two decimals
+            previousQuantity: updatedQuantity, // Save as new previous value
+            previousAmount: newAmount,
+          };
+          return newData;
+        });
+  
+        // Exit editing mode
+        setEditingCell({ rowIndex: null, field: null });
       } catch (error) {
         Swal.fire("Error", "Failed to fetch stock quantity", "error");
         console.error("Error fetching stock quantity:", error);
       }
     }
   };
+  
+
+
+
+
 
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
-
+  
     if (input.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/products/search?query=${input}&store=${store}`
+          `http://localhost:5000/api/products/search_invoice_by_store?query=${input}&store=${store}`
         );
-        setSuggestions(response.data);
+  
+        const products = response.data;
+  
+        if (products.length === 0) {
+          Swal.fire("Not Found", "No products found for this barcode.", "warning");
+        } else {
+          setSuggestions(products);
+        }
       } catch (error) {
-        Swal.fire("Error", "Failed to fetch product suggestions", error);
+        Swal.fire("Error", "Failed to fetch product suggestions.", "error");
+        console.error("Error fetching product suggestions:", error);
       }
     } else {
       setSuggestions([]);
     }
   };
+  
+
 
   const handlePercentageChange = (value) => {
     setPercentage(value);
   };
+
+
 
   const handlePercentageEnter = () => {
     const enteredPercentage = parseFloat(percentage);
@@ -420,6 +474,8 @@ export default function Invoice() {
     setPercentage(""); // Clear the percentage input
     qtyInputRef.current.focus(); // Move focus to the quantity input
   };
+
+
 
   const handlePriceEnter = () => {
     const enteredPrice = parseFloat(price);
@@ -453,7 +509,10 @@ export default function Invoice() {
         setBarcode(product.barcode);
         setLockedPrice(product.lockedPrice);
         setSuggestedPrice(product.mrpPrice);
+        setProductId(product.productId); // Save productId to state
+        setBarcode(product.barcode);
   
+        // Set the default price but allow user to edit
         if (isWholesale) {
           setPrice(product.wholesalePrice);
         } else if (isDiscount) {
@@ -501,6 +560,7 @@ export default function Invoice() {
         });
   
         setSuggestions([]);
+        // Focus on price input to allow editing
         priceInputRef.current.focus();
       } else {
         Swal.fire(
@@ -515,7 +575,12 @@ export default function Invoice() {
   };
   
 
-  const handleQtyEnter = () => {
+
+
+
+
+
+  const handleQtyEnter = async () => {
     if (!qty || isNaN(parseFloat(qty)) || parseFloat(qty) <= 0) {
       Swal.fire("Invalid Quantity", "Please enter a valid quantity.", "error");
       return;
@@ -529,65 +594,70 @@ export default function Invoice() {
       return;
     }
   
-    setTableData((prevData) => {
-      const existingIndex = prevData.findIndex(
-        (item) => item.barcode === barcode
+    try {
+      // Fetch available stock for the product
+      const response = await axios.get(
+        `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
       );
   
-      if (existingIndex !== -1) {
-        // Update existing product in the table
-        const existingItem = prevData[existingIndex];
-        const updatedQuantity =
-          parseFloat(existingItem.quantity) + requestedQuantity;
-        const updatedAmount = updatedQuantity * parseFloat(existingItem.rate);
+      const availableQuantity = response.data.stockQuantity;
   
-        const updatedItem = {
-          ...existingItem,
-          quantity: updatedQuantity.toFixed(2),
-          amount: updatedAmount.toFixed(2),
-        };
+      // Calculate the total quantity for the same product ID across all rows
+      const existingQuantity = tableData
+        .filter((item) => item.productId === productId)
+        .reduce((total, item) => total + parseFloat(item.quantity), 0);
   
-        const updatedData = [...prevData];
-        updatedData[existingIndex] = updatedItem;
-        return updatedData;
-      } else {
-        // Add a new product to the table
-        return [
-          ...prevData,
-          {
-            productId: tableData.find((item) => item.barcode === barcode)
-              ?.productId || "Unknown", // Get from tableData if exists
-            name: productName,
-            cost: parseFloat(costPrice || 0).toFixed(2),
-            mrp: parseFloat(suggestedPrice || 0).toFixed(2),
-            discount: (parseFloat(suggestedPrice || 0) - enteredPrice).toFixed(2),
-            rate: enteredPrice.toFixed(2),
-            quantity: requestedQuantity.toFixed(2),
-            amount: (requestedQuantity * enteredPrice).toFixed(2),
-            barcode: barcode,
-            type: "new",
-          },
-        ];
+      // Total quantity after adding the new requested quantity
+      const totalQuantity = existingQuantity + requestedQuantity;
+  
+      // Check if the total quantity exceeds available stock
+      if (totalQuantity > availableQuantity) {
+        Swal.fire(
+          "Insufficient Stock",
+          `Only ${availableQuantity} units are available in stock. Currently in table: ${existingQuantity} units.`,
+          "error"
+        );
+        return;
       }
-    });
   
-    // Clear input fields after adding/updating item
-    setProductName("");
-    setBarcode("");
-    setPrice("");
-    setQty("");
-    setSuggestedPrice("");
-    barcodeInputRef.current.focus();
+      // Add a new row with the requested quantity
+      setTableData((prevData) => [
+        ...prevData,
+        {
+          productId, // Use productId from state
+          barcode, // Optionally keep barcode for reference
+          name: productName,
+          cost: parseFloat(costPrice || 0).toFixed(2),
+          mrp: parseFloat(suggestedPrice || 0).toFixed(2),
+          discount: (parseFloat(suggestedPrice || 0) - enteredPrice).toFixed(2),
+          rate: enteredPrice.toFixed(2),
+          quantity: requestedQuantity.toFixed(2),
+          amount: (requestedQuantity * enteredPrice).toFixed(2),
+          type: "new",
+        },
+      ]);
+  
+      // Clear input fields after adding item
+      setProductName("");
+      setBarcode("");
+      setPrice("");
+      setQty("");
+      setProductId(""); // Clear productId
+      setSuggestedPrice("");
+      barcodeInputRef.current.focus();
+    } catch (error) {
+      Swal.fire("Error", "Failed to check stock availability.", "error");
+      console.error("Error checking stock:", error);
+    }
   };
-
   
-
-
 
 
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
+
+
 
   const calculateTotals = () => {
     // Filter out items with negative discount or quantity
@@ -617,6 +687,8 @@ export default function Invoice() {
     setItemCount(validItems.length);
   };
 
+
+
   const handleVirtualEnter = () => {
     if (document.activeElement === barcodeInputRef.current) {
       handleBarcodeEnter();
@@ -627,6 +699,8 @@ export default function Invoice() {
     }
   };
 
+
+  
   const handleCheckboxChange = (type) => {
     if (type === "wholesale") {
       setIsWholesale(!isWholesale);
@@ -638,12 +712,15 @@ export default function Invoice() {
   };
 
   const handleSuggestionClick = (suggestion) => {
+    // Set all necessary fields from the selected suggestion
     setBarcode(suggestion.barcode);
+    setProductId(suggestion.productId); // Save productId to state
     setCostPrice(suggestion.costPrice);
     setLockedPrice(suggestion.lockedPrice);
     setProductName(suggestion.productName);
     setSuggestedPrice(suggestion.mrpPrice);
-
+  
+    // Determine the default price based on conditions
     if (isWholesale) {
       setPrice(suggestion.wholesalePrice);
     } else if (isDiscount) {
@@ -651,10 +728,20 @@ export default function Invoice() {
     } else {
       setPrice(suggestion.mrpPrice);
     }
-
+  
+    // Clear the suggestions dropdown
     setSuggestions([]);
-    priceInputRef.current.focus();
+  
+    // Refocus the price input field reliably
+    setTimeout(() => {
+      if (priceInputRef.current) {
+        priceInputRef.current.focus();
+        priceInputRef.current.select(); // Highlight the price for easy overwrite
+      }
+    }, 100); // Delay ensures focus works even after state updates
   };
+  
+
 
   const handleNumericInput = (value) => {
     if (document.activeElement) {
