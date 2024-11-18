@@ -8,7 +8,7 @@
 }
 
 #product-table-container-supplier-stock-model {
-  max-height: 500px; /* Ensure the table container can scroll vertically */
+  max-height: 400px; /* Ensure the table container can scroll vertically */
   overflow-y: auto;
   width: 100%; /* Make the container span the modal's width */
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import "../css/AddLoanModal.css"; // Add appropriate styles here
@@ -90,7 +90,7 @@ const AddCashModal = ({ supplier, onClose, onSave }) => {
           ×
         </button>
         <h2>Add Cash Details</h2>
-        <form className="two-column-layout">
+        <form className="three-column-layout">
           {/* Row 1 */}
           <div className="form-group-add-loan-model">
             <label>Supplier ID:</label>
@@ -100,7 +100,6 @@ const AddCashModal = ({ supplier, onClose, onSave }) => {
             <label>Supplier Name:</label>
             <input type="text" value={supplier.Supname} readOnly />
           </div>
-          {/* Row 2 */}
           <div className="form-group-add-loan-model">
             <label>Cash Amount:</label>
             <input
@@ -110,6 +109,7 @@ const AddCashModal = ({ supplier, onClose, onSave }) => {
               onChange={(e) => setCashAmount(e.target.value)}
             />
           </div>
+          {/* Row 2 */}
           <div className="form-group-add-loan-model">
             <label>Reference Number:</label>
             <input
@@ -119,7 +119,6 @@ const AddCashModal = ({ supplier, onClose, onSave }) => {
               onChange={(e) => setReferenceNumber(e.target.value)}
             />
           </div>
-          {/* Row 3 */}
           <div className="form-group-add-loan-model">
             <label>Payment Method:</label>
             <select
@@ -151,7 +150,7 @@ const AddCashModal = ({ supplier, onClose, onSave }) => {
               </div>
             </>
           )}
-          {/* Row 4 */}
+          {/* Row 3 */}
           <div className="form-group-add-loan-model full-width">
             <label>Description:</label>
             <textarea
@@ -160,7 +159,7 @@ const AddCashModal = ({ supplier, onClose, onSave }) => {
               onChange={(e) => setDescription(e.target.value)}
             ></textarea>
           </div>
-          {/* Row 5 */}
+          {/* Row 4 */}
           <div className="form-group-add-loan-model full-width">
             <label>Upload File:</label>
             <input
