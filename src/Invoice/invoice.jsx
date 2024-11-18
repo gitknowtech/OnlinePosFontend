@@ -178,6 +178,8 @@ export default function Invoice() {
           setIsReturnModalOpen(false);
           setIsStockModalOpen(false);
           setIsPaymentModalOpen(false);
+          setIsTodaySalesOpen(false);
+          setIsTodayIssueBillCheckOpen(false);
           break;
         default:
           break;

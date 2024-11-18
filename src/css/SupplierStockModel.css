@@ -1,28 +1,31 @@
-.modal-content-stock-update-container {
-  max-width: 1000px; /* Set a fixed maximum width for the modal */
+.modal-content-supplier-stock-model {
+  max-width: 1200px; /* Set a fixed maximum width for the modal */
   width: 120%; /* Ensure the modal width adapts up to 90% of the viewport */
   padding: 20px;
-  background-color: #fff;
+  background-color: #d4d4f3;
   border-radius: 10px;
-  margin-top: 30px;
+  margin-top: 100px;
 }
 
-#product-table-container {
+#product-table-container-supplier-stock-model {
   max-height: 500px; /* Ensure the table container can scroll vertically */
   overflow-y: auto;
   width: 100%; /* Make the container span the modal's width */
 }
 
-#product-table {
+#product-table-supplier-stock-model {
   width: 100%; /* Ensure the table uses the full width of its container */
   border-collapse: collapse;
   margin-bottom: 20px;
+  border-radius: 5px;
+  align-items: center;
+  background-color: #fff;
   font-size: 12px; /* Adjust font size for readability */
   table-layout: fixed; /* Ensure the columns have a fixed width */
 }
 
-#product-table th,
-#product-table td {
+#product-table-supplier-stock-model th,
+#product-table-supplier-stock-model td {
   border: 1px solid #ddd;
   padding: 8px;
   overflow: hidden; /* Prevents content from overflowing */
@@ -31,33 +34,45 @@
   white-space: nowrap; /* Prevents text from wrapping */
 }
 
-#product-table th{
+#product-table-supplier-stock-model th{
     text-align: center;
     font-weight: 600;
 }
 
-#product-table th {
+#product-table-supplier-stock-model th {
   background-color: #777676;
   color: #fff;
   font-weight: bold;
 }
 
-#quantity-filter {
-  display: flex;
+#quantity-filter-supplier-stock-model {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
   gap: 20px; /* Space between input fields */
 }
 
-#minQuantity,
-#maxQuantity {
-  width: 120px; /* Increase the width of the input fields */
-  padding: 5px;
-  font-weight: 800;
+
+#minQuantity-supplier-stock-model{
+  margin-left: 20px;
+  border-radius: 5px;
 }
 
-#close-button {
+
+#maxQuantity-supplier-stock-model{
+  margin-left: 20px;
+  border-radius: 5px;
+}
+
+
+#minQuantity-supplier-stock-model,
+#maxQuantity-supplier-stock-model {
+  width: 120px; /* Increase the width of the input fields */
+  padding: 5px;
+  font-weight: 600;
+}
+
+#close-button-supplier-stock-model {
   padding: 5px 15px;
   background-color: #d33;
   color: white;
@@ -67,6 +82,6 @@
   margin-top: 20px; /* Adds spacing above the button */
 }
 
-#close-button:hover {
+#close-button-supplier-stock-model:hover {
   background-color: #c12c2c;
 }

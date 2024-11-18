@@ -27,8 +27,10 @@
 }
 
 .supplier-table th {
-  background-color: #acabab;
+  background-color: #7c7b7b;
   font-weight: bold;
+  color: #fff;
+  text-align: center;
 }
 
 .supplier-table tr:nth-child(even) {

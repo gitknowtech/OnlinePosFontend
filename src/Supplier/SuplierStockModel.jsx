@@ -42,33 +42,33 @@ export default function SupplierStockModel({ supName, onClose }) {
     isOpen={true}
     onRequestClose={onClose}
     contentLabel="Supplier Stock Details"
-    className="modal-content-stock-update-container"
+    className="modal-content-supplier-stock-model"
     overlayClassName="modal-overlay"
     ariaHideApp={false}
   >
     <h2 style={{fontSize:"20px"}}>Supplier Products</h2>
 
     {/* Quantity range filter */}
-    <div id="quantity-filter">
-      <label htmlFor="minQuantity">Min Quantity:</label>
+    <div id="quantity-filter-supplier-stock-model">
+      <label htmlFor="minQuantity" id="minQuantity-supplier-stock-model">Min Quantity:</label>
       <input
         type="number"
-        id="minQuantity"
+        id="minQuantity-supplier-stock-model"
         value={minQuantity}
         onChange={(e) => setMinQuantity(Number(e.target.value))}
       />
-      <label htmlFor="maxQuantity">Max Quantity:</label>
+      <label htmlFor="maxQuantity" id="maxQuantity-supplier-stock-model">Max Quantity:</label>
       <input
         type="number"
-        id="maxQuantity"
+        id="maxQuantity-supplier-stock-model"
         value={maxQuantity}
         onChange={(e) => setMaxQuantity(Number(e.target.value))}
       />
     </div>
 
     {/* Product table */}
-    <div id="product-table-container">
-      <table id="product-table">
+    <div id="product-table-container-supplier-stock-model">
+      <table id="product-table-supplier-stock-model">
         <thead>
           <tr>
             <th>ID</th>
@@ -96,7 +96,7 @@ export default function SupplierStockModel({ supName, onClose }) {
       </table>
     </div>
 
-    <button id="close-button" onClick={onClose}>Close</button>
+    <button id="close-button-supplier-stock-model" onClick={onClose}>Close</button>
   </Modal>
 );
 

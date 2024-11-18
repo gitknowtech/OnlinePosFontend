@@ -257,14 +257,6 @@ const Dashboard = () => {
                 </li>
                 <li>
                   <div className="icon-link">
-                    <a href="#">
-                      <FontAwesomeIcon className="nav-icon" icon={faVcard} />
-                      <span className="link-name">CREDIT SALES</span>
-                    </a>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
                   <Link
                     to="products"
                     state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
@@ -340,15 +332,6 @@ const Dashboard = () => {
                       <span className="link-name">CHART</span>
                     </a>
                   </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <a href="#">
-                      <FontAwesomeIcon className="nav-icon" icon={faHistory} />
-                      <span className="link-name">HISTORY</span>
-                    </a>
-                  </div>
-                  <hr />
                 </li>
                 <li>
                   <div className="icon-link">
