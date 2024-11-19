@@ -11,20 +11,23 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
   const [updatedLoan, setUpdatedLoan] = useState({});
   const [startDate, setStartDate] = useState(null); // Start date for filtering
   const [endDate, setEndDate] = useState(null); // End date for filtering
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentGeneratedId, setPaymentGeneratedId] = useState("");
+  const [paymentGrossTotal, setPaymentGrossTotal] = useState(0);
+  const [paymentCashAmount, setPaymentCashAmount] = useState(0);
+  const [paymentCreditAmount, setPaymentCreditAmount] = useState(0);
+  const [referenceNumber, setReferenceNumber] = useState("");
 
   useEffect(() => {
     fetchLoans();
   }, [supplierId]);
 
-  // Fetch all loans for the supplier
   const fetchLoans = async () => {
     try {
       const response = await fetch(
         `http://localhost:5000/api/suppliers/get_loans_supplier_loan/${supplierId}`
       );
       const data = await response.json();
-
-      console.log("All loans fetched:", data);
 
       if (response.ok) {
         setLoans(data);
@@ -37,7 +40,6 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
     }
   };
 
-  // Fetch loans filtered by date range
   const fetchLoansByDate = async () => {
     if (!startDate || !endDate) {
       Swal.fire("Error", "Please select both start and end dates.", "error");
@@ -50,16 +52,10 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       );
       const data = await response.json();
 
-      console.log("Filtered loans fetched:", data);
-
       if (response.ok) {
         setLoans(data);
       } else {
-        Swal.fire(
-          "Error",
-          data.message || "Failed to fetch loans by date.",
-          "error"
-        );
+        Swal.fire("Error", data.message || "Failed to fetch loans by date.", "error");
       }
     } catch (error) {
       console.error("Error fetching loans by date:", error);
@@ -102,7 +98,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
     setEditingLoan(loan.id);
     setUpdatedLoan({
       loanAmount: loan.loanAmount,
-      cashPayment: loan.cashPayment,
+      cashAmount: loan.cashAmount,
       description: loan.description,
       billNumber: loan.billNumber,
     });
@@ -154,12 +150,48 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
   };
 
   const handlePayment = (loan) => {
-    // Handle the payment action (e.g., opening a payment modal or redirecting to a payment page)
-    Swal.fire(
-      "Payment",
-      `Processing payment for Loan ID: ${loan.generatedId}`,
-      "info"
-    );
+    setPaymentGeneratedId(loan.generatedId);
+    setPaymentGrossTotal(loan.totalAmount);
+    setPaymentCashAmount(loan.cashAmount || 0);
+    setPaymentCreditAmount(loan.totalAmount - (loan.cashAmount || 0));
+    setShowPaymentModal(true);
+  };
+
+  const handleCashAmountChange = (e) => {
+    const newCashAmount = parseFloat(e.target.value || 0);
+    setPaymentCashAmount(newCashAmount);
+    setPaymentCreditAmount(paymentGrossTotal - newCashAmount);
+  };
+
+  const handleUpdatePayment = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/suppliers/update_payment`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            generatedId: paymentGeneratedId,
+            cashAmount: paymentCashAmount,
+            creditAmount: paymentCreditAmount,
+            referenceNumber,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire("Success", "Payment updated successfully.", "success");
+        setShowPaymentModal(false);
+        fetchLoans(); // Refresh the loans list
+      } else {
+        Swal.fire("Error", data.message || "Failed to update payment.", "error");
+      }
+    } catch (error) {
+      console.error("Error updating payment:", error);
+      Swal.fire("Error", "Failed to update payment.", "error");
+    }
   };
 
   return (
@@ -188,7 +220,10 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
             placeholderText="Select End Date"
             dateFormat="yyyy-MM-dd" // Only display the date
           />
-          <button onClick={fetchLoansByDate} className="filter-button-add-loan-supplier">
+          <button
+            onClick={fetchLoansByDate}
+            className="filter-button-add-loan-supplier"
+          >
             Filter
           </button>
         </div>
@@ -201,6 +236,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
                 <th>Generated ID</th>
                 <th>Loan Amount</th>
                 <th>Cash Payment</th>
+                <th>Total Amount</th>
                 <th>Bill Number</th>
                 <th>Description</th>
                 <th>Saved Time</th>
@@ -227,6 +263,9 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
                   </td>
                   <td style={{ textAlign: "center" }}>
                     {loan.cashAmount ? `${loan.cashAmount}` : "N/A"}
+                  </td>
+                  <td style={{ textAlign: "center" }}>
+                    {loan.totalAmount ? `${loan.totalAmount}` : "N/A"}
                   </td>
                   <td>
                     {editingLoan === loan.id ? (
@@ -300,6 +339,59 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
             </tbody>
           </table>
         </div>
+
+        {/* Payment Modal */}
+        {showPaymentModal && (
+          <div id="modal-overlay">
+            <div id="modal-content">
+              <h3>Update Payment Amounts</h3>
+              <div id="modal-field-generatedid" className="modal-field">
+                <label>Generated ID:</label>
+                <span>{paymentGeneratedId}</span>
+              </div>
+              <div id="modal-field-grosstotal" className="modal-field">
+                <label>Gross Total:</label>
+                <span>{paymentGrossTotal.toFixed(2)}</span>
+              </div>
+              <div id="modal-field-cashamount" className="modal-field">
+                <label>Cash Amount:</label>
+                <input
+                  type="number"
+                  value={paymentCashAmount}
+                  onChange={handleCashAmountChange}
+                />
+              </div>
+              <div id="modal-field-creditamount" className="modal-field">
+                <label>Credit Amount:</label>
+                <input
+                  type="number"
+                  value={paymentCreditAmount.toFixed(2)}
+                  readOnly
+                />
+              </div>
+              <div id="modal-field-reference" className="modal-field">
+                <label>Reference Number:</label>
+                <input
+                  type="text"
+                  value={referenceNumber}
+                  onChange={(e) => setReferenceNumber(e.target.value)}
+                />
+              </div>
+              <div id="modal-buttons">
+                <button id="update-button" onClick={handleUpdatePayment}>
+                  Update
+                </button>
+                <button
+                  id="cancel-button"
+                  onClick={() => setShowPaymentModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <button className="cancel-button-view-loan-supplier" onClick={onClose}>
           Close
         </button>

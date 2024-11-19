@@ -24,6 +24,8 @@ const AddLoanModal = ({ supplier, onClose }) => {
     setSelectedFile(e.target.files[0]);
   };
 
+ 
+
   const handleSave = async () => {
     if (!loanAmount || loanAmount <= 0 || !billNumber.trim() || !cashAmount || cashAmount <= 0) {
       Swal.fire("Error", "Please fill all required fields correctly.", "error");
