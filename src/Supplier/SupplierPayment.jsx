@@ -4,7 +4,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import "../css/SupplierPayment.css"; // Separate CSS file for styling
 import AddLoanModal from "../Supplier/AddLoanModel"; // Modal for adding loans
-import AddCashModal from "../Supplier/AddCashModel"; // Modal for adding cash
+import ViewCashModel from "../Supplier/ViewCashModel"; // Modal for adding cash
 
 // Import the images
 import addLoanImage from "../assets/icons/addLoan.png";
@@ -63,20 +63,13 @@ export default function SupplierPayment({ store }) {
     }
   };
 
-  // Save cash handler for modal
-  const handleSaveCash = async (cashData) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/supplier_cash/add",
-        cashData
-      );
-      Swal.fire("Success", response.data.message, "success");
-      setShowCashModal(false); // Close modal after successful save
-    } catch (error) {
-      console.error("Error saving cash:", error);
-      Swal.fire("Error", "Failed to save cash details.", "error");
-    }
+  
+  // Open cash modal for selected supplier
+  const handleViewCashClick = (supplier) => {
+    setSelectedSupplier(supplier);
+    setShowCashModal(true);
   };
+
 
   // Fetch and display balance for a supplier
   const handleViewBalance = async (supplierId) => {
@@ -100,11 +93,7 @@ export default function SupplierPayment({ store }) {
     setShowLoanModal(true);
   };
 
-  // Open cash modal for selected supplier
-  const handleAddCashClick = (supplier) => {
-    setSelectedSupplier(supplier);
-    setShowCashModal(true);
-  };
+
 
   // Pagination logic
   const filteredSuppliers = suppliers.filter((supplier) =>
@@ -207,9 +196,9 @@ export default function SupplierPayment({ store }) {
                   >
                     <img src={addLoanImage} alt="Add Loan" />
                   </button>
-                  <button
+                   <button
                     className="icon-button"
-                    onClick={() => handleAddCashClick(supplier)}
+                    onClick={() => handleViewCashClick(supplier)}
                   >
                     <img src={addCashImage} alt="Add Cash" />
                   </button>
@@ -231,10 +220,9 @@ export default function SupplierPayment({ store }) {
 
       {/* Cash Modal */}
       {showCashModal && selectedSupplier && (
-        <AddCashModal
-          supplier={selectedSupplier}
+        <ViewCashModel
+          supplierId={selectedSupplier.Supid}
           onClose={() => setShowCashModal(false)}
-          onSave={handleSaveCash}
         />
       )}
 

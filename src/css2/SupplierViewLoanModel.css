@@ -3,6 +3,7 @@
     top: 0;
     left: 0;
     width: 100vw;
+    font-size: 12px;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
@@ -156,4 +157,143 @@
     font-family: sans-serif;
   }
   
-  
+  /* Overlay for the modal */
+#supplier_payment_history_model_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Modal content container */
+#supplier_payment_history_model_content {
+  background: #fff;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 800px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden; /* Prevent content overflow */
+}
+
+/* Modal header */
+#supplier_payment_history_model_content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+/* Scrollable table container */
+#supplier_payment_history_model_table_container {
+  max-height: 300px; /* Set a fixed height for the table container */
+  overflow-y: auto; /* Enable vertical scrolling */
+  border: 1px solid #ddd; /* Optional: Add a border around the scrollable container */
+  padding: 10px;
+  margin-bottom: 20px; /* Add spacing between the table and other modal content */
+}
+
+/* History table */
+#supplier_payment_history_model_table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#search-bill-number{
+  padding: 8px 8px;
+  border-radius: 5px;
+  border: 1px solid #000;
+  margin-left: 5px;
+}
+
+#supplier_payment_history_model_table th,
+#supplier_payment_history_model_table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+#supplier_payment_history_model_table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  color: #555;
+}
+
+#supplier_payment_history_model_table td {
+  color: #444;
+}
+
+#supplier_payment_history_model_table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Button styles */
+#supplier_payment_history_model_content button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#supplier_payment_history_model_content .close-history-modal {
+  background-color: #d9534f;
+  color: #fff;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+#supplier_payment_history_model_content .close-history-modal:hover {
+  background-color: #c9302c;
+}
+
+#supplier_payment_history_model_table button {
+  background-color: #5bc0de;
+  color: #fff;
+}
+
+#supplier_payment_history_model_table button:hover {
+  background-color: #31b0d5;
+}
+
+
+.history-button-view-loan-supplier{
+  background-color: #e2d87e;
+}
+
+
+.history-button-view-loan-supplier:hover{
+  background-color: #6d6205;
+  color: #fff;
+  transition: 0.3s ease-in-out;
+}
+
+
+
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #supplier_payment_history_model_content {
+    width: 95%;
+  }
+
+  #supplier_payment_history_model_table th,
+  #supplier_payment_history_model_table td {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+
+  #supplier_payment_history_model_content button {
+    font-size: 0.85rem;
+  }
+}

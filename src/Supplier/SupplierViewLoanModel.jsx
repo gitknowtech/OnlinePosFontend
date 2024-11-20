@@ -9,6 +9,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
   const [loans, setLoans] = useState([]);
   const [editingLoan, setEditingLoan] = useState(null);
   const [filteredLoans, setFilteredLoans] = useState([]);
+  const [paymentFile, setPaymentFile] = useState([]);
   const [updatedLoan, setUpdatedLoan] = useState({});
   const [startDate, setStartDate] = useState(null); // Start date for filtering
   const [endDate, setEndDate] = useState(null); // End date for filtering
@@ -30,7 +31,6 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
     applySettlementFilter(); // Apply filter whenever loans or settlement status changes
   }, [loans, settlementStatus]);
 
-
   // Fetch all loans for the supplier
   const fetchLoans = async () => {
     try {
@@ -50,7 +50,6 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
     }
   };
 
-
   // Filter loans based on settlement status
   const applySettlementFilter = () => {
     if (settlementStatus === "Settled") {
@@ -63,7 +62,6 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       setFilteredLoans(loans); // Show all loans
     }
   };
-
 
   // Fetch loans filtered by date range
   const fetchLoansByDate = async () => {
@@ -82,14 +80,17 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
         setLoans(data);
         setFilteredLoans(data); // Update filtered loans
       } else {
-        Swal.fire("Error", data.message || "Failed to fetch loans by date.", "error");
+        Swal.fire(
+          "Error",
+          data.message || "Failed to fetch loans by date.",
+          "error"
+        );
       }
     } catch (error) {
       console.error("Error fetching loans by date:", error);
       Swal.fire("Error", "Failed to fetch loans by date.", "error");
     }
   };
-
 
   const handleViewDocument = (filePath) => {
     if (!filePath) {
@@ -165,13 +166,14 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
           loans.map((loan) =>
             loan.id === id
               ? {
-                ...loan,
-                loanAmount: updatedLoan.loanAmount,
-                billNumber: updatedLoan.billNumber,
-                description: updatedLoan.description,
-                totalAmount:
-                  parseFloat(updatedLoan.loanAmount) + parseFloat(loan.cashAmount || 0),
-              }
+                  ...loan,
+                  loanAmount: updatedLoan.loanAmount,
+                  billNumber: updatedLoan.billNumber,
+                  description: updatedLoan.description,
+                  totalAmount:
+                    parseFloat(updatedLoan.loanAmount) +
+                    parseFloat(loan.cashAmount || 0),
+                }
               : loan
           )
         );
@@ -229,10 +231,13 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
     setPaymentCreditAmount(paymentGrossTotal - newCashAmount);
   };
 
-
   const handleUpdatePayment = async () => {
     if (!referenceNumber || paymentCashAmount === "") {
-      Swal.fire("Error", "Please enter a valid cash amount and reference number.", "error");
+      Swal.fire(
+        "Error",
+        "Please enter a valid cash amount and reference number.",
+        "error"
+      );
       return;
     }
 
@@ -261,13 +266,43 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
 
     const paymentDifference = paymentCashAmount - paymentOriginalCashAmount;
 
-    if (paymentDifference === 0) {
-      Swal.fire("Info", "No changes in cash amount detected.", "info");
+    if (paymentDifference === 0 && !paymentFile) {
+      Swal.fire(
+        "Info",
+        "No changes in cash amount detected and no file uploaded.",
+        "info"
+      );
       return;
     }
 
     try {
-      // Step 1: Update the supplier_loan table using generatedId
+      // Step 1: Create form data for file upload and other details
+      const formData = new FormData();
+      formData.append("generatedId", paymentGeneratedId);
+      formData.append("paymentAmount", paymentDifference);
+      formData.append("referenceNumber", referenceNumber);
+      if (paymentFile) {
+        formData.append("file", paymentFile); // Include the file if uploaded
+      }
+
+      // Step 2: Send POST request to add payment record with file
+      const addPaymentResponse = await fetch(
+        `http://localhost:5000/api/suppliers/add_supplier_loan_payment`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const addPaymentData = await addPaymentResponse.json();
+
+      if (!addPaymentResponse.ok) {
+        throw new Error(
+          addPaymentData.message || "Failed to save payment record."
+        );
+      }
+
+      // Step 3: Update the supplier_loan table using the generated ID
       const updateLoanResponse = await fetch(
         `http://localhost:5000/api/suppliers/update_supplier_loan_new/${paymentGeneratedId}`,
         {
@@ -286,27 +321,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
         throw new Error(updateLoanData.message || "Failed to update loan.");
       }
 
-      // Step 2: Insert a new record into the supplier_loan_payment table
-      const addPaymentResponse = await fetch(
-        `http://localhost:5000/api/suppliers/add_supplier_loan_payment`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            generatedId: paymentGeneratedId,
-            paymentAmount: paymentDifference,
-            referenceNumber: referenceNumber,
-          }),
-        }
-      );
-
-      const addPaymentData = await addPaymentResponse.json();
-
-      if (!addPaymentResponse.ok) {
-        throw new Error(addPaymentData.message || "Failed to save payment record.");
-      }
-
-      // Step 3: Refresh the loans table by fetching the latest data
+      // Step 4: Refresh the loans table by fetching the latest data
       await fetchLoans();
 
       // Close the payment modal and show success message
@@ -317,8 +332,6 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       Swal.fire("Error", error.message || "Failed to update payment.", "error");
     }
   };
-
-
 
   return (
     <div className="modal-overlay-view-loan-supplier">
@@ -368,7 +381,6 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
             </select>
           </div>
         </div>
-
 
         {/* Loans Table */}
         <div className="table-container-view-loan-supplier">
@@ -528,9 +540,19 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
                   onChange={(e) => setReferenceNumber(e.target.value)}
                 />
               </div>
+              <div className="modal-field">
+                <label>Upload File:</label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                  onChange={(e) => setPaymentFile(e.target.files[0])} // Handle file selection
+                />
+              </div>
               <div className="modal-buttons">
                 <button onClick={handleUpdatePayment}>Update</button>
-                <button onClick={() => setShowPaymentModal(false)}>Cancel</button>
+                <button onClick={() => setShowPaymentModal(false)}>
+                  Cancel
+                </button>
               </div>
             </div>
           </div>

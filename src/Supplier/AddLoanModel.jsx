@@ -27,11 +27,18 @@ const AddLoanModal = ({ supplier, onClose }) => {
  
 
   const handleSave = async () => {
-    if (!loanAmount || loanAmount <= 0 || !billNumber.trim() || !cashAmount || cashAmount <= 0) {
+    // Ensure loanAmount can be 0 and only reject negative values
+    if (
+      loanAmount === undefined || 
+      loanAmount < 0 || 
+      !billNumber.trim() || 
+      cashAmount === undefined || 
+      cashAmount < 0
+    ) {
       Swal.fire("Error", "Please fill all required fields correctly.", "error");
       return;
     }
-
+  
     // Create form data
     const formData = new FormData();
     formData.append("supId", supplier.Supid);
@@ -40,18 +47,18 @@ const AddLoanModal = ({ supplier, onClose }) => {
     formData.append("cashAmount", cashAmount);
     formData.append("billNumber", billNumber.trim());
     formData.append("description", description.trim());
-
+  
     // Only append the file if it is selected
     if (selectedFile) {
       formData.append("file", selectedFile);
     }
-
+  
     try {
       const response = await fetch("http://localhost:5000/api/suppliers/add_loan", {
         method: "POST",
         body: formData,
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         Swal.fire("Success", data.message, "success");
@@ -65,6 +72,7 @@ const AddLoanModal = ({ supplier, onClose }) => {
     }
   };
 
+  
   return (
     <div className="modal-overlay">
       <div className="modal-container">
