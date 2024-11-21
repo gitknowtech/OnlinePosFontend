@@ -19,6 +19,9 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
   const [paymentGrossTotal, setPaymentGrossTotal] = useState(0);
   const [paymentCashAmount, setPaymentCashAmount] = useState(0);
   const [paymentCreditAmount, setPaymentCreditAmount] = useState(0);
+  const [paymentType, setPaymentType] = useState("Direct Payment"); // Payment type state
+  const [chequeDate, setChequeDate] = useState(null); // Cheque date state
+  const [chequeNumber, setChequeNumber] = useState(""); // Cheque number state
   const [referenceNumber, setReferenceNumber] = useState("");
   const [paymentOriginalCashAmount, setPaymentOriginalCashAmount] = useState(0);
   const [paymentId, setPaymentId] = useState(null); // Add this line to store the loan ID
@@ -240,12 +243,18 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       );
       return;
     }
-
-    console.log("Generated ID:", paymentGeneratedId); // Debug generated ID
-    console.log("Cash Amount:", paymentCashAmount); // Debug cash amount
-    console.log("Credit Amount:", paymentCreditAmount); // Debug credit amount
-
-    // Validation: Check if the cash amount is less than the original or greater than the gross amount
+  
+    const mappedPaymentType =
+      paymentType === "Direct Payment" ? "Direct" : "Cheque";
+  
+    if (mappedPaymentType === "Cheque" && !chequeDate) {
+      Swal.fire("Error", "Please select a valid cheque date.", "error");
+      return;
+    }
+  
+    console.log("Generated ID:", paymentGeneratedId);
+    console.log("Payment Type:", mappedPaymentType); // Debug mapped ENUM value
+  
     if (paymentCashAmount < paymentOriginalCashAmount) {
       Swal.fire(
         "Error",
@@ -254,7 +263,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       );
       return;
     }
-
+  
     if (paymentCashAmount > paymentGrossTotal) {
       Swal.fire(
         "Error",
@@ -263,9 +272,9 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       );
       return;
     }
-
+  
     const paymentDifference = paymentCashAmount - paymentOriginalCashAmount;
-
+  
     if (paymentDifference === 0 && !paymentFile) {
       Swal.fire(
         "Info",
@@ -274,18 +283,18 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       );
       return;
     }
-
+  
     try {
-      // Step 1: Create form data for file upload and other details
       const formData = new FormData();
       formData.append("generatedId", paymentGeneratedId);
       formData.append("paymentAmount", paymentDifference);
       formData.append("referenceNumber", referenceNumber);
+      formData.append("paymentType", mappedPaymentType); // Use ENUM value
+      formData.append("chequeDate", chequeDate ? chequeDate.toISOString() : null);
       if (paymentFile) {
-        formData.append("file", paymentFile); // Include the file if uploaded
+        formData.append("file", paymentFile);
       }
-
-      // Step 2: Send POST request to add payment record with file
+  
       const addPaymentResponse = await fetch(
         `http://localhost:5000/api/suppliers/add_supplier_loan_payment`,
         {
@@ -293,16 +302,15 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
           body: formData,
         }
       );
-
+  
       const addPaymentData = await addPaymentResponse.json();
-
+  
       if (!addPaymentResponse.ok) {
         throw new Error(
           addPaymentData.message || "Failed to save payment record."
         );
       }
-
-      // Step 3: Update the supplier_loan table using the generated ID
+  
       const updateLoanResponse = await fetch(
         `http://localhost:5000/api/suppliers/update_supplier_loan_new/${paymentGeneratedId}`,
         {
@@ -314,17 +322,15 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
           }),
         }
       );
-
+  
       const updateLoanData = await updateLoanResponse.json();
-
+  
       if (!updateLoanResponse.ok) {
         throw new Error(updateLoanData.message || "Failed to update loan.");
       }
-
-      // Step 4: Refresh the loans table by fetching the latest data
+  
       await fetchLoans();
-
-      // Close the payment modal and show success message
+  
       Swal.fire("Success", "Payment updated successfully.", "success");
       setShowPaymentModal(false);
     } catch (error) {
@@ -332,6 +338,8 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       Swal.fire("Error", error.message || "Failed to update payment.", "error");
     }
   };
+  
+  
 
   return (
     <div className="modal-overlay-view-loan-supplier">
@@ -503,60 +511,83 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
           </table>
         </div>
 
+
         {/* Payment Modal */}
-        {showPaymentModal && (
-          <div id="modal-overlay">
-            <div id="modal-content">
-              <h3>Update Payment Amounts</h3>
-              <div className="modal-field">
-                <label>Generated ID:</label>
-                <span>{paymentGeneratedId}</span>
-              </div>
-              <div className="modal-field">
-                <label>Gross Total:</label>
-                <span>{paymentGrossTotal.toFixed(2)}</span>
-              </div>
-              <div className="modal-field">
-                <label>Cash Amount:</label>
-                <input
-                  type="number"
-                  value={paymentCashAmount}
-                  onChange={handleCashAmountChange}
-                />
-              </div>
-              <div className="modal-field">
-                <label>Credit Amount:</label>
-                <input
-                  type="number"
-                  value={paymentCreditAmount.toFixed(2)}
-                  readOnly
-                />
-              </div>
-              <div className="modal-field">
-                <label>Reference Number:</label>
-                <input
-                  type="text"
-                  value={referenceNumber}
-                  onChange={(e) => setReferenceNumber(e.target.value)}
-                />
-              </div>
-              <div className="modal-field">
-                <label>Upload File:</label>
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-                  onChange={(e) => setPaymentFile(e.target.files[0])} // Handle file selection
-                />
-              </div>
-              <div className="modal-buttons">
-                <button onClick={handleUpdatePayment}>Update</button>
-                <button onClick={() => setShowPaymentModal(false)}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+{showPaymentModal && (
+  <div id="modal-overlay">
+    <div id="modal-content">
+      <h3>Update Payment Amounts</h3>
+      <div className="modal-field">
+        <label>Generated ID:</label>
+        <span>{paymentGeneratedId}</span>
+      </div>
+      <div className="modal-field">
+        <label>Gross Total:</label>
+        <span>{paymentGrossTotal.toFixed(2)}</span>
+      </div>
+      <div className="modal-field">
+        <label>Cash Amount:</label>
+        <input
+          type="number"
+          value={paymentCashAmount}
+          onChange={handleCashAmountChange}
+        />
+      </div>
+      <div className="modal-field">
+        <label>Credit Amount:</label>
+        <input
+          type="number"
+          value={paymentCreditAmount.toFixed(2)}
+          readOnly
+        />
+      </div>
+      <div className="modal-field">
+        <label>Payment Type:</label>
+        <select
+          value={paymentType}
+          onChange={(e) => setPaymentType(e.target.value)}
+        >
+          <option value="Direct Payment">Direct Payment</option>
+          <option value="Cheque Payment">Cheque Payment</option>
+        </select>
+      </div>
+      {paymentType === "Cheque Payment" && (
+        <div className="modal-field">
+          <label>Cheque Date:</label>
+          <DatePicker
+            selected={chequeDate}
+            onChange={(date) => setChequeDate(date)}
+            placeholderText="Select Cheque Date"
+            dateFormat="yyyy-MM-dd"
+          />
+        </div>
+      )}
+      <div className="modal-field">
+        <label>Reference Number:</label>
+        <input
+          type="text"
+          value={referenceNumber}
+          onChange={(e) => setReferenceNumber(e.target.value)}
+        />
+      </div>
+      <div className="modal-field">
+        <label>Upload File:</label>
+        <input
+          type="file"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+          onChange={(e) => setPaymentFile(e.target.files[0])} // Handle file selection
+        />
+      </div>
+      <div className="modal-buttons">
+        <button onClick={handleUpdatePayment}>Update</button>
+        <button onClick={() => setShowPaymentModal(false)}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
         <button className="cancel-button-view-loan-supplier" onClick={onClose}>
           Close

@@ -54,6 +54,47 @@ const ViewCashModel = ({ supplierId, onClose }) => {
     }
   };
 
+  const handleDeletePayment = async (paymentId, generatedId, paymentAmount) => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action will delete the payment and update the loan record.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel",
+    });
+  
+    if (confirm.isConfirmed) {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/suppliers/delete_supplier_payment/${paymentId}`,
+          {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ generatedId, paymentAmount }), // Send the required data to update supplier_loan
+          }
+        );
+  
+        const data = await response.json();
+  
+        if (response.ok) {
+          console.log("Delete successful:", data); // Log success response
+          setHistoryData(historyData.filter((payment) => payment.id !== paymentId));
+          Swal.fire("Deleted!", "Payment and related file deleted successfully.", "success");
+          fetchLoans(); // Refresh loans table after deletion
+        } else {
+          console.error("Error response from server:", data); // Log server error response
+          Swal.fire("Error", data.message || "Failed to delete payment.", "error");
+        }
+      } catch (error) {
+        console.error("Error occurred during delete operation:", error);
+        Swal.fire("Error", "Failed to delete payment.", "error");
+      }
+    }
+  };
+  
+
+
   // View document
   const handleViewDocument = (filePath) => {
     if (!filePath) {
@@ -79,8 +120,8 @@ const ViewCashModel = ({ supplierId, onClose }) => {
     window.open(url, "_blank");
   };
 
- 
-  
+
+
 
   // Filter loans by bill number
   const filteredLoans = loans.filter((loan) =>
@@ -164,7 +205,7 @@ const ViewCashModel = ({ supplierId, onClose }) => {
                       >
                         History
                       </button>
-                    </td> 
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -184,50 +225,62 @@ const ViewCashModel = ({ supplierId, onClose }) => {
             <div id="supplier_payment_history_model_content">
               <h3>Payment History for Generated ID: {selectedGeneratedId}</h3>
               <div id="supplier_payment_history_model_table_container">
-  <table id="supplier_payment_history_model_table">
-                <thead>
-                  <tr>
-                    <th>Payment ID</th>
-                    <th>Payment Amount</th>
-                    <th>Reference Number</th>
-                    <th>Saved Time</th>
-                    <th>Document</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historyData.length > 0 ? (
-                    historyData.map((payment) => (
-                      <tr key={payment.id}>
-                        <td>{payment.id}</td>
-                        <td>{payment.paymentAmount}</td>
-                        <td>{payment.referenceNumber}</td>
-                        <td>
-                          {payment.saveTime
-                            ? new Date(payment.saveTime).toLocaleString()
-                            : "N/A"}
-                        </td>
-                        <td>
-                          {payment.filePath ? (
+                <table id="supplier_payment_history_model_table">
+                  <thead>
+                    <tr>
+                      <th>Payment ID</th>
+                      <th>Payment Amount</th>
+                      <th>Reference Number</th>
+                      <th>Saved Time</th>
+                      <th>Document</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historyData.length > 0 ? (
+                      historyData.map((payment) => (
+                        <tr key={payment.id}>
+                          <td>{payment.id}</td>
+                          <td>{payment.paymentAmount}</td>
+                          <td>{payment.referenceNumber}</td>
+                          <td>
+                            {payment.saveTime
+                              ? new Date(payment.saveTime).toLocaleString()
+                              : "N/A"}
+                          </td>
+                          <td>
+                            {payment.filePath ? (
+                              <button
+                                onClick={() => handleViewDocumentNew(payment.filePath)}
+                              >
+                                View
+                              </button>
+                            ) : (
+                              "N/A"
+                            )}
+                          </td>
+                          <td>
                             <button
-                              onClick={() => handleViewDocumentNew(payment.filePath)}
+                              className="delete-button-history"
+                              onClick={() =>
+                                handleDeletePayment(payment.id, payment.generatedId, payment.paymentAmount)
+                              }
                             >
-                              View
+                              Delete
                             </button>
-                          ) : (
-                            "N/A"
-                          )}
+
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" style={{ textAlign: "center" }}>
+                          No payment history found.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" style={{ textAlign: "center" }}>
-                        No payment history found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
               </div>
               <button
                 id="supplier_payment_history_model_close"
