@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import deleteImage from "../assets/icons/bin.png";
@@ -115,7 +115,7 @@ const ManageUser = () => {
           const response = await axios.delete(
             `http://localhost:5000/delete_user/${userName}`
           );
-
+  
           if (response.status === 200) {
             Swal.fire({
               icon: "success",
@@ -135,7 +135,7 @@ const ManageUser = () => {
       }
     });
   };
-
+  
 
   return (
     <div className="manage-user">

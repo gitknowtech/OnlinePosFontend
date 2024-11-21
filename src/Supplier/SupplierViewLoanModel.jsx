@@ -19,9 +19,6 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
   const [paymentGrossTotal, setPaymentGrossTotal] = useState(0);
   const [paymentCashAmount, setPaymentCashAmount] = useState(0);
   const [paymentCreditAmount, setPaymentCreditAmount] = useState(0);
-  const [paymentType, setPaymentType] = useState("Direct Payment"); // Payment type state
-  const [chequeDate, setChequeDate] = useState(null); // Cheque date state
-  const [chequeNumber, setChequeNumber] = useState(""); // Cheque number state
   const [referenceNumber, setReferenceNumber] = useState("");
   const [paymentOriginalCashAmount, setPaymentOriginalCashAmount] = useState(0);
   const [paymentId, setPaymentId] = useState(null); // Add this line to store the loan ID
@@ -244,16 +241,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       return;
     }
   
-    const mappedPaymentType =
-      paymentType === "Direct Payment" ? "Direct" : "Cheque";
-  
-    if (mappedPaymentType === "Cheque" && !chequeDate) {
-      Swal.fire("Error", "Please select a valid cheque date.", "error");
-      return;
-    }
-  
     console.log("Generated ID:", paymentGeneratedId);
-    console.log("Payment Type:", mappedPaymentType); // Debug mapped ENUM value
   
     if (paymentCashAmount < paymentOriginalCashAmount) {
       Swal.fire(
@@ -289,8 +277,6 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       formData.append("generatedId", paymentGeneratedId);
       formData.append("paymentAmount", paymentDifference);
       formData.append("referenceNumber", referenceNumber);
-      formData.append("paymentType", mappedPaymentType); // Use ENUM value
-      formData.append("chequeDate", chequeDate ? chequeDate.toISOString() : null);
       if (paymentFile) {
         formData.append("file", paymentFile);
       }
@@ -303,12 +289,17 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
         }
       );
   
-      const addPaymentData = await addPaymentResponse.json();
-  
+      // Check if the response is not ok
       if (!addPaymentResponse.ok) {
-        throw new Error(
-          addPaymentData.message || "Failed to save payment record."
-        );
+        // Attempt to parse the error response
+        try {
+          const addPaymentData = await addPaymentResponse.json();
+          throw new Error(
+            addPaymentData.message || "Failed to save payment record."
+          );
+        } catch (jsonError) {
+          throw new Error("Unexpected response format while saving payment record.", jsonError);
+        }
       }
   
       const updateLoanResponse = await fetch(
@@ -323,10 +314,14 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
         }
       );
   
-      const updateLoanData = await updateLoanResponse.json();
-  
+      // Check if the update request was successful
       if (!updateLoanResponse.ok) {
-        throw new Error(updateLoanData.message || "Failed to update loan.");
+        try {
+          const updateLoanData = await updateLoanResponse.json();
+          throw new Error(updateLoanData.message || "Failed to update loan.");
+        } catch (jsonError) {
+          throw new Error("Unexpected response format while updating loan.", jsonError);
+        }
       }
   
       await fetchLoans();
@@ -512,83 +507,60 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
         </div>
 
 
-        {/* Payment Modal */}
-{showPaymentModal && (
-  <div id="modal-overlay">
-    <div id="modal-content">
-      <h3>Update Payment Amounts</h3>
-      <div className="modal-field">
-        <label>Generated ID:</label>
-        <span>{paymentGeneratedId}</span>
-      </div>
-      <div className="modal-field">
-        <label>Gross Total:</label>
-        <span>{paymentGrossTotal.toFixed(2)}</span>
-      </div>
-      <div className="modal-field">
-        <label>Cash Amount:</label>
-        <input
-          type="number"
-          value={paymentCashAmount}
-          onChange={handleCashAmountChange}
-        />
-      </div>
-      <div className="modal-field">
-        <label>Credit Amount:</label>
-        <input
-          type="number"
-          value={paymentCreditAmount.toFixed(2)}
-          readOnly
-        />
-      </div>
-      <div className="modal-field">
-        <label>Payment Type:</label>
-        <select
-          value={paymentType}
-          onChange={(e) => setPaymentType(e.target.value)}
-        >
-          <option value="Direct Payment">Direct Payment</option>
-          <option value="Cheque Payment">Cheque Payment</option>
-        </select>
-      </div>
-      {paymentType === "Cheque Payment" && (
-        <div className="modal-field">
-          <label>Cheque Date:</label>
-          <DatePicker
-            selected={chequeDate}
-            onChange={(date) => setChequeDate(date)}
-            placeholderText="Select Cheque Date"
-            dateFormat="yyyy-MM-dd"
-          />
-        </div>
-      )}
-      <div className="modal-field">
-        <label>Reference Number:</label>
-        <input
-          type="text"
-          value={referenceNumber}
-          onChange={(e) => setReferenceNumber(e.target.value)}
-        />
-      </div>
-      <div className="modal-field">
-        <label>Upload File:</label>
-        <input
-          type="file"
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-          onChange={(e) => setPaymentFile(e.target.files[0])} // Handle file selection
-        />
-      </div>
-      <div className="modal-buttons">
-        <button onClick={handleUpdatePayment}>Update</button>
-        <button onClick={() => setShowPaymentModal(false)}>
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
+       {/* Payment Modal */}
+       {showPaymentModal && (
+          <div id="modal-overlay">
+            <div id="modal-content">
+              <h3>Update Payment Amounts</h3>
+              <div className="modal-field">
+                <label>Generated ID:</label>
+                <span>{paymentGeneratedId}</span>
+              </div>
+              <div className="modal-field">
+                <label>Gross Total:</label>
+                <span>{paymentGrossTotal.toFixed(2)}</span>
+              </div>
+              <div className="modal-field">
+                <label>Cash Amount:</label>
+                <input
+                  type="number"
+                  value={paymentCashAmount}
+                  onChange={handleCashAmountChange}
+                />
+              </div>
+              <div className="modal-field">
+                <label>Credit Amount:</label>
+                <input
+                  type="number"
+                  value={paymentCreditAmount.toFixed(2)}
+                  readOnly
+                />
+              </div>
+              <div className="modal-field">
+                <label>Reference Number:</label>
+                <input
+                  type="text"
+                  value={referenceNumber}
+                  onChange={(e) => setReferenceNumber(e.target.value)}
+                />
+              </div>
+              <div className="modal-field">
+                <label>Upload File:</label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                  onChange={(e) => setPaymentFile(e.target.files[0])} // Handle file selection
+                />
+              </div>
+              <div className="modal-buttons">
+                <button onClick={handleUpdatePayment}>Update</button>
+                <button onClick={() => setShowPaymentModal(false)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <button className="cancel-button-view-loan-supplier" onClick={onClose}>
           Close
         </button>

@@ -155,6 +155,8 @@ const ViewCashModel = ({ supplierId, onClose }) => {
           />
         </div>
 
+        
+
         {/* Loans Table */}
         <div className="table-container-view-loan-supplier">
           <table className="loans-table-view-loan-supplier">

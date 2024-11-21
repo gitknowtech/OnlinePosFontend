@@ -6,7 +6,6 @@ import {
   faDollar,
   faPlus,
   faShoppingBag,
-  faSnowflake,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import "../css/SupplierMain.css";
@@ -28,7 +27,7 @@ const Supplier = () => {
 
   const [activeContent, setActiveContent] = useState(null); // Manage active content ('supplier' or 'purchase')
 
-  // Function to toggle the purchasing content
+ {/*} // Function to toggle the purchasing content
   const togglePurchasingContent = () => {
     setActiveContent(activeContent === "createNewPerches" ? null : "createNewPerches"); // Toggle purchasing content
   };
@@ -37,7 +36,7 @@ const Supplier = () => {
   const toggleSupplierContent = () => {
     setActiveContent(activeContent === "purchasingDetails" ? null : "purchasingDetails"); // Toggle supplier content
   };
-
+*/}
 
   const toggleBankModel = () =>{
     if(activeContent === "bank"){
@@ -72,13 +71,14 @@ const Supplier = () => {
     }
   }
 
-  const togglerManageSupplierDueSummery = () => {
+  {/*const togglerManageSupplierDueSummery = () => {
     if(activeContent === "DueSummery"){
       setActiveContent(null);
     }else{
       setActiveContent("DueSummery");
     }
   }
+*/}
 
   const togglerManageSupplierPayment = () => {
     if(activeContent === "SupplierPayment"){
@@ -116,7 +116,7 @@ const Supplier = () => {
           <FontAwesomeIcon className="button-icon" icon={faShoppingBag} />
           Manage Bank
         </button>
-        <button onClick={togglePurchasingContent}>
+      {/*  <button onClick={togglePurchasingContent}>
           <FontAwesomeIcon className="button-icon" icon={faCodeFork} />
           Create New Purchase
         </button>
@@ -127,7 +127,7 @@ const Supplier = () => {
         <button onClick={togglerManageSupplierDueSummery}>
           <FontAwesomeIcon className="button-icon" icon={faSnowflake} />
           Due Summary
-        </button>
+        </button> */}
         <button id="removed-button" onClick={togglerManageSupplierDelete}>
           <FontAwesomeIcon className="button-icon" icon={faTrash} />
           Removed Suppliers

@@ -9,7 +9,7 @@ import ManageUser from "./ManageUser"; // Import the ManageUser component
 
 const UserManagement = () => {
   const location = useLocation(); // Access the location state
-  const { UserName, Store, Type, Email, LastLogin } = location.state || {}; // Destructure the passed state
+  const { UserName, Store, Email, LastLogin } = location.state || {}; // Destructure the passed state
 
   const [activeContent, setActiveContent] = useState(null); // Manage active content
   const [showAddUserModal, setShowAddUserModal] = useState(false); // Manage Add User Modal

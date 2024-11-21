@@ -5,11 +5,13 @@ import {
   faUserPlus,
   faClipboardList,
   faChartLine,
-  faTrash,
+  faCreditCard,
+  faAddressCard,
 } from "@fortawesome/free-solid-svg-icons";
 import "../css1/Customer.css"
 import AddCustomer from './AddCustomer';
 import ManageCustomer from "./ManageCustomer";
+import Creditsales from "./CreditSales";
 
 
 
@@ -52,6 +54,14 @@ const Customer = () => {
     }
   };
 
+  const toggleCreditCustomer = () => {
+    if (activeContent === "CreditSales") {
+      setActiveContent(null); // Hide report if already active
+    } else {
+      setActiveContent("CreditSales"); // Show report
+    }
+  };
+
   return (
     <div className="customer-panel">
       {/* Display user info */}
@@ -73,12 +83,16 @@ const Customer = () => {
           <FontAwesomeIcon className="button-icon" icon={faUserPlus} />
           Add Customer
         </button>
+        <button onClick={toggleCreditCustomer}>
+          <FontAwesomeIcon className="button-icon" icon={faAddressCard} />
+          Credit Sales
+        </button>
         <button onClick={toggleCustomerReport}>
           <FontAwesomeIcon className="button-icon" icon={faChartLine} />
           Customer Report
         </button>
         <button id="removed-button" onClick={toggleManageCustomerRemoved}>
-          <FontAwesomeIcon className="button-icon" icon={faTrash} />
+          <FontAwesomeIcon className="button-icon" icon={faCreditCard} />
           Removed Customers
         </button>
       </div>
@@ -87,6 +101,7 @@ const Customer = () => {
       <div className="customer-content">
         {activeContent === "addCustomer" && <AddCustomer UserName={UserName} store={Store} />}
         {activeContent === "manageCustomer" && <ManageCustomer UserName={UserName} store={Store} />}
+        {activeContent === "CreditSales" && <Creditsales UserName={UserName} store={Store} />}
       </div>
     </div>
   );
