@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import Swal from "sweetalert2";
-import debounce from "lodash.debounce";
 import "../css1/salesTable.css";
 import addCashImage from "../assets/icons/addCash.png"; // Import payment image
+import historyImage from "../assets/icons/history.png"; // Import history image
 
 const CreditSales = ({ store }) => {
   const [sales, setSales] = useState([]);
@@ -20,6 +20,11 @@ const CreditSales = ({ store }) => {
   const [modalData, setModalData] = useState(null);
   const [oldValues, setOldValues] = useState({});
   const [validationTimer, setValidationTimer] = useState(null); // Timer for debounced validation
+
+  // New state variables for payment history modal
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
 
   useEffect(() => {
     const fetchSales = async () => {
@@ -68,20 +73,19 @@ const CreditSales = ({ store }) => {
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredSales.slice(indexOfFirstRow, indexOfLastRow);
 
-  const handlePrevPage = () =>
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNextPage = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   const handleAddPaymentClick = (sale) => {
     setModalData({ ...sale });
     setInitialValues({
-      CashPay: sale.CashPay || 0,
-      CardPay: sale.CardPay || 0,
+      CashPay: parseFloat(sale.CashPay) || 0,
+      CardPay: parseFloat(sale.CardPay) || 0,
     });
     setOldValues({
-      CashPay: sale.CashPay || 0,
-      CardPay: sale.CardPay || 0,
+      CashPay: parseFloat(sale.CashPay) || 0,
+      CardPay: parseFloat(sale.CardPay) || 0,
     });
     setShowModal(true);
   };
@@ -93,7 +97,7 @@ const CreditSales = ({ store }) => {
 
   const validatePayment = (field, value) => {
     const initial = initialValues[field];
-    const grossTotal = modalData.GrossTotal || 0;
+    const grossTotal = parseFloat(modalData.GrossTotal) || 0;
     const otherField = field === "CashPay" ? "CardPay" : "CashPay";
     const otherValue = parseFloat(modalData[otherField]) || 0;
 
@@ -132,6 +136,7 @@ const CreditSales = ({ store }) => {
     const numericValue = value === "" ? 0 : parseFloat(value);
 
     clearTimeout(validationTimer);
+
     setModalData((prevData) => {
       const updatedData = { ...prevData, [field]: numericValue };
 
@@ -145,7 +150,7 @@ const CreditSales = ({ store }) => {
     });
 
     setValidationTimer(
-      setTimeout(() => validatePayment(field, numericValue), 1000)
+      setTimeout(() => validatePayment(field, numericValue), 500)
     );
 
     setOldValues((prevOldValues) => ({
@@ -157,7 +162,7 @@ const CreditSales = ({ store }) => {
   const handleUpdateModal = async (updatedData) => {
     try {
       const { invoiceId, CashPay, CardPay, Balance, CustomerId } = updatedData;
-  
+
       const response = await axios.put(
         `http://localhost:5000/api/customer/update_sale/${invoiceId}`,
         {
@@ -167,12 +172,12 @@ const CreditSales = ({ store }) => {
           customerId: CustomerId,
         }
       );
-  
+
       if (response.status === 200) {
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Sale updated successfully!",
+          text: response.data.message,
         });
         setSales((prevSales) =>
           prevSales.map((sale) =>
@@ -190,14 +195,84 @@ const CreditSales = ({ store }) => {
         });
       }
     } catch (error) {
+      console.error("Frontend Error:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "An error occurred while updating the sale.",
+        text: `An error occurred: ${
+          error.response?.data?.message || error.message
+        }`,
       });
     }
   };
-  
+
+  // New functions for handling payment history
+  const handleHistoryClick = async (invoiceId) => {
+    try {
+      setSelectedInvoiceId(invoiceId);
+      const response = await axios.get(
+        `http://localhost:5000/api/customer/payment_history/${invoiceId}`
+      );
+      setPaymentHistory(response.data);
+      setShowHistoryModal(true);
+    } catch (error) {
+      console.error("Error fetching payment history:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `Failed to fetch payment history: ${
+          error.response?.data?.message || error.message
+        }`,
+      });
+    }
+  };
+
+  const handleCloseHistoryModal = () => {
+    setShowHistoryModal(false);
+    setPaymentHistory([]);
+    setSelectedInvoiceId(null);
+  };
+
+  const handleDeletePayment = async (paymentId) => {
+    try {
+      const confirmResult = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this action!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+      });
+
+      if (confirmResult.isConfirmed) {
+        const response = await axios.delete(
+          `http://localhost:5000/api/customer/delete_payment/${paymentId}`
+        );
+
+        if (response.status === 200) {
+          Swal.fire("Deleted!", response.data.message, "success");
+          // Refresh payment history
+          setPaymentHistory((prevHistory) =>
+            prevHistory.filter((payment) => payment.id !== paymentId)
+          );
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to delete the payment.",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting payment:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `An error occurred: ${
+          error.response?.data?.message || error.message
+        }`,
+      });
+    }
+  };
 
   if (loading) return <p>Loading sales...</p>;
   if (error) return <p>{error}</p>;
@@ -254,7 +329,7 @@ const CreditSales = ({ store }) => {
             <th>Payment Type</th>
             <th>Balance</th>
             <th>Created At</th>
-            <th>Action</th>
+            <th>Actions</th> {/* Updated column header */}
           </tr>
         </thead>
         <tbody>
@@ -270,9 +345,7 @@ const CreditSales = ({ store }) => {
               <td>{sale.CardPay}</td>
               <td>{sale.PaymentType}</td>
               <td>{sale.Balance}</td>
-              <td>
-                {new Date(sale.createdAt).toLocaleDateString()}
-              </td>
+              <td>{new Date(sale.createdAt).toLocaleDateString()}</td>
               <td>
                 <button
                   className="icon-button"
@@ -280,12 +353,31 @@ const CreditSales = ({ store }) => {
                 >
                   <img src={addCashImage} alt="Add Cash" />
                 </button>
+                <button
+                  className="icon-button"
+                  onClick={() => handleHistoryClick(sale.invoiceId)}
+                >
+                  <img src={historyImage} alt="History" />
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
 
+      <div className="pagination">
+        <button onClick={handlePrevPage} disabled={currentPage === 1}>
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages || 1}
+        </span>
+        <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+          Next
+        </button>
+      </div>
+
+      {/* Payment Modal */}
       {showModal && modalData && (
         <div id="modal-overlay">
           <div id="modal-content">
@@ -306,6 +398,7 @@ const CreditSales = ({ store }) => {
               <label>Cash Pay:</label>
               <input
                 type="number"
+                step="0.01"
                 value={modalData.CashPay || 0}
                 onChange={(e) =>
                   handleModalInputChange("CashPay", e.target.value)
@@ -316,6 +409,7 @@ const CreditSales = ({ store }) => {
               <label>Card Pay:</label>
               <input
                 type="number"
+                step="0.01"
                 value={modalData.CardPay || 0}
                 onChange={(e) =>
                   handleModalInputChange("CardPay", e.target.value)
@@ -326,6 +420,7 @@ const CreditSales = ({ store }) => {
               <label>Balance:</label>
               <input
                 type="number"
+                step="0.01"
                 value={modalData.Balance || 0}
                 readOnly
               />
@@ -339,10 +434,72 @@ const CreditSales = ({ store }) => {
           </div>
         </div>
       )}
+
+      {/* Payment History Modal */}
+      {showHistoryModal && (
+        <div id="modal-overlay-credit-Table">
+          <div id="modal-content-credit-Table">
+            <h3 id="modal-title">
+              Payment History for Invoice {selectedInvoiceId}
+            </h3>
+            {paymentHistory.length > 0 ? (
+              <div className="table-container-credit-Table">
+                <table className="history-table-credit-Table">
+                  <thead>
+                    <tr>
+                      <th>Payment ID</th>
+                      <th>Invoice ID</th>
+                      <th>CustomerId</th>
+                      <th>Cash Payment</th>
+                      <th>Card Payment</th>
+                      <th>Total Payment</th>
+                      <th>Payment Date</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paymentHistory.map((payment) => (
+                      <tr key={payment.id}>
+                        <td>{payment.id}</td>
+                        <td>{payment.invoiceId}</td>
+                        <td>{payment.customerId}</td>
+                        <td>{payment.cashPayment}</td>
+                        <td>{payment.cardPayment}</td>
+                        <td>{payment.totalPayment}</td>
+                        <td>
+                          {new Date(payment.saveTime).toLocaleDateString()}{" "}
+                          {new Date(payment.saveTime).toLocaleTimeString()}
+                        </td>
+                        <td>
+                          <button
+                            className="delete-button-credit-Table"
+                            onClick={() => handleDeletePayment(payment.id)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p>No payment history found for this invoice.</p>
+            )}
+            <div id="modal-buttons-credit-Table">
+              <button
+                id="close-buttob-credit-table"
+                onClick={handleCloseHistoryModal}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 
 CreditSales.propTypes = {
   store: PropTypes.string.isRequired,

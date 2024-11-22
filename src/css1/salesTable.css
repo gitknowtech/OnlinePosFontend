@@ -109,6 +109,91 @@
   margin: 20px;
 }
 
+/* Add to your CSS file (e.g., salesTable.css) */
+
+/* Container to make the table scrollable */
+.table-container-credit-Table {
+  max-height: 400px; /* Set the desired max height */
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+/* Adjust the modal content to be scrollable if needed */
+#modal-content-credit-Table {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1200px;
+  position: relative;
+  max-height: 90vh; /* Ensure modal doesn't exceed viewport height */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Rest of your CSS */
+.history-table-credit-Table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.history-table-credit-Table th,
+.history-table-credit-Table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.history-table-credit-Table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.delete-button-credit-Table {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.delete-button-credit-Table:hover {
+  background-color: #ff1a1a;
+}
+
+#close-buttob-credit-table {
+  background-color: #f57777;
+  padding: 8px 15px;
+  font-size: 12px;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+#close-buttob-credit-table:hover {
+  background-color: #850707;
+  font-weight: 600;
+  color: #fff;
+  transition: 0.3s ease-in-out;
+}
+
+#modal-overlay-credit-Table {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#modal-buttons-credit-Table {
+  margin-top: auto;
+  text-align: right;
+}
+
   
   /* Responsive Design */
   @media (max-width: 768px) {
