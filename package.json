@@ -16,6 +16,7 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "boxicons": "^2.1.4",
+    "chart.js": "^4.4.6",
     "fa": "^1.0.1",
     "lodash.debounce": "^4.0.8",
     "mathjs": "^13.2.0",

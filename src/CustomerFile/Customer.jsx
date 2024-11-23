@@ -12,6 +12,7 @@ import "../css1/Customer.css"
 import AddCustomer from './AddCustomer';
 import ManageCustomer from "./ManageCustomer";
 import Creditsales from "./CreditSales";
+import CustomerReport from './CustomerReport';
 
 
 
@@ -46,19 +47,19 @@ const Customer = () => {
     }
   };
 
-  const toggleCustomerReport = () => {
-    if (activeContent === "customerReport") {
-      setActiveContent(null); // Hide report if already active
-    } else {
-      setActiveContent("customerReport"); // Show report
-    }
-  };
-
   const toggleCreditCustomer = () => {
     if (activeContent === "CreditSales") {
       setActiveContent(null); // Hide report if already active
     } else {
       setActiveContent("CreditSales"); // Show report
+    }
+  };
+
+  const toggleReportCustomer = () => {
+    if (activeContent === "CustomerReport") {
+      setActiveContent(null); // Hide report if already active
+    } else {
+      setActiveContent("CustomerReport"); // Show report
     }
   };
 
@@ -87,7 +88,7 @@ const Customer = () => {
           <FontAwesomeIcon className="button-icon" icon={faAddressCard} />
           Credit Sales
         </button>
-        <button onClick={toggleCustomerReport}>
+        <button onClick={toggleReportCustomer}>
           <FontAwesomeIcon className="button-icon" icon={faChartLine} />
           Customer Report
         </button>
@@ -102,6 +103,7 @@ const Customer = () => {
         {activeContent === "addCustomer" && <AddCustomer UserName={UserName} store={Store} />}
         {activeContent === "manageCustomer" && <ManageCustomer UserName={UserName} store={Store} />}
         {activeContent === "CreditSales" && <Creditsales UserName={UserName} store={Store} />}
+        {activeContent === "CustomerReport" && <CustomerReport UserName={UserName} store={Store} />}
       </div>
     </div>
   );

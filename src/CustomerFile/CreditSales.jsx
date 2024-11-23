@@ -48,6 +48,27 @@ const CreditSales = ({ store }) => {
     fetchSales();
   }, [store]);
 
+
+
+  const fetchSales = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/invoices/fetch_sales_new",
+        {
+          params: { Store: store },
+        }
+      );
+      setSales(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError(
+        `Failed to load sales: ${err.response?.data?.message || err.message}`
+      );
+      setLoading(false);
+    }
+  };
+  
+
   const isDateInRange = (saleDate, start, end) => {
     const sale = new Date(saleDate).setHours(0, 0, 0, 0);
     if (!start && !end) return true;
@@ -159,33 +180,60 @@ const CreditSales = ({ store }) => {
     }));
   };
 
+  
+  
+  
+  
+  
   const handleUpdateModal = async (updatedData) => {
     try {
       const { invoiceId, CashPay, CardPay, Balance, CustomerId } = updatedData;
-
+  
+      // Ensure balance is passed as a negative value if not zero
+      const formattedBalance =
+        parseFloat(Balance) !== 0 ? -Math.abs(parseFloat(Balance)) : 0;
+  
+      // Determine PaymentType
+      let paymentType = "Unknown";
+      if (parseFloat(CashPay) > 0 && parseFloat(CardPay) > 0) {
+        paymentType = "Cash and Card Payment";
+      } else if (parseFloat(CashPay) > 0) {
+        paymentType = "Cash Payment";
+      } else if (parseFloat(CardPay) > 0) {
+        paymentType = "Card Payment";
+      }
+  
       const response = await axios.put(
         `http://localhost:5000/api/customer/update_sale/${invoiceId}`,
         {
           CashPay: parseFloat(CashPay) || 0,
           CardPay: parseFloat(CardPay) || 0,
-          Balance: parseFloat(Balance) || 0,
+          Balance: formattedBalance,
           customerId: CustomerId,
         }
       );
-
+  
       if (response.status === 200) {
         Swal.fire({
           icon: "success",
           title: "Success",
           text: response.data.message,
         });
+  
         setSales((prevSales) =>
           prevSales.map((sale) =>
             sale.invoiceId === invoiceId
-              ? { ...sale, CashPay, CardPay, Balance }
+              ? {
+                  ...sale,
+                  CashPay,
+                  CardPay,
+                  Balance: formattedBalance,
+                  PaymentType: paymentType, // Update PaymentType
+                }
               : sale
           )
         );
+  
         handleCloseModal();
       } else {
         Swal.fire({
@@ -206,6 +254,11 @@ const CreditSales = ({ store }) => {
     }
   };
 
+  
+
+
+  
+  
   // New functions for handling payment history
   const handleHistoryClick = async (invoiceId) => {
     try {
@@ -234,45 +287,55 @@ const CreditSales = ({ store }) => {
   };
 
   const handleDeletePayment = async (paymentId) => {
-    try {
-      const confirmResult = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this action!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-      });
+  try {
+    const confirmResult = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action will delete the payment and update the sales record.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+    });
 
-      if (confirmResult.isConfirmed) {
-        const response = await axios.delete(
-          `http://localhost:5000/api/customer/delete_payment/${paymentId}`
+    if (confirmResult.isConfirmed) {
+      const response = await axios.delete(
+        `http://localhost:5000/api/customer/delete_payment/${paymentId}`
+      );
+
+      if (response.status === 200) {
+        await Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: response.data.message,
+        });
+
+        // Refresh payment history
+        setPaymentHistory((prevHistory) =>
+          prevHistory.filter((payment) => payment.id !== paymentId)
         );
 
-        if (response.status === 200) {
-          Swal.fire("Deleted!", response.data.message, "success");
-          // Refresh payment history
-          setPaymentHistory((prevHistory) =>
-            prevHistory.filter((payment) => payment.id !== paymentId)
-          );
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to delete the payment.",
-          });
-        }
+        // Refresh the sales table
+        fetchSales(); // Call the fetchSales function here to refresh the table
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to delete the payment.",
+        });
       }
-    } catch (error) {
-      console.error("Error deleting payment:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: `An error occurred: ${
-          error.response?.data?.message || error.message
-        }`,
-      });
     }
-  };
+  } catch (error) {
+    console.error("Error deleting payment:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: `An error occurred: ${
+        error.response?.data?.message || error.message
+      }`,
+    });
+  }
+};
+
+  
 
   if (loading) return <p>Loading sales...</p>;
   if (error) return <p>{error}</p>;
