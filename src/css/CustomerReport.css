@@ -1,61 +1,68 @@
+/* General Styles */
 #container-customer-report {
-    padding: 20px;
-    background-color: #b8c2fd;
-    min-height: 900px;
-    font-family: Arial, sans-serif;
-  }
-  
-  #title-customer-report {
-    text-align: center;
-    font-size: 24px;
-    color: #333;
-  }
-  
-  #search-container-customer-report {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  
-  #search-box-customer-report {
-    width: 250px;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  #start-date,
-  #end-date {
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  #search-button-customer-report {
-    padding: 10px 15px;
-    font-size: 14px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  #search-button-customer-report:hover {
-    background-color: #218838;
-  }
-  
-  #chart-container-customer-report {
-    margin: 20px auto;
-    width: 80%;
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
+  padding: 20px;
+  background-color: #b8c2fd;
+  min-height: 900px;
+  font-family: Arial, sans-serif;
+}
+
+#title-customer-report,
+#title-loan-payment-report {
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Search Containers */
+#search-container-customer-report,
+#search-container-loan-report {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Input Fields */
+#search-box-customer-report,
+#invoice-search,
+#start-date-customer-report,
+#end-date-customer-report,
+#payment-start-date-customer-report,
+#payment-end-date-customer-report {
+  width: 250px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Buttons */
+#search-button-customer-report,
+#search-button-loan-report {
+  padding: 10px 15px;
+  font-size: 14px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#search-button-customer-report:hover,
+#search-button-loan-report:hover {
+  background-color: #218838;
+}
+
+/* Charts */
+#chart-container-customer-report,
+#chart-container-loan-report {
+  margin: 20px auto;
+  width: 80%;
+  cursor: pointer;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}

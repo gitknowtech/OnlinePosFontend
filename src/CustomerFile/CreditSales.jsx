@@ -286,55 +286,56 @@ const CreditSales = ({ store }) => {
     setSelectedInvoiceId(null);
   };
 
+  
   const handleDeletePayment = async (paymentId) => {
-  try {
-    const confirmResult = await Swal.fire({
-      title: "Are you sure?",
-      text: "This action will delete the payment and update the sales record.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-    });
-
-    if (confirmResult.isConfirmed) {
-      const response = await axios.delete(
-        `http://localhost:5000/api/customer/delete_payment/${paymentId}`
-      );
-
-      if (response.status === 200) {
-        await Swal.fire({
-          icon: "success",
-          title: "Deleted!",
-          text: response.data.message,
-        });
-
-        // Refresh payment history
-        setPaymentHistory((prevHistory) =>
-          prevHistory.filter((payment) => payment.id !== paymentId)
+    try {
+      const confirmResult = await Swal.fire({
+        title: "Are you sure?",
+        text: "This action will delete the payment and update the sales record.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+      });
+  
+      if (confirmResult.isConfirmed) {
+        const response = await axios.delete(
+          `http://localhost:5000/api/customer/delete_payment/${paymentId}`
         );
-
-        // Refresh the sales table
-        fetchSales(); // Call the fetchSales function here to refresh the table
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Failed to delete the payment.",
-        });
+  
+        if (response.status === 200) {
+          await Swal.fire({
+            icon: "success",
+            title: "Deleted!",
+            text: response.data.message,
+          });
+  
+          // Refresh payment history
+          setPaymentHistory((prevHistory) =>
+            prevHistory.filter((payment) => payment.id !== paymentId)
+          );
+  
+          // Refresh the sales table
+          fetchSales(); // Refresh the sales table to reflect changes
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to delete the payment.",
+          });
+        }
       }
+    } catch (error) {
+      console.error("Error deleting payment:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `An error occurred: ${
+          error.response?.data?.message || error.message
+        }`,
+      });
     }
-  } catch (error) {
-    console.error("Error deleting payment:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: `An error occurred: ${
-        error.response?.data?.message || error.message
-      }`,
-    });
-  }
-};
-
+  };
+  
   
 
   if (loading) return <p>Loading sales...</p>;
@@ -489,8 +490,8 @@ const CreditSales = ({ store }) => {
               />
             </div>
             <div id="modal-buttons">
-              <button onClick={handleCloseModal}>Close</button>
-              <button onClick={() => handleUpdateModal(modalData)}>
+              <button  onClick={handleCloseModal}>Close</button>
+              <button style={{backgroundColor:"blue"}} onClick={() => handleUpdateModal(modalData)}>
                 Update
               </button>
             </div>
