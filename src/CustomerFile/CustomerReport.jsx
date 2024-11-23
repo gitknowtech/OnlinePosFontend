@@ -132,32 +132,40 @@ const CustomerReport = () => {
     const ctx = document
       .getElementById("customer-loan-chart")
       .getContext("2d");
-
+  
     const labels = payments.map(
       (payment) =>
         `${payment.invoiceId} (${new Date(payment.saveTime).toLocaleDateString()})`
     );
-    const data = payments.map((payment) => payment.totalPayment);
-
+    const cashData = payments.map((payment) => payment.cashPayment);
+    const cardData = payments.map((payment) => payment.cardPayment);
+  
     if (loanChartInstance) loanChartInstance.destroy();
-
+  
     const newLoanChartInstance = new Chart(ctx, {
       type: "bar",
       data: {
         labels,
         datasets: [
           {
-            label: "Loan Payments",
-            data,
+            label: "Cash Payment",
+            data: cashData,
+            backgroundColor: "rgba(75, 192, 192, 0.5)",
+            borderColor: "rgba(75, 192, 192, 1)",
+          },
+          {
+            label: "Card Payment",
+            data: cardData,
             backgroundColor: "rgba(54, 162, 235, 0.5)",
             borderColor: "rgba(54, 162, 235, 1)",
           },
         ],
       },
     });
-
+  
     setLoanChartInstance(newLoanChartInstance);
   };
+  
 
   // Function to clear a chart
   const clearChart = (chart) => {

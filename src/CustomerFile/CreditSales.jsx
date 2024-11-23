@@ -153,32 +153,52 @@ const CreditSales = ({ store }) => {
     return true;
   };
 
+
+    // Calculate totals for filtered data
+    const totalNetAmount = filteredSales.reduce(
+      (total, sale) => total + (parseFloat(sale.netAmount) || 0),
+      0
+    );
+    const totalLoanAmount = filteredSales.reduce(
+      (total, sale) => total + (parseFloat(sale.Balance) || 0),
+      0
+    );
+    const totalCashAmount = filteredSales.reduce(
+      (total, sale) => total + (parseFloat(sale.CashPay) || 0),
+      0
+    );
+    const totalCardAmount = filteredSales.reduce(
+      (total, sale) => total + (parseFloat(sale.CardPay) || 0),
+      0
+    );
+
+  
   const handleModalInputChange = (field, value) => {
     const numericValue = value === "" ? 0 : parseFloat(value);
-
-    clearTimeout(validationTimer);
-
+  
     setModalData((prevData) => {
       const updatedData = { ...prevData, [field]: numericValue };
-
+  
       const cashPay = parseFloat(updatedData.CashPay) || 0;
       const cardPay = parseFloat(updatedData.CardPay) || 0;
       const grossTotal = parseFloat(updatedData.GrossTotal) || 0;
-
+  
       updatedData.Balance = (grossTotal - (cashPay + cardPay)).toFixed(2);
-
+  
+      // Ensure balance is not negative
+      if (updatedData.Balance < 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Balance",
+          text: "Balance cannot be negative.",
+        });
+        updatedData.Balance = prevData.Balance; // Revert to previous balance
+      }
+  
       return updatedData;
     });
-
-    setValidationTimer(
-      setTimeout(() => validatePayment(field, numericValue), 500)
-    );
-
-    setOldValues((prevOldValues) => ({
-      ...prevOldValues,
-      [field]: numericValue,
-    }));
   };
+  
 
   
   
@@ -286,56 +306,55 @@ const CreditSales = ({ store }) => {
     setSelectedInvoiceId(null);
   };
 
-  
   const handleDeletePayment = async (paymentId) => {
-    try {
-      const confirmResult = await Swal.fire({
-        title: "Are you sure?",
-        text: "This action will delete the payment and update the sales record.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-      });
-  
-      if (confirmResult.isConfirmed) {
-        const response = await axios.delete(
-          `http://localhost:5000/api/customer/delete_payment/${paymentId}`
+  try {
+    const confirmResult = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action will delete the payment and update the sales record.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (confirmResult.isConfirmed) {
+      const response = await axios.delete(
+        `http://localhost:5000/api/customer/delete_payment/${paymentId}`
+      );
+
+      if (response.status === 200) {
+        await Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: response.data.message,
+        });
+
+        // Refresh payment history
+        setPaymentHistory((prevHistory) =>
+          prevHistory.filter((payment) => payment.id !== paymentId)
         );
-  
-        if (response.status === 200) {
-          await Swal.fire({
-            icon: "success",
-            title: "Deleted!",
-            text: response.data.message,
-          });
-  
-          // Refresh payment history
-          setPaymentHistory((prevHistory) =>
-            prevHistory.filter((payment) => payment.id !== paymentId)
-          );
-  
-          // Refresh the sales table
-          fetchSales(); // Refresh the sales table to reflect changes
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to delete the payment.",
-          });
-        }
+
+        // Refresh the sales table
+        fetchSales(); // Call the fetchSales function here to refresh the table
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to delete the payment.",
+        });
       }
-    } catch (error) {
-      console.error("Error deleting payment:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: `An error occurred: ${
-          error.response?.data?.message || error.message
-        }`,
-      });
     }
-  };
-  
+  } catch (error) {
+    console.error("Error deleting payment:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: `An error occurred: ${
+        error.response?.data?.message || error.message
+      }`,
+    });
+  }
+};
+
   
 
   if (loading) return <p>Loading sales...</p>;
@@ -441,6 +460,28 @@ const CreditSales = ({ store }) => {
         </button>
       </div>
 
+       {/* Summary Table */}
+      <div className="summary-container-credit-sales">
+        <table className="summary-table-credit-sales">
+          <thead>
+            <tr>
+              <th>Total Net Amount</th>
+              <th>Total Loan Amount</th>
+              <th>Total Cash Amount</th>
+              <th>Total Card Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{totalNetAmount.toFixed(2)}</td>
+              <td>{totalLoanAmount.toFixed(2)}</td>
+              <td>{totalCashAmount.toFixed(2)}</td>
+              <td>{totalCardAmount.toFixed(2)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       {/* Payment Modal */}
       {showModal && modalData && (
         <div id="modal-overlay">
@@ -489,9 +530,9 @@ const CreditSales = ({ store }) => {
                 readOnly
               />
             </div>
-            <div id="modal-buttons">
-              <button  onClick={handleCloseModal}>Close</button>
-              <button style={{backgroundColor:"blue"}} onClick={() => handleUpdateModal(modalData)}>
+            <div id="modal-buttons-credit-sales">
+              <button id="close-button-credit-sale-payment" onClick={handleCloseModal}>Close</button>
+              <button id="update-button-credit-sale-payment" onClick={() => handleUpdateModal(modalData)}>
                 Update
               </button>
             </div>

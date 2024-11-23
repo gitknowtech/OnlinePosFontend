@@ -194,6 +194,77 @@
   text-align: right;
 }
 
+
+#close-button-credit-sale-payment{
+  margin-right: 20px;
+  background-color: #f37676;
+  color: #000;
+  font-size: 12px;
+  border: 1px solid #000;
+}
+
+#close-button-credit-sale-payment:hover{
+  margin-right: 20px;
+  background-color: #910c0c;
+  color: #fff;
+  transition: 0.3s ease-in-out;
+  border: 1px solid #000;
+}
+
+
+#update-button-credit-sale-payment{
+  margin-right: 20px;
+  background-color: #8cf194;
+  color: #000;
+  font-size: 12px;
+  border: 1px solid #000;
+}
+
+#update-button-credit-sale-payment:hover{
+  margin-right: 20px;
+  background-color: #088538;
+  color: #fff;
+  transition: 0.3s ease-in-out;
+  border: 1px solid #000;
+}
+
+
+.summary-container-credit-sales {
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.summary-table-credit-sales {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.summary-table-credit-sales th,
+.summary-table-credit-sales td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.summary-table-credit-sales th {
+  background-color: #d6d5d5;
+}
+
+.summary-table-credit-sales td {
+  font-size: 16px;
+  font-weight: 1000;
+}
+
+
+
+
+
+
+
   
   /* Responsive Design */
   @media (max-width: 768px) {
