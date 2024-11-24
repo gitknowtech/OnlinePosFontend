@@ -9,8 +9,9 @@ import ExpensesModel from "../models/ExpensesModel";
 import "../css1/invoice.css";
 import PaymentModel from "./PaymentModel";
 import Calculator from "../models/Calculator";
-import TodaySales from "./TodaySales"
+import TodaySales from "./TodaySales";
 import TodayIssueBillCheck from "./TodayIssueBillCheck";
+import CustomerPaymentModel from "../Invoice/CustomePaymentModel";
 
 // Ensure these image paths are correct in your project structure
 import productimage from "../assets/images/products.png";
@@ -55,11 +56,12 @@ export default function Invoice() {
     field: null,
   });
   const [percentage, setPercentage] = useState(""); // State for percentage input
+  const [isCustomerPaymentModalOpen, setIsCustomerPaymentModalOpen] =
+    useState(false);
 
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
   const barcodeInputRef = useRef(null);
-
 
   const [isTodaySalesOpen, setIsTodaySalesOpen] = useState(false); // State for modal
 
@@ -67,7 +69,8 @@ export default function Invoice() {
     setIsTodaySalesOpen(true);
   };
 
-  const [isTodayIssueBillCheckOpen, setIsTodayIssueBillCheckOpen] = useState(false); // State for the modal
+  const [isTodayIssueBillCheckOpen, setIsTodayIssueBillCheckOpen] =
+    useState(false); // State for the modal
 
   const handleTodayIssueBillCheckClick = () => {
     setIsTodayIssueBillCheckOpen(true);
@@ -79,6 +82,14 @@ export default function Invoice() {
 
   const handleCloseTodaySales = () => {
     setIsTodaySalesOpen(false);
+  };
+
+  const handleOpenCustomerPaymentModal = () => {
+    setIsCustomerPaymentModalOpen(true);
+  };
+
+  const handleCloseCustomerPaymentModal = () => {
+    setIsCustomerPaymentModalOpen(false);
   };
 
   // OtherItem model related contents
@@ -235,12 +246,6 @@ export default function Invoice() {
     };
   }, [isWholesale, isDiscount]); // Add dependencies to keep the hook up-to-date
 
-
-
-
-
-
-
   const handleAddOtherItem = (item) => {
     const { productName, productCost, productMRP, productRate, qty, discount } =
       item;
@@ -262,22 +267,15 @@ export default function Invoice() {
     setIsOtherItemModalOpen(false); // Close the modal after adding the item
   };
 
-
-
-
   // Function to handle when the "Return" button is clicked
   const handleReturnClick = () => {
     console.log("Return button clicked"); // Debugging log
     setIsReturnModalOpen(true);
   };
 
-
-
   const handleCloseReturnModal = () => {
     setIsReturnModalOpen(false);
   };
-
-
 
   const handleAddReturnItem = (item) => {
     // Adjust the data to have negative values
@@ -303,8 +301,6 @@ export default function Invoice() {
     setIsReturnModalOpen(false);
   };
 
-
-
   const handleQuantityChange = (e, index) => {
     const newQuantity = e.target.value;
     setTableData((prevData) => {
@@ -314,8 +310,6 @@ export default function Invoice() {
     });
   };
 
-
-
   const clearInvoiceTable = () => {
     setTableData([]); // Clears the table data
     setTotalAmount("0.00");
@@ -324,8 +318,6 @@ export default function Invoice() {
     setItemCount(0);
   };
 
-
-
   const handleQuantityEditEnterKeyPress = async (e, index) => {
     if (e.key === "Enter") {
       const updatedQuantity = parseFloat(tableData[index].quantity);
@@ -333,13 +325,13 @@ export default function Invoice() {
       const productId = tableData[index].productId; // Retrieve productId from row data
       const productName = tableData[index].name;
       const rate = parseFloat(tableData[index].rate);
-  
+
       // Save the old values before proceeding
       const previousQuantity =
         tableData[index].previousQuantity || tableData[index].quantity;
       const previousAmount =
         tableData[index].previousAmount || tableData[index].amount;
-  
+
       // Validate quantity
       if (isNaN(updatedQuantity)) {
         Swal.fire(
@@ -349,12 +341,12 @@ export default function Invoice() {
         );
         return;
       }
-  
+
       // If the rate is negative, assume it's a return and skip stock checking
       if (rate < 0) {
         // Calculate the amount with positive quantity first
         const positiveAmount = rate * Math.abs(updatedQuantity);
-  
+
         // Ensure both quantity and amount are negative
         setTableData((prevData) => {
           const newData = [...prevData];
@@ -365,12 +357,12 @@ export default function Invoice() {
           };
           return newData;
         });
-  
+
         // Exit editing mode
         setEditingCell({ rowIndex: null, field: null });
         return; // Skip further checks
       }
-  
+
       // For non-negative rates, proceed with stock checking
       try {
         // Fetch available stock for the product
@@ -378,7 +370,7 @@ export default function Invoice() {
           `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
         );
         const availableStock = response.data.stockQuantity;
-  
+
         // Calculate the total quantity across all rows for the same productId
         const totalQuantityInTable = tableData
           .filter((item) => item.productId === productId)
@@ -388,10 +380,10 @@ export default function Invoice() {
             }
             return total + parseFloat(item.quantity);
           }, 0);
-  
+
         // Total quantity after updating the current row
         const totalQuantity = totalQuantityInTable + updatedQuantity;
-  
+
         // Check if the total quantity exceeds the available stock
         if (totalQuantity > availableStock) {
           Swal.fire(
@@ -409,16 +401,16 @@ export default function Invoice() {
               };
               return newData;
             });
-  
+
             // Exit editing mode
             setEditingCell({ rowIndex: null, field: null });
           });
           return;
         }
-  
+
         // Calculate the new amount
         const newAmount = rate * updatedQuantity;
-  
+
         // Update the quantity and amount
         setTableData((prevData) => {
           const newData = [...prevData];
@@ -431,7 +423,7 @@ export default function Invoice() {
           };
           return newData;
         });
-  
+
         // Exit editing mode
         setEditingCell({ rowIndex: null, field: null });
       } catch (error) {
@@ -440,26 +432,25 @@ export default function Invoice() {
       }
     }
   };
-  
-
-
-
-
 
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
-  
+
     if (input.length > 1) {
       try {
         const response = await axios.get(
           `http://localhost:5000/api/products/search_invoice_by_store?query=${input}&store=${store}`
         );
-  
+
         const products = response.data;
-  
+
         if (products.length === 0) {
-          Swal.fire("Not Found", "No products found for this barcode.", "warning");
+          Swal.fire(
+            "Not Found",
+            "No products found for this barcode.",
+            "warning"
+          );
         } else {
           setSuggestions(products);
         }
@@ -471,14 +462,10 @@ export default function Invoice() {
       setSuggestions([]);
     }
   };
-  
-
 
   const handlePercentageChange = (value) => {
     setPercentage(value);
   };
-
-
 
   const handlePercentageEnter = () => {
     const enteredPercentage = parseFloat(percentage);
@@ -499,8 +486,6 @@ export default function Invoice() {
     qtyInputRef.current.focus(); // Move focus to the quantity input
   };
 
-
-
   const handlePriceEnter = () => {
     const enteredPrice = parseFloat(price);
     const originalPrice = parseFloat(suggestedPrice);
@@ -520,14 +505,12 @@ export default function Invoice() {
     qtyInputRef.current.focus();
   };
 
-
-
   const handleBarcodeEnter = async () => {
     try {
       const response = await axios.get(
         `http://localhost:5000/api/products/search_by_barcode?query=${barcode}`
       );
-  
+
       if (response.data.length > 0) {
         const product = response.data[0];
         setBarcode(product.barcode);
@@ -535,7 +518,7 @@ export default function Invoice() {
         setSuggestedPrice(product.mrpPrice);
         setProductId(product.productId); // Save productId to state
         setBarcode(product.barcode);
-  
+
         // Set the default price but allow user to edit
         if (isWholesale) {
           setPrice(product.wholesalePrice);
@@ -544,24 +527,24 @@ export default function Invoice() {
         } else {
           setPrice(product.mrpPrice);
         }
-  
+
         setTableData((prevData) => {
           const existingIndex = prevData.findIndex(
             (item) => item.barcode === product.barcode
           );
-  
+
           if (existingIndex !== -1) {
             const existingItem = prevData[existingIndex];
             const updatedQuantity = parseFloat(existingItem.quantity) + 1;
             const updatedAmount =
               updatedQuantity * parseFloat(existingItem.rate);
-  
+
             const updatedItem = {
               ...existingItem,
               quantity: updatedQuantity.toFixed(2),
               amount: updatedAmount.toFixed(2),
             };
-  
+
             const updatedData = [...prevData];
             updatedData[existingIndex] = updatedItem;
             return updatedData;
@@ -582,7 +565,7 @@ export default function Invoice() {
             ];
           }
         });
-  
+
         setSuggestions([]);
         // Focus on price input to allow editing
         priceInputRef.current.focus();
@@ -597,43 +580,37 @@ export default function Invoice() {
       Swal.fire("Error", "Failed to fetch product by barcode", error.message);
     }
   };
-  
-
-
-
-
-
 
   const handleQtyEnter = async () => {
     if (!qty || isNaN(parseFloat(qty)) || parseFloat(qty) <= 0) {
       Swal.fire("Invalid Quantity", "Please enter a valid quantity.", "error");
       return;
     }
-  
+
     const requestedQuantity = parseFloat(qty);
     const enteredPrice = parseFloat(price);
-  
+
     if (!enteredPrice || enteredPrice <= 0) {
       Swal.fire("Invalid Price", "Please enter a valid price.", "error");
       return;
     }
-  
+
     try {
       // Fetch available stock for the product
       const response = await axios.get(
         `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
       );
-  
+
       const availableQuantity = response.data.stockQuantity;
-  
+
       // Calculate the total quantity for the same product ID across all rows
       const existingQuantity = tableData
         .filter((item) => item.productId === productId)
         .reduce((total, item) => total + parseFloat(item.quantity), 0);
-  
+
       // Total quantity after adding the new requested quantity
       const totalQuantity = existingQuantity + requestedQuantity;
-  
+
       // Check if the total quantity exceeds available stock
       if (totalQuantity > availableQuantity) {
         Swal.fire(
@@ -643,7 +620,7 @@ export default function Invoice() {
         );
         return;
       }
-  
+
       // Add a new row with the requested quantity
       setTableData((prevData) => [
         ...prevData,
@@ -660,7 +637,7 @@ export default function Invoice() {
           type: "new",
         },
       ]);
-  
+
       // Clear input fields after adding item
       setProductName("");
       setBarcode("");
@@ -674,14 +651,10 @@ export default function Invoice() {
       console.error("Error checking stock:", error);
     }
   };
-  
-
 
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
-
-
 
   const calculateTotals = () => {
     // Filter out items with negative discount or quantity
@@ -711,8 +684,6 @@ export default function Invoice() {
     setItemCount(validItems.length);
   };
 
-
-
   const handleVirtualEnter = () => {
     if (document.activeElement === barcodeInputRef.current) {
       handleBarcodeEnter();
@@ -723,8 +694,6 @@ export default function Invoice() {
     }
   };
 
-
-  
   const handleCheckboxChange = (type) => {
     if (type === "wholesale") {
       setIsWholesale(!isWholesale);
@@ -743,7 +712,7 @@ export default function Invoice() {
     setLockedPrice(suggestion.lockedPrice);
     setProductName(suggestion.productName);
     setSuggestedPrice(suggestion.mrpPrice);
-  
+
     // Determine the default price based on conditions
     if (isWholesale) {
       setPrice(suggestion.wholesalePrice);
@@ -752,10 +721,10 @@ export default function Invoice() {
     } else {
       setPrice(suggestion.mrpPrice);
     }
-  
+
     // Clear the suggestions dropdown
     setSuggestions([]);
-  
+
     // Refocus the price input field reliably
     setTimeout(() => {
       if (priceInputRef.current) {
@@ -764,8 +733,6 @@ export default function Invoice() {
       }
     }, 100); // Delay ensures focus works even after state updates
   };
-  
-
 
   const handleNumericInput = (value) => {
     if (document.activeElement) {
@@ -1215,13 +1182,14 @@ export default function Invoice() {
             />
             Quotation List
           </button>
-          <button>
+          <button onClick={handleOpenCustomerPaymentModal}>
             <img
               src={customer}
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
             Customer Balance
           </button>
+
           <button onClick={handleTodayIssueBillCheckClick}>
             <img
               src={bill}
@@ -1293,19 +1261,24 @@ export default function Invoice() {
 
         <Calculator show={isCalculatorOpen} onClose={handleCloseCalculator} />
 
-         {/* Include the TodaySales modal */}
-      <TodaySales
-        show={isTodaySalesOpen}
-        onClose={handleCloseTodaySales}
-        store={store} // Pass the store prop
-      />
+        {/* Include the TodaySales modal */}
+        <TodaySales
+          show={isTodaySalesOpen}
+          onClose={handleCloseTodaySales}
+          store={store} // Pass the store prop
+        />
 
-      {/* Include the TodayIssueBillCheck modal */}
-      <TodayIssueBillCheck
-        show={isTodayIssueBillCheckOpen}
-        onClose={handleCloseTodayIssueBillCheck}
-        store={store} // Pass the store prop
-      />
+        {/* Include the TodayIssueBillCheck modal */}
+        <TodayIssueBillCheck
+          show={isTodayIssueBillCheckOpen}
+          onClose={handleCloseTodayIssueBillCheck}
+          store={store} // Pass the store prop
+        />
+
+        <CustomerPaymentModel
+          show={isCustomerPaymentModalOpen}
+          onClose={handleCloseCustomerPaymentModal}
+        />
       </div>
     </div>
   );

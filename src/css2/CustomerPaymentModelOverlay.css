@@ -1,0 +1,120 @@
+/* General modal styling */
+.custom-modal-customer-Balance-Paayment {
+    width: 500px;
+    margin: auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+    position: relative;
+  }
+  
+  .custom-overlay-customer-Balance-Paayment {
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+  
+  /* Header styling */
+  #header-customer-Balance-Paayment {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+  }
+  
+  /* Search box container */
+  #search-container-customer-Balance-Paayment {
+    margin-bottom: 20px;
+  }
+  
+  #search-container-customer-Balance-Paayment label {
+    display: block;
+    font-size: 1em;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  
+  #search-input-customer-Balance-Paayment {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  #search-input-customer-Balance-Paayment:focus {
+    border-color: #007bff;
+  }
+  
+  /* Suggestions list styling */
+  #suggestions-customer-Balance-Paayment {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-top: 5px;
+  }
+  
+  #suggestions-customer-Balance-Paayment li {
+    padding: 10px;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  #suggestions-customer-Balance-Paayment li:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Customer details section */
+  #customer-details-customer-Balance-Paayment {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  #customer-details-customer-Balance-Paayment p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #333;
+  }
+  
+  #customer-details-customer-Balance-Paayment strong {
+    color: #555;
+  }
+  
+  /* Balance styling */
+  #balance-amount-customer-Balance-Paayment {
+    font-size: 1.2em;
+    color: green;
+    font-weight: bold;
+  }
+  
+  /* Close button */
+  #close-button-customer-Balance-Paayment {
+    display: block;
+    width: 100px;
+    margin: 20px auto 0;
+    padding: 10px;
+    font-size: 1em;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  #close-button-customer-Balance-Paayment:hover {
+    background-color: #0056b3;
+  }
+  
