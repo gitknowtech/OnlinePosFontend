@@ -40,13 +40,14 @@ const Customer = () => {
     }
   };
 
-  const toggleManageCustomerRemoved = () => {
+  {/*const toggleManageCustomerRemoved = () => {
     if (activeContent === "manageCustomerRemoved") {
       setActiveContent(null); // Hide removed customers if already active
     } else {
       setActiveContent("manageCustomerRemoved"); // Show removed customers
     }
   };
+*/}
 
   const toggleCreditCustomer = () => {
     if (activeContent === "CreditSales") {
@@ -105,10 +106,10 @@ const Customer = () => {
           <FontAwesomeIcon className="button-icon" icon={faCreditCard} />
           Customer Balance
         </button>
-        <button id="removed-button" onClick={toggleManageCustomerRemoved}>
+        {/*<button id="removed-button" onClick={toggleManageCustomerRemoved}>
           <FontAwesomeIcon className="button-icon" icon={faCreditCard} />
           Removed Customers
-        </button>
+        </button>*/}
         
       </div>
 

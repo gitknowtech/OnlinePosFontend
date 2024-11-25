@@ -84,13 +84,6 @@ export default function Invoice() {
     setIsTodaySalesOpen(false);
   };
 
-  const handleOpenCustomerPaymentModal = () => {
-    setIsCustomerPaymentModalOpen(true);
-  };
-
-  const handleCloseCustomerPaymentModal = () => {
-    setIsCustomerPaymentModalOpen(false);
-  };
 
   // OtherItem model related contents
   const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);

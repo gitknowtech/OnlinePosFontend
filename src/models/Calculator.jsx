@@ -65,8 +65,7 @@ export default function Calculator({ show, onClose }) {
     <div id="calculator-modal">
       <div id="calculator-container">
         <div id="calculator-header">
-          <h2>Calculator</h2>
-          <button id="close-button" onClick={() => { setInput("0"); onClose(); }}>
+          <button id="close-button-calculator" onClick={() => { setInput("0"); onClose(); }}>
             &times;
           </button>
         </div>

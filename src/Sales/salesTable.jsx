@@ -2,30 +2,50 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import "../css1/salesTable.css";
+import Swal from "sweetalert2";
+import InvoiceEditModel from "../Invoice/invoiceEditModel";
+
+
+// Import the edit and delete images
+import editimage from "../assets/icons/edit.png";
+import deleteimage from "../assets/icons/bin.png";
 
 const SalesTable = ({ store }) => {
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [startDate, setStartDate] = useState(() => new Date().toISOString().split("T")[0]); // Default to today
-  const [endDate, setEndDate] = useState(() => new Date().toISOString().split("T")[0]); // Default to today
+  const [startDate, setStartDate] = useState(
+    () => new Date().toISOString().split("T")[0]
+  ); // Default to today
+  const [endDate, setEndDate] = useState(
+    () => new Date().toISOString().split("T")[0]
+  ); // Default to today
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
+
+  // Modal state
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
 
   useEffect(() => {
     const fetchSales = async () => {
       try {
         console.log("API Request Parameters:", { Store: store });
-        const response = await axios.get("http://localhost:5000/api/invoices/fetch_sales", {
-          params: { Store: store },
-        });
+        const response = await axios.get(
+          "http://localhost:5000/api/invoices/fetch_sales",
+          {
+            params: { Store: store },
+          }
+        );
         console.log("Fetched sales:", response.data);
         setSales(response.data);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching sales:", err);
-        setError(`Failed to load sales: ${err.response?.data?.message || err.message}`);
+        setError(
+          `Failed to load sales: ${err.response?.data?.message || err.message}`
+        );
         setLoading(false);
       }
     };
@@ -45,6 +65,12 @@ const SalesTable = ({ store }) => {
     return <p>No sales found for the selected store.</p>;
   }
 
+  const handleModalClose = () => {
+    setEditModalOpen(false);
+    setSelectedInvoiceId(null);
+  };
+
+
   // Ensure the date range is inclusive
   const isDateInRange = (saleDate, start, end) => {
     const sale = new Date(saleDate).setHours(0, 0, 0, 0); // Normalize to 00:00
@@ -55,7 +81,9 @@ const SalesTable = ({ store }) => {
 
   // Filter sales based on search query and date range
   const filteredSales = sales.filter((sale) => {
-    const matchesSearchQuery = sale.invoiceId.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearchQuery = sale.invoiceId
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     const withinDateRange = isDateInRange(sale.createdAt, startDate, endDate);
     return matchesSearchQuery && withinDateRange;
   });
@@ -72,6 +100,92 @@ const SalesTable = ({ store }) => {
     { discountAmount: 0, netAmount: 0, cardAmount: 0, cashAmount: 0 }
   );
 
+  
+
+  const handleDeleteSale = async (invoiceId) => {
+    try {
+      console.log('Deleting invoiceId:', invoiceId);
+  
+      // Step 1: Check if the invoice is linked in customer_loan_payment
+      const loanResponse = await axios.get(
+        `http://localhost:5000/api/invoices/check_invoice/${invoiceId}`
+      );
+  
+      console.log('Loan response data:', loanResponse.data);
+  
+      if (loanResponse.data.hasLoanPayment) {
+        // If the invoice is linked, display a message and prevent deletion
+        Swal.fire(
+          "Cannot Delete Invoice",
+          "This invoice is linked to customer loan payments. Please resolve the loan payments before deleting.",
+          "warning"
+        );
+        return; // Exit the function, do not proceed with deletion
+      }
+  
+      // Step 2: Confirm Deletion
+      const confirmDelete = await Swal.fire({
+        title: "Are you sure?",
+        text: `Do you really want to delete Invoice ID: ${invoiceId}? This action cannot be undone.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+      });
+  
+      if (confirmDelete.isConfirmed) {
+        // Step 3: Proceed with deletion
+        await axios.delete(
+          `http://localhost:5000/api/invoices/delete_invoice/${invoiceId}`
+        );
+  
+        // Remove the deleted sale from the state
+        setSales((prevSales) =>
+          prevSales.filter((sale) => sale.invoiceId !== invoiceId)
+        );
+  
+        Swal.fire(
+          "Deleted!",
+          `Invoice ID: ${invoiceId} has been deleted.`,
+          "success"
+        );
+      }
+    } catch (error) {
+      console.error("Error during deletion process:", error);
+      Swal.fire(
+        "Error",
+        `An error occurred: ${error.response?.data?.message || error.message}`,
+        "error"
+      );
+    }
+  };
+
+  const handleModalUpdate = () => {
+    // Refresh the sales table or trigger a re-fetch of sales data
+    const fetchUpdatedSales = async () => {
+      const response = await axios.get(
+        "http://localhost:5000/api/invoices/fetch_sales",
+        { params: { Store: store } }
+      );
+      setSales(response.data);
+    };
+
+    fetchUpdatedSales();
+    handleModalClose();
+  };
+  
+
+  // Handler for editing a sale (you can customize this as needed)
+  const handleEditSale = (invoiceId) => {
+    // Implement your edit logic here
+    Swal.fire(
+      "Edit Sale",
+      `Edit functionality for Invoice ID: ${invoiceId} is not implemented yet.`,
+      "info"
+    );
+  };
+
   // Pagination logic
   const totalPages = Math.ceil(filteredSales.length / rowsPerPage);
   const indexOfLastRow = currentPage * rowsPerPage;
@@ -79,7 +193,8 @@ const SalesTable = ({ store }) => {
   const currentRows = filteredSales.slice(indexOfFirstRow, indexOfLastRow);
 
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handleNextPage = () =>
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const getPaginationNumbers = () => {
     const numbers = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -141,6 +256,7 @@ const SalesTable = ({ store }) => {
             <th>Payment Type</th>
             <th>Balance</th>
             <th>Created At</th>
+            <th>Actions</th> {/* New Actions Column */}
           </tr>
         </thead>
         <tbody>
@@ -156,11 +272,47 @@ const SalesTable = ({ store }) => {
               <td>{sale.CardPay}</td>
               <td>{sale.PaymentType}</td>
               <td>{sale.Balance}</td>
-              <td style={{ color: "green" }}>{new Date(sale.createdAt).toLocaleDateString()}</td>
+              <td style={{ color: "green" }}>
+                {new Date(sale.createdAt).toLocaleDateString()}
+              </td>
+              {/* Actions Column */}
+              <td>
+                <div className="action-buttons">
+                  <img
+                    style={{
+                      width: "20px",
+                      marginRight: "10px",
+                      cursor: "pointer",
+                    }}
+                    src={editimage}
+                    alt="Edit"
+                    title="Edit"
+                    onClick={() => handleEditSale(sale.invoiceId)}
+                    className="action-icon"
+                  />
+                  <img
+                    style={{ width: "20px", cursor: "pointer" }}
+                    src={deleteimage}
+                    alt="Delete"
+                    title="Delete"
+                    onClick={() => handleDeleteSale(sale.invoiceId)}
+                    className="action-icon"
+                  />
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+
+       {/* Edit Modal */}
+       <InvoiceEditModel
+        isOpen={isEditModalOpen}
+        onClose={handleModalClose}
+        invoiceId={selectedInvoiceId}
+        onUpdate={handleModalUpdate}
+      />
 
       {/* Totals */}
       <div id="totals-row">
