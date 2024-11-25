@@ -72,7 +72,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
   };
 
   const handleSuggestionClick = (customer) => {
-    setCustomerMobile(customer.id);
+    setCustomerMobile(customer.cusId);
     setSuggestions([]);
   };
 
@@ -287,7 +287,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
                     id="suggestion-item"
                     onClick={() => handleSuggestionClick(customer)}
                   >
-                    {customer.id} - {customer.cusName} - {customer.mobile1 || customer.mobile2}
+                    {customer.cusId} - {customer.cusName} - {customer.mobile1 || customer.mobile2}
                   </div>
                 ))}
               </div>

@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "../css1/salesTable.css";
 import addCashImage from "../assets/icons/addCash.png"; // Import payment image
 import historyImage from "../assets/icons/history.png"; // Import history image
 
-const CreditSales = ({ store }) => {
+const CreditSalesNew = () => {
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,47 +24,34 @@ const CreditSales = ({ store }) => {
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
 
-  useEffect(() => {
-    const fetchSales = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/api/invoices/fetch_sales_new",
-          {
-            params: { Store: store },
-          }
-        );
-        setSales(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError(
-          `Failed to load sales: ${err.response?.data?.message || err.message}`
-        );
-        setLoading(false);
-      }
-    };
+  // Define fetchSales outside of useEffect
+const fetchSales = async (params = {}) => {
+  setLoading(true);
+  setError(null);
 
-    fetchSales();
-  }, [store]);
+  try {
+    const response = await axios.get(
+      "http://localhost:5000/api/invoices/fetch_sales_store_removed",
+      { params } // Pass dynamic parameters here
+    );
+    setSales(response.data);
+    setLoading(false);
+  } catch (err) {
+    setError(
+      `Failed to load sales: ${err.response?.data?.message || err.message}`
+    );
+    setLoading(false);
+  }
+};
 
+// Use useEffect to call fetchSales with customerId
+useEffect(() => {
+  if (customerId) {
+    fetchSales({ customerId });
+  }
+}, [customerId]);
 
-
-  const fetchSales = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:5000/api/invoices/fetch_sales_new",
-        {
-          params: { Store: store },
-        }
-      );
-      setSales(response.data);
-      setLoading(false);
-    } catch (err) {
-      setError(
-        `Failed to load sales: ${err.response?.data?.message || err.message}`
-      );
-      setLoading(false);
-    }
-  };
+  
 
 
   const isDateInRange = (saleDate, start, end) => {
@@ -359,16 +345,7 @@ const CreditSales = ({ store }) => {
   return (
     <div className="sales-table-container_salesTable">
       <div className="filters-container">
-        <div className="search-box-salesTable">
-          <input
-            type="text"
-            placeholder="Search by Customer ID"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
-        </div>
-
+       
         <div className="date-range-filters">
           <div className="date-picker">
             <label htmlFor="start-date">Start Date:</label>
@@ -607,8 +584,6 @@ const CreditSales = ({ store }) => {
   );
 };
 
-CreditSales.propTypes = {
-  store: PropTypes.string.isRequired,
-};
 
-export default CreditSales;
+
+export default CreditSalesNew;

@@ -1,0 +1,180 @@
+#container-customer-balance {
+    max-width: 400px;
+    margin: 15px auto;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #8a93df, #e5e7c9);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: "Arial", sans-serif;
+  }
+  
+  #title-customer-balance {
+    text-align: center;
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  #search-container-customer-balance {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  #search-box-customer-balance {
+    width: 100%;
+    padding: 8px;
+    font-size: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: box-shadow 0.3s;
+  }
+  
+  #search-box-customer-balance:focus {
+    box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
+  }
+  
+  #suggestions-list-customer-balance {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  #suggestions-list-customer-balance li {
+    padding: 8px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+  }
+  
+  #suggestions-list-customer-balance li:hover {
+    background: #f0f0f0;
+  }
+  
+  #details-panel-customer-balance {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  #details-grid-customer-balance {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    row-gap: 10px;
+    column-gap: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  #details-grid-customer-balance div {
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  #details-grid-customer-balance strong {
+    color: #555;
+  }
+
+  #details-title-customer-balance {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  #details-panel-customer-balance p {
+    font-size: 1rem;
+    margin: 10px 0;
+  }
+  
+  #details-panel-customer-balance strong {
+    color: #555;
+  }
+  
+
+  #balance-panel-customer-balance {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #df9e9e, #ffffff);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  #balance-title-customer-balance {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  #balance-amount-customer-balance {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #2d3748;
+  }
+  
+
+  #add-cash-button-customer-balance {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  #add-cash-button-customer-balance:hover {
+    background-color: #45a049;
+  }
+  
+
+  #close-modal-button-customer-balance{
+    background-color: #ec7c7c;
+    color: #000;
+    font-size: 10px;
+    margin-left: 380px;
+    font-weight: 800;
+  }
+
+  #close-modal-button-customer-balance:hover{
+    background-color: #c02020;
+    color: #fdfdfd;
+    transition: 0.3s ease-in-out;
+  }
+
+
+  #modal-overlay-customer-balance-invoice{
+    position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin-bottom: 200px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  }
+
+  #modal-content-customer-balance-invoice{
+    background-color: #fff;
+    width: 450px;
+    border-radius: 10px;
+    padding: 10px;
+  }

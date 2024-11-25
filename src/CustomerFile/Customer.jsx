@@ -13,6 +13,7 @@ import AddCustomer from './AddCustomer';
 import ManageCustomer from "./ManageCustomer";
 import Creditsales from "./CreditSales";
 import CustomerReport from './CustomerReport';
+import CustomerBalance from "./customerBalance";
 
 
 
@@ -63,6 +64,14 @@ const Customer = () => {
     }
   };
 
+  const toggleCustomerBalance = () => {
+    if (activeContent === "CustomerBalance") {
+      setActiveContent(null); // Hide report if already active
+    } else {
+      setActiveContent("CustomerBalance"); // Show report
+    }
+  };
+
   return (
     <div className="customer-panel">
       {/* Display user info */}
@@ -92,10 +101,15 @@ const Customer = () => {
           <FontAwesomeIcon className="button-icon" icon={faChartLine} />
           Customer Report
         </button>
+        <button onClick={toggleCustomerBalance}>
+          <FontAwesomeIcon className="button-icon" icon={faCreditCard} />
+          Customer Balance
+        </button>
         <button id="removed-button" onClick={toggleManageCustomerRemoved}>
           <FontAwesomeIcon className="button-icon" icon={faCreditCard} />
           Removed Customers
         </button>
+        
       </div>
 
       {/* Replace modal with embedded content */}
@@ -104,6 +118,7 @@ const Customer = () => {
         {activeContent === "manageCustomer" && <ManageCustomer UserName={UserName} store={Store} />}
         {activeContent === "CreditSales" && <Creditsales UserName={UserName} store={Store} />}
         {activeContent === "CustomerReport" && <CustomerReport UserName={UserName} store={Store} />}
+        {activeContent === "CustomerBalance" && <CustomerBalance UserName={UserName} store={Store} />}
       </div>
     </div>
   );

@@ -11,7 +11,8 @@ import PaymentModel from "./PaymentModel";
 import Calculator from "../models/Calculator";
 import TodaySales from "./TodaySales";
 import TodayIssueBillCheck from "./TodayIssueBillCheck";
-import CustomerPaymentModel from "../Invoice/CustomePaymentModel";
+
+
 
 // Ensure these image paths are correct in your project structure
 import productimage from "../assets/images/products.png";
@@ -28,6 +29,7 @@ import discount from "../assets/images/discount.png";
 import wholesale from "../assets/images/wholesale.png";
 import removeImage from "../assets/images/remove.png";
 import calculatorImage from "../assets/icons/calculator.png";
+import CustomerBalance from "../CustomerFile/customerBalance";
 
 export default function Invoice() {
   const location = useLocation();
@@ -56,8 +58,6 @@ export default function Invoice() {
     field: null,
   });
   const [percentage, setPercentage] = useState(""); // State for percentage input
-  const [isCustomerPaymentModalOpen, setIsCustomerPaymentModalOpen] =
-    useState(false);
 
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
@@ -110,7 +110,19 @@ export default function Invoice() {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
   const handleCalculatorClick = () => setIsCalculatorOpen(true);
-  const handleCloseCalculator = () => setIsCalculatorOpen(false);
+  const handleCloseCalculator = () => setIsCalculatorOpen(false);  
+  const [isCustomerBalanceModalOpen, setIsCustomerBalanceModalOpen] =
+  useState(false);
+
+
+  const handleOpenCustomerBalanceModal = () => {
+    setIsCustomerBalanceModalOpen(true);
+  };
+
+  const handleCloseCustomerBalanceModal = () => {
+    setIsCustomerBalanceModalOpen(false);
+  };
+
 
   const handleOpenPaymentModal = () => {
     console.log("Payment button clicked");
@@ -1182,13 +1194,13 @@ export default function Invoice() {
             />
             Quotation List
           </button>
-          <button onClick={handleOpenCustomerPaymentModal}>
-            <img
-              src={customer}
-              style={{ width: "20px", height: "20px", marginRight: "5px" }}
-            />
-            Customer Balance
-          </button>
+          <button onClick={handleOpenCustomerBalanceModal}>
+          <img
+            src={customer}
+            style={{ width: "20px", height: "20px", marginRight: "5px" }}
+          />
+          Customer Balance
+        </button>
 
           <button onClick={handleTodayIssueBillCheckClick}>
             <img
@@ -1275,10 +1287,23 @@ export default function Invoice() {
           store={store} // Pass the store prop
         />
 
-        <CustomerPaymentModel
-          show={isCustomerPaymentModalOpen}
-          onClose={handleCloseCustomerPaymentModal}
-        />
+          {/* Customer Balance Modal */}
+      {isCustomerBalanceModalOpen && (
+        <div id="modal-overlay-customer-balance-invoice">
+          <div id="modal-content-customer-balance-invoice">
+          <button
+              id="close-modal-button-customer-balance"
+              onClick={handleCloseCustomerBalanceModal}
+            >
+              X
+            </button>
+            <CustomerBalance /> {/* Render the CustomerBalance component */}
+            
+          </div>
+          
+        </div>
+      )}
+
       </div>
     </div>
   );
