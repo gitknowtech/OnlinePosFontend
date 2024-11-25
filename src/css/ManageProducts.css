@@ -114,39 +114,6 @@
   background-color: #e53935;
 }
 
-/* Pagination styling */
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.pagination button {
-  margin: 0 3px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  background-color: white;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.pagination button.active {
-  background-color: #4CAF50;
-  color: white;
-  border-color: #4CAF50;
-}
-
-.pagination button:hover:not(.active) {
-  background-color: #ddd;
-}
-
-.pagination button:disabled {
-  background-color: #f1f1f1;
-  cursor: not-allowed;
-}
 
 /* Modal overlay styling */
 .modal-overlay {
@@ -239,11 +206,6 @@
   }
 
   .action-button button {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-
-  .pagination button {
     padding: 6px 10px;
     font-size: 12px;
   }

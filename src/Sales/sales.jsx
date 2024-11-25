@@ -6,28 +6,27 @@ import "../css/SupplierMain.css";
 import InvoiceTable from "./invoiceTable";
 import SalesTable from "./salesTable";
 
-
 const Sales = () => {
   const location = useLocation(); // Get location object
   const { UserName, Store } = location.state || {}; // Default destructuring
 
-  const [activeContent, setActiveContent] = useState(null); // Manage active content ('salesList' or 'invoiceList')
-
- 
+  // Set default active content to "salesList"
+  const [activeContent, setActiveContent] = useState("salesList");
 
   // Toggle Invoice List content
   const toggleInvoiceList = () => {
     setActiveContent(activeContent === "invoiceList" ? null : "invoiceList");
   };
 
+  // Toggle Sales List content
   const toggleSalesList = () => {
     setActiveContent(activeContent === "salesList" ? null : "salesList");
   };
 
   return (
-    <div className="supplier-panel ">
+    <div className="supplier-panel">
       {/* Display user info */}
-      <div className="user-info-panel" style={{display:"none"}} >
+      <div className="user-info-panel" style={{ display: "none" }}>
         <p><strong>Username:</strong> {UserName}</p>
         <p><strong>Store:</strong> {Store}</p>
       </div>

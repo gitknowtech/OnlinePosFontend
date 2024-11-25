@@ -12,82 +12,57 @@ import {
 import "../css/ProductsMain.css";
 import CategoryModel from "../Products/CategoryModel"; // Import the CategoryModel component
 import UnitModel from "../Products/UnitModel";
-import AddProducts from "../Products/AddProducts"
+import AddProducts from "../Products/AddProducts";
 import ManageStore from "../Products/StoreModel"; 
 import ManageBatch from "../Products/BatchModel";
 import ManageProducts from "../Products/ManageProducts";
-import ManageProductsRemoved from "../Products/ManageProductsRemoved"
-
+import ManageProductsRemoved from "../Products/ManageProductsRemoved";
+import ManageProductCard from "../Products/ManageProductsCard";
 
 const Product = () => {
   const location = useLocation(); // Get location object
   const { UserName, Store } = location.state || {};
 
-  const [activeContent, setActiveContent] = useState(null); // Manage active content ('category' or 'unit')
+  // Set default active content to "ManageProductsCard"
+  const [activeContent, setActiveContent] = useState("ManageProductsCard");
 
-  // Function to toggle the category content
+  // Toggle functions for each content
   const toggleCategoryContent = () => {
-    if (activeContent === "category") {
-      setActiveContent(null); // Hide category if already active
-    } else {
-      setActiveContent("category"); // Show category and hide unit
-    }
+    setActiveContent(activeContent === "category" ? null : "category");
   };
 
   const toggleRemovedProducts = () => {
-    if(activeContent === "ManageProductsRemoved"){
-        setActiveContent(null)
-    }else{
-      setActiveContent("ManageProductsRemoved");
-    }
-  }
+    setActiveContent(activeContent === "ManageProductsRemoved" ? null : "ManageProductsRemoved");
+  };
 
-  // Function to toggle the unit content
   const toggleUnitContent = () => {
-    if (activeContent === "unit") {
-      setActiveContent(null); // Hide unit if already active
-    } else {
-      setActiveContent("unit"); // Show unit and hide category
-    }
+    setActiveContent(activeContent === "unit" ? null : "unit");
   };
 
   const togglerAddProductsContent = () => {
-    if(activeContent === "addProducts"){
-      setActiveContent(null);
-    }else{
-      setActiveContent("addProducts");
-    }
-  }
+    setActiveContent(activeContent === "addProducts" ? null : "addProducts");
+  };
 
   const togglerManagaeStore = () => {
-    if(activeContent === "manageStore"){
-      setActiveContent(null);
-    }else{
-      setActiveContent("manageStore");
-    }
-  }
+    setActiveContent(activeContent === "manageStore" ? null : "manageStore");
+  };
 
   const togglermanageBatch = () => {
-    if(activeContent === "manageBatch"){
-      setActiveContent(null);
-    }else{
-      setActiveContent("manageBatch");
-    }
-  }
+    setActiveContent(activeContent === "manageBatch" ? null : "manageBatch");
+  };
 
   const togglermanageProducts = () => {
-    if(activeContent === "ManageProducts"){
-      setActiveContent(null);
-    }else{
-      setActiveContent("ManageProducts");
-    }
-  }
+    setActiveContent(activeContent === "ManageProducts" ? null : "ManageProducts");
+  };
+
+  const togglermanageProductsCard = () => {
+    setActiveContent(activeContent === "ManageProductsCard" ? null : "ManageProductsCard");
+  };
 
   return (
     <div className="product-panel">
-
       {/* Display user info */}
-      <div className="user-info-panel" style={{display: "none"}}>
+      <div className="user-info-panel" style={{ display: "none" }}>
         <p>
           <strong>Username:</strong> {UserName}
         </p>
@@ -96,7 +71,12 @@ const Product = () => {
         </p>
       </div>
 
+      {/* Button List */}
       <div className="button-list">
+        <button onClick={togglermanageProductsCard}>
+          <FontAwesomeIcon className="button-icon" icon={faCodeFork} />
+          Product Card
+        </button>
         <button onClick={togglermanageProducts}>
           <FontAwesomeIcon className="button-icon" icon={faCodeFork} />
           Product List
@@ -109,33 +89,34 @@ const Product = () => {
           <FontAwesomeIcon className="button-icon" icon={faBacteria} />
           Manage Batch
         </button>
-        <button onClick={togglerManagaeStore} > {/* open unit content on click */}
+        <button onClick={togglerManagaeStore}>
           <FontAwesomeIcon className="button-icon" icon={faStore} />
           Manage Store
         </button>
-        <button onClick={toggleUnitContent}> {/* open unit content on click */}
+        <button onClick={toggleUnitContent}>
           <FontAwesomeIcon className="button-icon" icon={faCodeFork} />
           Manage Unit
         </button>
-        <button onClick={toggleCategoryContent}> {/* Open category content on click */}
+        <button onClick={toggleCategoryContent}>
           <FontAwesomeIcon className="button-icon" icon={faSnowflake} />
           Manage Category
         </button>
-        <button  id="removed-button" onClick={toggleRemovedProducts}>
+        <button id="removed-button" onClick={toggleRemovedProducts}>
           <FontAwesomeIcon className="button-icon" icon={faTrash} />
           Removed Products
         </button>
       </div>
 
-      {/* Replace modal with embedded content */}
+      {/* Embedded content */}
       <div className="product-content">
-        {activeContent === "category" && <CategoryModel UserName={UserName} store={Store}/>} {/* Load CategoryModel directly */}
-        {activeContent === "unit" && <UnitModel UserName={UserName} store={Store}/>} {/*Load Unit Model Directly*/}
-        {activeContent === "addProducts" && <AddProducts UserName={UserName} store={Store}/>}
-        {activeContent === "manageStore" && <ManageStore UserName={UserName} store={Store}/>}
-        {activeContent === "manageBatch" && <ManageBatch UserName={UserName} store={Store}/>}
-        {activeContent === "ManageProducts" && <ManageProducts UserName={UserName} store={Store}/>}
-        {activeContent === "ManageProductsRemoved" && <ManageProductsRemoved UserName={UserName} store={Store}/>}
+        {activeContent === "category" && <CategoryModel UserName={UserName} store={Store} />}
+        {activeContent === "unit" && <UnitModel UserName={UserName} store={Store} />}
+        {activeContent === "addProducts" && <AddProducts UserName={UserName} store={Store} />}
+        {activeContent === "manageStore" && <ManageStore UserName={UserName} store={Store} />}
+        {activeContent === "manageBatch" && <ManageBatch UserName={UserName} store={Store} />}
+        {activeContent === "ManageProducts" && <ManageProducts UserName={UserName} store={Store} />}
+        {activeContent === "ManageProductsRemoved" && <ManageProductsRemoved UserName={UserName} store={Store} />}
+        {activeContent === "ManageProductsCard" && <ManageProductCard UserName={UserName} store={Store} />}
       </div>
     </div>
   );

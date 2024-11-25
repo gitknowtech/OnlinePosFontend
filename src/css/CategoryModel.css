@@ -71,24 +71,6 @@
   background-color: #fffae6;
 }
 
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-}
-
-.pagination button {
-  padding: 5px 10px;
-  border: 1px solid #ccc;
-  background-color: #f2f2f2;
-  cursor: pointer;
-}
-
-.pagination button.active {
-  background-color: #4CAF50;
-  color: white;
-}
 
 /* Hide the default checkbox */
 .checkbox-label input[type="checkbox"] {
@@ -244,24 +226,3 @@
   pointer-events: none;
   font-size: 16px;
 }
-
-/* Pagination styles */
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.pagination button {
-  padding: 5px 10px;
-  margin: 0 3px;
-  border: 1px solid #ddd;
-  background-color: #f4f4f4;
-  cursor: pointer;
-}
-
-.pagination button.active {
-  background-color: #4285f4;
-  color: white;
-}
-

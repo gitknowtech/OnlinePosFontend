@@ -15,6 +15,7 @@ import PerchasingDetails from './Supplier/PurchasingDetails';
 import DueSummery from "./Supplier/DueSummary";
 import UserManage from "./UserFile/UserManagement";
 import SalesManage from "./Sales/sales";
+import Qutation from "./Invoice/invoiceNew";
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
           <Route path="DueSummery" element={<DueSummery />} />
           <Route path="ManageUser" element={<UserManage />} />
           <Route path="Sales" element={<SalesManage/>} />      {/* You can add other nested routes under Dashboard */}
+          <Route path="invoiceNew" element={<Qutation/>} />
         </Route>
 
       </Routes>

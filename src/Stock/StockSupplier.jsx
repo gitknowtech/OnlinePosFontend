@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
-import "../css1/StockSupplier.css";
+import "../css1/StockSupplier.css"; // Assuming CSS file for styling
 
 export default function StockSupplier() {
     const [products, setProducts] = useState([]);
@@ -107,12 +107,13 @@ export default function StockSupplier() {
     };
 
     return (
-        <div className="manage-products-stock-supplier" id="manage_stock_background">
-            <div className="controls-container-stock-supplier">
-                <div className="form-group-stock-supplier">
+        <div className="manage-products-stock-by-category" id="manage_stock_background">
+            {/* Search and quantity controls */}
+            <div className="controls-container-stock-by-category">
+                <div className="form-group-stock-by-category">
                     <label htmlFor="selectedSupplier">Enter Supplier Name</label>
                     <input
-                    id="supplier_text_input-stock-supplier"
+                        id="supplier_text_input-stock-by-category"
                         type="text"
                         value={selectedSupplier}
                         onChange={handleSupplierSearch}
@@ -122,7 +123,7 @@ export default function StockSupplier() {
                         autoComplete="off"
                     />
                     {isSupplierDropDownVisible && filteredSupplierList.length > 0 && (
-                        <ul className="dropdown-list-stock-supplier" style={{fontSize:"10px", fontWeight:"600"}}>
+                        <ul className="dropdown-list-stock-by-category">
                             {filteredSupplierList.map((supplier) => (
                                 <li
                                     key={supplier.Supid}
@@ -135,10 +136,10 @@ export default function StockSupplier() {
                     )}
                 </div>
 
-                <div className="quantity-range-container-stock-supplier">
+                <div className="quantity-range-container-stock-by-category">
                     <label>Quantity Range:</label>
                     <input
-                    id="input_quantityrange_one"
+                        id="input_quantityrange_one"
                         type="number"
                         name="min"
                         placeholder="Min"
@@ -146,7 +147,7 @@ export default function StockSupplier() {
                         onChange={handleQuantityRangeChange}
                     />
                     <input
-                    id="input_quantityrange_two"
+                        id="input_quantityrange_two"
                         type="number"
                         name="max"
                         placeholder="Max"
@@ -156,50 +157,25 @@ export default function StockSupplier() {
                 </div>
             </div>
 
-
-            {/* Product table */}
-            <div id="product-table-supplier-stock">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Product Name</th>
-                            <th>Supplier</th>
-                            <th>Category</th>
-                            <th>Unit</th>
-                            <th>MRP</th>
-                            <th>Stock</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentProducts.map((product, index) => (
-                            <tr key={product.productId}>
-                                <td>{indexOfFirstProduct + index + 1}</td>
-                                <td>{product.productName}</td>
-                                <td>{product.selectedSupplier}</td>
-                                <td>{product.selectedCategory}</td>
-                                <td>{product.selectedUnit}</td>
-                                <td>{product.mrpPrice}</td>
-                                <td>{product.stockQuantity}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="pagination">
-                <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
-                {getPaginationNumbers().map((number) => (
-                    <button
-                        key={number}
-                        onClick={() => setCurrentPage(number)}
-                        className={currentPage === number ? "active" : ""}
-                    >
-                        {number}
-                    </button>
+            {/* Product cards */}
+            <div className="product-card-container-stock-by-category">
+                {currentProducts.map((product) => (
+                    <div className="product-card-stock-by-category" key={product.productId}>
+                        <img
+                            src={product.imageLink}
+                            alt={product.productName}
+                            className="product-image-stock-by-category"
+                        />
+                        <div className="product-info-stock-by-category">
+                            <h3>{product.productName}</h3>
+                            <p>Supplier: {product.selectedSupplier}</p>
+                            <p>Category: {product.selectedCategory}</p>
+                            <p>Unit: {product.selectedUnit}</p>
+                            <p>MRP: {product.mrpPrice} RS</p>
+                            <p>Stock: {product.stockQuantity}</p>
+                        </div>
+                    </div>
                 ))}
-                <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
             </div>
         </div>
     );

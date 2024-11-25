@@ -132,30 +132,6 @@
       background-color: yellow;
     }
   
-  /* Pagination styles */
-  .pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  
-  .pagination button {
-    padding: 5px 10px;
-    margin: 0 3px;
-    border: 1px solid #ddd;
-    background-color: #f4f4f4;
-    cursor: pointer;
-  }
-  
-  .pagination button.active {
-    background-color: #4285f4;
-    color: white;
-  }
-  
-  .pagination button:hover {
-    background-color: #e0e0e0;
-  }
-  
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .unit-form {

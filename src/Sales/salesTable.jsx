@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import "../css1/salesTable.css";
 import Swal from "sweetalert2";
-import InvoiceEditModel from "../Invoice/invoiceEditModel";
 
 
 // Import the edit and delete images
@@ -24,9 +23,7 @@ const SalesTable = ({ store }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
 
-  // Modal state
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
+
 
   useEffect(() => {
     const fetchSales = async () => {
@@ -65,11 +62,6 @@ const SalesTable = ({ store }) => {
     return <p>No sales found for the selected store.</p>;
   }
 
-  const handleModalClose = () => {
-    setEditModalOpen(false);
-    setSelectedInvoiceId(null);
-  };
-
 
   // Ensure the date range is inclusive
   const isDateInRange = (saleDate, start, end) => {
@@ -100,19 +92,19 @@ const SalesTable = ({ store }) => {
     { discountAmount: 0, netAmount: 0, cardAmount: 0, cashAmount: 0 }
   );
 
-  
+
 
   const handleDeleteSale = async (invoiceId) => {
     try {
       console.log('Deleting invoiceId:', invoiceId);
-  
+
       // Step 1: Check if the invoice is linked in customer_loan_payment
       const loanResponse = await axios.get(
         `http://localhost:5000/api/invoices/check_invoice/${invoiceId}`
       );
-  
+
       console.log('Loan response data:', loanResponse.data);
-  
+
       if (loanResponse.data.hasLoanPayment) {
         // If the invoice is linked, display a message and prevent deletion
         Swal.fire(
@@ -122,7 +114,7 @@ const SalesTable = ({ store }) => {
         );
         return; // Exit the function, do not proceed with deletion
       }
-  
+
       // Step 2: Confirm Deletion
       const confirmDelete = await Swal.fire({
         title: "Are you sure?",
@@ -133,18 +125,18 @@ const SalesTable = ({ store }) => {
         cancelButtonColor: "#3085d6",
         confirmButtonText: "Yes, delete it!",
       });
-  
+
       if (confirmDelete.isConfirmed) {
         // Step 3: Proceed with deletion
         await axios.delete(
           `http://localhost:5000/api/invoices/delete_invoice/${invoiceId}`
         );
-  
+
         // Remove the deleted sale from the state
         setSales((prevSales) =>
           prevSales.filter((sale) => sale.invoiceId !== invoiceId)
         );
-  
+
         Swal.fire(
           "Deleted!",
           `Invoice ID: ${invoiceId} has been deleted.`,
@@ -161,30 +153,6 @@ const SalesTable = ({ store }) => {
     }
   };
 
-  const handleModalUpdate = () => {
-    // Refresh the sales table or trigger a re-fetch of sales data
-    const fetchUpdatedSales = async () => {
-      const response = await axios.get(
-        "http://localhost:5000/api/invoices/fetch_sales",
-        { params: { Store: store } }
-      );
-      setSales(response.data);
-    };
-
-    fetchUpdatedSales();
-    handleModalClose();
-  };
-  
-
-  // Handler for editing a sale (you can customize this as needed)
-  const handleEditSale = (invoiceId) => {
-    // Implement your edit logic here
-    Swal.fire(
-      "Edit Sale",
-      `Edit functionality for Invoice ID: ${invoiceId} is not implemented yet.`,
-      "info"
-    );
-  };
 
   // Pagination logic
   const totalPages = Math.ceil(filteredSales.length / rowsPerPage);
@@ -279,18 +247,6 @@ const SalesTable = ({ store }) => {
               <td>
                 <div className="action-buttons">
                   <img
-                    style={{
-                      width: "20px",
-                      marginRight: "10px",
-                      cursor: "pointer",
-                    }}
-                    src={editimage}
-                    alt="Edit"
-                    title="Edit"
-                    onClick={() => handleEditSale(sale.invoiceId)}
-                    className="action-icon"
-                  />
-                  <img
                     style={{ width: "20px", cursor: "pointer" }}
                     src={deleteimage}
                     alt="Delete"
@@ -305,21 +261,13 @@ const SalesTable = ({ store }) => {
         </tbody>
       </table>
 
-
-       {/* Edit Modal */}
-       <InvoiceEditModel
-        isOpen={isEditModalOpen}
-        onClose={handleModalClose}
-        invoiceId={selectedInvoiceId}
-        onUpdate={handleModalUpdate}
-      />
-
       {/* Totals */}
       <div id="totals-row">
         <p>Total Net Amount: {totals.netAmount.toFixed(2)}</p>
         <p>Total Cash Pay: {totals.cashAmount.toFixed(2)}</p>
         <p>Total Card Pay: {totals.cardAmount.toFixed(2)}</p>
       </div>
+
 
       {/* Pagination */}
       <div className="pagination">

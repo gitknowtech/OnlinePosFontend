@@ -1,0 +1,94 @@
+
+/* Main container */
+.manage-products-container-manage-product-design {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+  }
+  
+  /* Search box styling */
+  .search-box-manage-product-design {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .search-input-manage-product-design {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+  
+  /* Product card container */
+  .product-card-container-manage-product-design {
+    display: grid;
+    cursor: pointer;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  /* Individual product card */
+  .product-card-manage-product-design {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-align: center;
+    padding: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .product-card-manage-product-design:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Product image */
+  .product-image-manage-product-design {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+  }
+  
+  /* Product info */
+  .product-info-manage-product-design {
+    padding: 10px;
+  }
+  
+  .product-name-manage-product-design {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 5px 0;
+  }
+  
+  .product-id-manage-product-design,
+  .product-price-manage-product-design {
+    font-size: 14px;
+    color: #555;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .product-card-container-manage-product-design {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+  
+    .product-image-manage-product-design {
+      height: 120px;
+    }
+  
+    .product-name-manage-product-design {
+      font-size: 14px;
+    }
+  
+    .product-id-manage-product-design,
+    .product-price-manage-product-design {
+      font-size: 12px;
+    }
+  }
+  

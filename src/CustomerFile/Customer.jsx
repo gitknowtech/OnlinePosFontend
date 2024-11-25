@@ -8,69 +8,39 @@ import {
   faCreditCard,
   faAddressCard,
 } from "@fortawesome/free-solid-svg-icons";
-import "../css1/Customer.css"
+import "../css1/Customer.css";
 import AddCustomer from './AddCustomer';
 import ManageCustomer from "./ManageCustomer";
 import Creditsales from "./CreditSales";
 import CustomerReport from './CustomerReport';
 import CustomerBalance from "./customerBalance";
 
-
-
 const Customer = () => {
   const location = useLocation(); // Get location object
   const { UserName, Store } = location.state || {};
 
-  const [activeContent, setActiveContent] = useState(null); // Manage active content
+  // Set default active content to "manageCustomer"
+  const [activeContent, setActiveContent] = useState("manageCustomer");
 
   // Function to toggle the customer content
   const toggleAddCustomer = () => {
-    if (activeContent === "addCustomer") {
-      setActiveContent(null); // Hide add customer if already active
-    } else {
-      setActiveContent("addCustomer"); // Show add customer
-    }
+    setActiveContent(activeContent === "addCustomer" ? null : "addCustomer");
   };
 
   const toggleManageCustomer = () => {
-    if (activeContent === "manageCustomer") {
-      setActiveContent(null); // Hide manage customer if already active
-    } else {
-      setActiveContent("manageCustomer"); // Show manage customer
-    }
+    setActiveContent(activeContent === "manageCustomer" ? null : "manageCustomer");
   };
-
-  {/*const toggleManageCustomerRemoved = () => {
-    if (activeContent === "manageCustomerRemoved") {
-      setActiveContent(null); // Hide removed customers if already active
-    } else {
-      setActiveContent("manageCustomerRemoved"); // Show removed customers
-    }
-  };
-*/}
 
   const toggleCreditCustomer = () => {
-    if (activeContent === "CreditSales") {
-      setActiveContent(null); // Hide report if already active
-    } else {
-      setActiveContent("CreditSales"); // Show report
-    }
+    setActiveContent(activeContent === "CreditSales" ? null : "CreditSales");
   };
 
   const toggleReportCustomer = () => {
-    if (activeContent === "CustomerReport") {
-      setActiveContent(null); // Hide report if already active
-    } else {
-      setActiveContent("CustomerReport"); // Show report
-    }
+    setActiveContent(activeContent === "CustomerReport" ? null : "CustomerReport");
   };
 
   const toggleCustomerBalance = () => {
-    if (activeContent === "CustomerBalance") {
-      setActiveContent(null); // Hide report if already active
-    } else {
-      setActiveContent("CustomerBalance"); // Show report
-    }
+    setActiveContent(activeContent === "CustomerBalance" ? null : "CustomerBalance");
   };
 
   return (
@@ -106,11 +76,6 @@ const Customer = () => {
           <FontAwesomeIcon className="button-icon" icon={faCreditCard} />
           Customer Balance
         </button>
-        {/*<button id="removed-button" onClick={toggleManageCustomerRemoved}>
-          <FontAwesomeIcon className="button-icon" icon={faCreditCard} />
-          Removed Customers
-        </button>*/}
-        
       </div>
 
       {/* Replace modal with embedded content */}

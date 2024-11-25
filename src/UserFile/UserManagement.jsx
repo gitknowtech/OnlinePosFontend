@@ -11,8 +11,9 @@ const UserManagement = () => {
   const location = useLocation(); // Access the location state
   const { UserName, Store, Email, LastLogin } = location.state || {}; // Destructure the passed state
 
-  const [activeContent, setActiveContent] = useState(null); // Manage active content
+  const [activeContent, setActiveContent] = useState("ManageUser"); // Manage active content
   const [showAddUserModal, setShowAddUserModal] = useState(false); // Manage Add User Modal
+
   const [formData, setFormData] = useState({
     Name: "",
     Email: "",
