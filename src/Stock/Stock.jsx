@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "../css/stockMain.css";
 import { useLocation } from "react-router-dom";
 import StockInModel from "../Stock/StockIn";

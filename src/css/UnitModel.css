@@ -1,150 +1,111 @@
-/* General styles for the unit model container */
 .unit-model {
-    padding: 20px;
-    background-color: #d1d9f3;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-family: sans-serif;
-    font-weight: 600;
-  }
-  
-  /* Unit form styles */
-  .unit-form {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-  
-  .unit-form input[type="text"] {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    width: 250px;
-  }
-  
-  .unit-form .check-box {
-    display: flex;
-    font-size: 14px;
-    align-items: center;
-  }
-  
-  .unit-form .check-box input[type="checkbox"] {
-    margin-right: 8px;
-    font-size: 14PX;
-  }
-  
-  .unit-form .button-group {
-    margin-left: auto;
-  }
-  
-  .unit-form .button-group button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  
-  .unit-form .button-group button:hover {
-    background-color: #45a049;
-  }
-  
-  /* Search box styling */
-  .search-box {
-    position: relative;
-    margin-left: auto;
-  }
-  
-  .search-box input {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    width: 250px;
-  }
-  
-  .search-box .search-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #ccc;
-    pointer-events: none;
-    font-size: 16px;
-  }
-  
-  /* Unit grid table styles */
-  .unit-grid table {
-    width: 100%;
-    font-size: 12px;
-    border-collapse: collapse;
-  }
-  
-  .unit-grid th, .unit-grid td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-  }
-  
-  .unit-grid th {
-    background-color: #706f6f;
-    font-weight: bold;
-    color: #fff;
-  }
-  
-  .unit-grid td {
-    background-color: #fff;
-  }
-  
-/* Style the delete button text to be red */
-#delete-button-unit-model {
-    background-color: #ee857b;
-      cursor: pointer;
-      border: 1px solid gray;
-      padding: 5px;
-      color: #000;
-      font-weight: 600;
-      font-size: 12px;
-      margin-left: 10px;
-    }
-    
-    /* Style the edit button text to be yellow */
-    .edit-button {
-      background-color: #e8f08f;
-      cursor: pointer;
-      border: 1px solid gray;
-      padding: 5px;
-      font-weight: 600;
-      font-size: 12px;
-      margin-right: 10px;
-    }
-    
-    #delete-button-unit-model:hover{
-      background-color: rgb(139, 9, 9);
-      color: #fff;
-    }
-    
-    .edit-button:hover{
-      background-color: yellow;
-    }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .unit-form {
-      flex-direction: column;
-    }
-  
-    .search-box {
-      margin-left: 0;
-      width: 100%;
-    }
-  
-    .search-box input {
-      width: 100%;
-    }
-  }
-  
+  padding: 10px; /* Reduced padding */
+  background-color: #dcdef0;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+
+.unit-form input {
+  padding: 6px; /* Reduced padding */
+  width: 180px; /* Reduced width */
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.unit-form button {
+  padding: 6px 10px; /* Reduced padding */
+  background-color: #62d666;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.unit-form button:hover {
+  background-color: #05752a;
+  color: #fff;
+}
+
+.unit-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjusted card width */
+  gap: 10px; /* Reduced gap between cards */
+}
+
+.unit-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px; /* Reduced padding */
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Slightly lighter shadow */
+  font-size: 12px;
+}
+
+.unit-card h4 {
+  margin: 8px 0; /* Reduced margin */
+  font-size: 12px;
+}
+
+.unit-card input {
+  width: 85%; /* Slightly reduced width */
+  padding: 5px;
+  margin-bottom: 8px; /* Reduced margin */
+  font-size: 12px;
+}
+
+.unit-image {
+  width: 60px; /* Reduced size */
+  height: 60px;
+  margin: 0 auto 8px; /* Adjusted margin */
+}
+
+.unit-actions button {
+  margin: 3px; /* Reduced margin between buttons */
+  padding: 4px 8px; /* Reduced button padding */
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.unit-actions .edit-button {
+  background-color: #62d666;
+  color: rgb(65, 64, 64);
+}
+
+.unit-actions .edit-button:hover {
+  background-color: #05752a;
+  color: #fff;
+}
+
+.unit-actions .delete-button {
+  background-color: #ee857b;
+  color: rgb(70, 70, 70);
+}
+
+.unit-actions .delete-button:hover {
+  background-color: #b54a4a;
+  color: #fff;
+}
+
+.unit-model-search-box{
+  margin-left: 500px;
+}
+
+.pagination button {
+  margin: 3px; /* Reduced margin */
+  padding: 4px 8px; /* Reduced padding */
+  font-size: 12px;
+  border-radius: 4px;
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #62d666;
+  color: white;
+  font-weight: bold;
+}

@@ -1,211 +1,269 @@
+/* Container for the entire BankModel component */
 .bank-model {
-    padding: 20px;
-    font-weight: 600;
-    font-size: 12px;
-    background-color: #d6def8;
-    border-radius: 8px;
-  }
-  
+  padding: 15px; /* Reduced padding for a more compact layout */
+  font-weight: 600;
+  font-size: 12px; /* Set all texts to 12px */
+  background-color: #d6def8;
+  border-radius: 8px;
+  box-sizing: border-box;
+  max-width: 1300px; /* Reduced max-width to fit smaller panels */
+  margin: 0 auto; /* Center the component horizontally */
+}
+
+/* Form Section */
+.bank-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px; /* Reduced gap for a tighter form layout */
+  margin-bottom: 20px; /* Slightly decreased margin */
+}
+
+/* Labels within the form */
+.bank-form label {
+  font-weight: bold;
+  color: #333;
+  min-width: 90px; /* Reduced min-width for smaller labels */
+  font-size: 12px; /* Set to 12px */
+}
+
+/* Text Inputs within the form */
+.bank-form input[type="text"],
+.search-box input {
+  padding: 6px 8px; /* Further reduced padding */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 200px; /* Further reduced width for compactness */
+  font-size: 12px; /* Set to 12px */
+  transition: border-color 0.3s ease;
+}
+
+.bank-form input[type="text"]:focus,
+.search-box input:focus {
+  border-color: #4285F4;
+  outline: none;
+}
+
+
+/* Save Button Styling */
+.save-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 6px 10px; /* Further reduced padding */
+  font-size: 12px; /* Set to 12px */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #45a049;
+}
+
+
+
+/* Container for all bank cards */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Further reduced min width for smaller cards */
+  gap: 10px; /* Further reduced gap for compactness */
+  width: 100%;
+}
+
+/* Individual Bank Card Styling */
+.bank-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Slightly reduced shadow */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ensures consistent card heights */
+}
+
+/* Hover effect for the card */
+.bank-card:hover {
+  transform: translateY(-4px); /* Slightly less movement */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12); /* Slightly reduced shadow */
+}
+
+/* Card Image */
+.card-image {
+  width: 100%;
+  height: 60px; /* Further reduced height for smaller images */
+  overflow: hidden;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the container without distortion */
+}
+
+/* Card Body */
+.card-body {
+  padding: 8px 8px; /* Reduced padding */
+  font-size: 12px; /* Set to 12px */
+  color: #333;
+  flex-grow: 1; /* Pushes the actions to the bottom */
+}
+
+.card-body h2 {
+  margin: 0;
+  font-size: 14px; /* Set to 12px */
+}
+
+.card-body p {
+  margin: 4px 0; /* Reduced margin */
+}
+
+/* Store Column Styling */
+.store-column {
+  color: green;
+  font-weight: bold;
+}
+
+/* Card Actions */
+.card-actions {
+  padding: 6px 8px; /* Reduced padding */
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #ddd;
+}
+
+/* Delete Button Styling */
+.delete-button {
+  background-color: #ee857b;
+  cursor: pointer;
+  border: none;
+  color: #000;
+  padding: 4px 8px; /* Further reduced padding */
+  font-weight: 600;
+  font-size: 12px; /* Set to 12px */
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: rgb(160, 7, 7);
+  color: #fff;
+}
+
+/* Pagination Styling */
+.pagination {
+  margin-top: 20px; /* Reduced margin */
+  display: flex;
+  gap: 4px; /* Reduced gap */
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination button {
+  padding: 4px 8px; /* Further reduced padding */
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 12px; /* Set to 12px */
+}
+
+.pagination button.active {
+  background-color: #4285F4;
+  color: #fff;
+  border-color: #4285F4;
+}
+
+.pagination button:hover:not(.active) {
+  background-color: #f0f0f0;
+}
+
+/* Error Message Styling */
+.error-message {
+  color: red;
+  font-size: 12px; /* Set to 12px */
+  margin-top: 4px; /* Reduced margin */
+}
+
+/* No Banks Message Styling */
+.no-banks-message {
+  font-size: 12px; /* Set to 12px */
+  color: #555;
+  text-align: center;
+  grid-column: 1 / -1; /* Span all columns */
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
   .bank-form {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  
-  .bank-form input[type="text"] {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 400px;
-  }
-  
-  .bank-form input[type="checkbox"] {
-    margin-right: 5px;
-  }
-  
-  .category-form .checkbox-label {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .bank-grid table {
-    width: 100%;
-    background-color: #fff;
-    border-collapse: collapse;
-  }
-  
-  .bank-grid th, .bank-grid td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
- #bank-grid-header {
-    background-color: #929191;
-    color: #fff;
-  }
-  
-  .editing-row {
-    background-color: #fffae6;
-  }
-  
-  
-  /* Hide the default checkbox */
-  .checkbox-label input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border: 2px solid #C8CCD4;
-    border-radius: 4px;
-    position: relative;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.3s ease;
-  }
-  
-  /* Add the checkmark inside the checkbox */
-  .checkbox-label input[type="checkbox"]:checked::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 10px;
-    height: 10px;
-    background-color: #4285F4;
-    transform: translate(-50%, -50%);
-    border-radius: 2px;
-  }
-  
-  /* Hover effect on the checkbox */
-  .checkbox-label input[type="checkbox"]:hover {
-    border-color: #4285F4;
-  }
-  
-  /* Style for the label next to the checkbox */
-  .checkbox-label {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  /* Add some spacing between the checkbox and label text */
-  .checkbox-label input[type="checkbox"] {
-    margin-right: 8px;
-  }
-  
-  /* Style for the label text */
-  .checkbox-label span {
-    color: #333;
-    transition: color 0.3s ease;
-  }
-  
-  /* Hover effect for the label text */
-  .checkbox-label:hover span {
-    color: #4285F4;
-  }
-  
-  .edit-button{
-    background: yellow;
-    padding: 5px;
-  }
-  
-  /* Style the store column text to be green */
-  .store-column {
-    color: green;
+    gap: 8px; /* Further reduced gap */
   }
 
-  .save-button{
-    margin-bottom: 20px;
-    background-color: #4CAF50;
-    color: white;
-    padding: 8px 10px;
-    font-size: 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  .bank-form label {
+    min-width: 70px; /* Further reduced min-width */
   }
-  
-  /* Style the delete button text to be red */
-#delete-button-bank-model {
-  background-color: #ee857b;
-    cursor: pointer;
-    border: 1px solid gray;
-    color: #000;
-    padding: 5px;
-    font-weight: 600;
-    font-size: 12px;
-    margin-left: 10px;
+
+  .bank-form input[type="text"],
+  .search-box input {
+    width: 180px; /* Further reduced width */
   }
-  
-  /* Style the edit button text to be yellow */
-  .edit-button {
-    background-color: #e8f08f;
-    cursor: pointer;
-    border: 1px solid gray;
-    padding: 5px;
-    font-weight: 600;
-    font-size: 12px;
-    margin-right: 10px;
+
+  .cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Further reduced min width */
+    gap: 8px; /* Further reduced gap */
   }
-  
-  #delete-button-bank-model:hover{
-    background-color: rgb(160, 7, 7);
-    color: #fff;
+}
+
+@media (max-width: 768px) {
+  .bank-form {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .edit-button:hover{
-    background-color: yellow;
+
+  .bank-form label {
+    min-width: 100%;
   }
-  
-  
-  /* Checkbox container */
-  .check-box {
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
-    margin-left: 10px;
-    margin-right: 10px;
-    cursor: pointer;
-  }
-  
-  .check-box input[type="checkbox"] {
-    margin-right: 8px;
-    cursor: pointer;
-  }
-  
-  
-  /* Search box styling */
-  .search-box {
-    display: flex;
-    justify-content: flex-end; /* Ensure the search box is aligned to the right */
-    position: relative;
+
+  .bank-form input[type="text"],
+  .search-box input {
     width: 100%;
   }
-  
-  .search-box input {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    width: 250px;
-    box-sizing: border-box;
+
+  .cards-container {
+    grid-template-columns: 1fr;
   }
-  
-  .search-icon {
-    position: absolute;
-    right: 20px; /* Adjust this value to ensure the icon appears within the input */
-    top: 50%;
-    transform: translateY(-50%);
-    color: #ccc;
-    pointer-events: none;
-    font-size: 16px;
+
+  /* Adjust image height for smaller screens */
+  .card-image {
+    height: 50px; /* Further reduced image height */
   }
-  
+}
+
+@media (max-width: 480px) {
+  .save-button,
+  .delete-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .card-body h2 {
+    font-size: 12px; /* Set to 12px */
+  }
+
+  .card-body p {
+    font-size: 12px; /* Set to 12px */
+  }
+
+  .pagination button {
+    padding: 3px 6px; /* Further reduced padding */
+    font-size: 12px; /* Set to 12px */
+  }
+
+  .card-image {
+    height: 40px; /* Further reduced image height */
+  }
+}

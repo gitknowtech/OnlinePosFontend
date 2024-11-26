@@ -23,7 +23,7 @@ export default function BatchModel({ UserName, store }) {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Error fetching batches",
+          text: "Error fetching batches",err
         });
       }
     };

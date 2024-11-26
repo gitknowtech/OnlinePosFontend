@@ -12,7 +12,7 @@ export default function CategoryModel({ UserName, store }) {
   const [editedCategoryName, setEditedCategoryName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [categoriesPerPage] = useState(30);
+  const [categoriesPerPage] = useState(18);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -25,7 +25,7 @@ export default function CategoryModel({ UserName, store }) {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Error fetching categories",
+          text: "Error fetching categories",err,
         });
       }
     };

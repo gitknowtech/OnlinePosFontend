@@ -8,11 +8,11 @@ import storeImage from "../assets/images/store.png"; // Placeholder image for st
 export default function StoreModel({ UserName, store }) {
   const [storeName, setStoreName] = useState("");
   const [stores, setStores] = useState([]);
-  const [editingStoreId, setEditingStoreId] = useState(null);
+  const [editingStoreId] = useState(null);
   const [editedStoreName, setEditedStoreName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [storesPerPage] = useState(8);
+  const [storesPerPage] = useState(10);
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -23,7 +23,7 @@ export default function StoreModel({ UserName, store }) {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Error fetching stores",
+          text: "Error fetching stores",err,
         });
       }
     };
@@ -87,7 +87,7 @@ export default function StoreModel({ UserName, store }) {
     }
   };
 
-  const handleEditClick = (storeId, storeName) => {
+  {/*const handleEditClick = (storeId, storeName) => {
     setEditingStoreId(storeId);
     setEditedStoreName(storeName);
   };
@@ -155,7 +155,7 @@ export default function StoreModel({ UserName, store }) {
         }
       }
     });
-  };
+  };*/}
 
   const filteredStores = stores.filter((store) =>
     store.storeName.toLowerCase().includes(searchTerm.toLowerCase())

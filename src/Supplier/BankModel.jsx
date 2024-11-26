@@ -1,17 +1,18 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Swal from 'sweetalert2'; // Import SweetAlert2
-import "../css/BankModel.css"; // Assuming similar styles for BankModel
+import Swal from 'sweetalert2';
+import batchImage from "../assets/images/bank.png"; // Import the bank image
+import "../css/BankModel.css";
 
 export default function BankModel({ UserName, store }) {
   const [bankName, setBankName] = useState('');
   const [banks, setBanks] = useState([]);
   const [error, setError] = useState('');
-  const [saveStoreAsAll, setSaveStoreAsAll] = useState(false); // State to manage checkbox status
-  const [searchTerm, setSearchTerm] = useState(''); // For search input
-  const [currentPage, setCurrentPage] = useState(1); // For pagination
-  const [banksPerPage] = useState(8); // Number of banks per page
+  const [saveStoreAsAll, setSaveStoreAsAll] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [banksPerPage] = useState(14);
 
   // Fetch banks when the component mounts
   useEffect(() => {
@@ -58,7 +59,7 @@ export default function BankModel({ UserName, store }) {
     const saveTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
     try {
-      const storeValue = saveStoreAsAll ? 'all' : store; // If checkbox is checked, store as "all"
+      const storeValue = saveStoreAsAll ? 'all' : store;
 
       const response = await axios.post('http://localhost:5000/api/banks/create_banks', {
         bankName: bankName,
@@ -76,10 +77,10 @@ export default function BankModel({ UserName, store }) {
           saveTime: saveTime,
         };
 
-        setBanks([...banks, newBank]); // Update the table with the new bank
-        setBankName(''); // Clear the input
+        setBanks([...banks, newBank]);
+        setBankName('');
         setError('');
-        setSaveStoreAsAll(false); // Reset checkbox after saving
+        setSaveStoreAsAll(false);
 
         Swal.fire({
           icon: 'success',
@@ -119,11 +120,10 @@ export default function BankModel({ UserName, store }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete('http://localhost:5000/api/banks/delete_bank', {
-            data: { bankName }, // Send bank name in the body of the delete request
+            data: { bankName },
           });
 
           if (response.status === 200) {
-            // Remove the deleted bank from the state to update the UI
             setBanks(banks.filter(bank => bank.bankName !== bankName));
 
             Swal.fire('Deleted!', `Bank "${bankName}" has been deleted.`, 'success');
@@ -158,15 +158,15 @@ export default function BankModel({ UserName, store }) {
         <label htmlFor="bankName">Bank Name</label>
         <input
           type="text"
+            autoComplete='off'
           id="bankName"
           value={bankName}
           onChange={(e) => setBankName(e.target.value)}
           placeholder="Enter bank name"
         />
-        {error && <p className="error-message">{error}</p>}
 
-        {/* Checkbox to save store as "all" */}
-        <div className="check-box" style={{display:"none"}}>
+        {/* Checkbox to save store as "all" (hidden) */}
+        <div className="check-box" style={{ display: "none" }}>
           <input
             type="checkbox"
             id="allowStore"
@@ -176,54 +176,44 @@ export default function BankModel({ UserName, store }) {
           <label htmlFor="allowStore">All Store</label>
         </div>
 
-        <div className="button-group">
-          <button className='save-button' onClick={handleSave}>Save</button>
-        </div>
+        <button className='save-button' onClick={handleSave}>Save</button>
 
-        {/* Search box with FontAwesome icon */}
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search bank..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search bank..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
+      {error && <p className="error-message">{error}</p>}
+
       <div className="bank-grid">
-        <table>
-          <thead id='bank-grid-header'>
-            <tr>
-              <th>No</th>
-              <th>Bank Name</th>
-              <th>User</th>
-              <th>Store</th>
-              <th>Added Time</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentBanks.map((bank, index) => (
-              <tr key={bank.id}>
-                <td>{indexOfFirstBank + index + 1}</td> {/*for continuous numbering*/}
-                <td>{bank.bankName}</td>
-                <td>{bank.user}</td>
-                <td>{bank.store}</td>
-                <td>{bank.saveTime}</td>
-                <td className="button-td">
+        <div className="cards-container">
+          {currentBanks.length > 0 ? (
+            currentBanks.map((bank) => (
+              <div className="bank-card" key={bank.id}>
+                <div className="card-image">
+                  <img src={batchImage} alt={`${bank.bankName} Logo`} loading="lazy" />
+                </div>
+                <div className="card-body">
+                  <h2>{bank.bankName}</h2>
+                </div>
+                <div className="card-actions">
                   <button
-                    className="delete-button" id='delete-button-bank-model'
+                    className="delete-button"
                     onClick={() => handleDelete(bank.bankName)}
                   >
                     Delete
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-banks-message">No banks found.</p>
+          )}
+        </div>
 
         {/* Pagination */}
         <div className="pagination">

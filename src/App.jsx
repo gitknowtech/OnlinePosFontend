@@ -16,6 +16,7 @@ import DueSummery from "./Supplier/DueSummary";
 import UserManage from "./UserFile/UserManagement";
 import SalesManage from "./Sales/sales";
 import Qutation from "./Invoice/invoiceNew";
+import Reports from "./Reports/Reports";
 
 
 function App() {
@@ -43,7 +44,8 @@ function App() {
           <Route path="ManageUser" element={<UserManage />} />
           <Route path="Sales" element={<SalesManage/>} />      {/* You can add other nested routes under Dashboard */}
           <Route path="invoiceNew" element={<Qutation/>} />
-        </Route>
+          <Route path="Reports" element={<Reports />} />
+        </Route> 
 
       </Routes>
     </Router>

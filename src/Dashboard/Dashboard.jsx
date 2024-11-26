@@ -19,7 +19,6 @@ import {
   faBars,
   faChartBar,
   faRightFromBracket,
-  faUserCircle,
   faBarsProgress,
   faEnvelope,
   faTry,
@@ -251,6 +250,7 @@ const Dashboard = () => {
                     </Link>
                   </div>
                 </li>
+                <hr />
                 <li>
                   <div className="icon-link">
                   <Link
@@ -260,7 +260,6 @@ const Dashboard = () => {
                     <span className="link-name">PRODUCTS</span>
                   </Link>
                   </div>
-                  <hr />
                 </li>
                 <li>
                   <div className="icon-link">
@@ -281,18 +280,6 @@ const Dashboard = () => {
                       <span className="link-name">User</span>
                     </Link>
                     </div>
-                </li>
-
-                <li>
-                  <div className="icon-link">
-                    <a href="#">
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faUserCircle}
-                      />
-                      <span className="link-name">EMPLOYEE</span>
-                    </a>
-                  </div>
                 </li>
                 <li>
                   <div className="icon-link">
@@ -317,10 +304,12 @@ const Dashboard = () => {
                 </li>
                 <li>
                   <div className="icon-link">
-                    <a href="#">
-                      <FontAwesomeIcon className="nav-icon" icon={faFileText} />
+                  <Link
+                    to="Reports"
+                    state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
+                      <FontAwesomeIcon className="nav-icon" icon={faFileText}/>
                       <span className="link-name">REPORTS</span>
-                    </a>
+                    </Link>
                   </div>
                 </li>
                 <li>
