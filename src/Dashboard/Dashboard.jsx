@@ -305,10 +305,10 @@ const Dashboard = () => {
                 <li>
                   <div className="icon-link">
                   <Link
-                    to="Reports"
+                    to="Charts"
                     state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
                       <FontAwesomeIcon className="nav-icon" icon={faFileText}/>
-                      <span className="link-name">REPORTS</span>
+                      <span className="link-name">CHARTS</span>
                     </Link>
                   </div>
                 </li>
@@ -316,7 +316,7 @@ const Dashboard = () => {
                   <div className="icon-link">
                     <a href="#">
                       <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
-                      <span className="link-name">CHART</span>
+                      <span className="link-name">REPORT</span>
                     </a>
                   </div>
                 </li>

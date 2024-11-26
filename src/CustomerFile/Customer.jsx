@@ -12,7 +12,6 @@ import "../css1/Customer.css";
 import AddCustomer from './AddCustomer';
 import ManageCustomer from "./ManageCustomer";
 import Creditsales from "./CreditSales";
-import CustomerReport from './CustomerReport';
 import CustomerBalance from "./customerBalance";
 
 const Customer = () => {
@@ -35,9 +34,6 @@ const Customer = () => {
     setActiveContent(activeContent === "CreditSales" ? null : "CreditSales");
   };
 
-  const toggleReportCustomer = () => {
-    setActiveContent(activeContent === "CustomerReport" ? null : "CustomerReport");
-  };
 
   const toggleCustomerBalance = () => {
     setActiveContent(activeContent === "CustomerBalance" ? null : "CustomerBalance");
@@ -68,10 +64,6 @@ const Customer = () => {
           <FontAwesomeIcon className="button-icon" icon={faAddressCard} />
           Credit Sales
         </button>
-        <button onClick={toggleReportCustomer}>
-          <FontAwesomeIcon className="button-icon" icon={faChartLine} />
-          Customer Report
-        </button>
         <button onClick={toggleCustomerBalance}>
           <FontAwesomeIcon className="button-icon" icon={faCreditCard} />
           Customer Balance
@@ -83,7 +75,6 @@ const Customer = () => {
         {activeContent === "addCustomer" && <AddCustomer UserName={UserName} store={Store} />}
         {activeContent === "manageCustomer" && <ManageCustomer UserName={UserName} store={Store} />}
         {activeContent === "CreditSales" && <Creditsales UserName={UserName} store={Store} />}
-        {activeContent === "CustomerReport" && <CustomerReport UserName={UserName} store={Store} />}
         {activeContent === "CustomerBalance" && <CustomerBalance UserName={UserName} store={Store} />}
       </div>
     </div>

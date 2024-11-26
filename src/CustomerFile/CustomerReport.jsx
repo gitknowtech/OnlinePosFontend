@@ -174,7 +174,7 @@ const CustomerReport = () => {
 
   return (
     <div id="container-customer-report">
-      <h2 id="title-customer-report">Customer Sales Report</h2>
+      <h2 id="title-customer-report">Customer Sales Chart</h2>
 
       <div id="search-container-customer-report">
         <input
@@ -205,7 +205,7 @@ const CustomerReport = () => {
         <canvas id="customer-sales-chart"></canvas>
       </div>
 
-      <h2 id="title-loan-payment-report">Customer Loan Payment Report</h2>
+      <h2 id="title-loan-payment-report">Customer Loan Payment Chart</h2>
       <div id="search-container-loan-report">
         <input
           type="text"

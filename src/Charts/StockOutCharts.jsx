@@ -1,12 +1,12 @@
-// StockOutReport.jsx
+// StockOutCharts.jsx
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import debounce from 'lodash.debounce';
 import Chart from 'chart.js/auto';
-import '../css/StockOutReport.css'; // Import the CSS for styling
+import '../css/StockOutChart.css'; // Import the CSS for styling
 
-const StockOutReport = () => {
+const StockOutCharts = () => {
   // State variables
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -32,7 +32,7 @@ const StockOutReport = () => {
         return;
       }
       try {
-        const response = await axios.get('http://localhost:5000/api/products/search_stock', {
+        const response = await axios.get('http://localhost:5000/api/products/search_stock_out_chart', {
           params: { query },
         });
         setSuggestions(response.data);
@@ -278,20 +278,33 @@ const StockOutReport = () => {
       {error && <p className="error-message">{error}</p>}
 
       {/* Product Information */}
+      {/* Product Information */}
       {selectedProduct && openingBalance && (
         <div className="product-info">
-          <h2>{selectedProduct.productName}</h2>
-          <p>
-            <strong>Product ID:</strong> {selectedProduct.productId}
-          </p>
-          <p>
-            <strong>Barcode:</strong> {selectedProduct.barcode}
-          </p>
-          <p>
-            <strong>Opening Balance:</strong> {openingBalance.openingBalance}
-          </p>
+          {/* Product Image */}
+          {selectedProduct.imageLink && (
+            <img
+              src={selectedProduct.imageLink}
+              alt={selectedProduct.productName}
+              className="product-image"
+            />
+          )}
+          {/* Product Details */}
+          <div className="product-details">
+            <h2>{selectedProduct.productName}</h2>
+            <p>
+              <strong>Product ID:</strong> {selectedProduct.productId}
+            </p>
+            <p>
+              <strong>Barcode:</strong> {selectedProduct.barcode}
+            </p>
+            <p>
+              <strong>Opening Balance:</strong> {openingBalance.openingBalance}
+            </p>
+          </div>
         </div>
       )}
+
 
       {/* Chart */}
       {stockOutData.length > 0 && (
@@ -304,4 +317,4 @@ const StockOutReport = () => {
   );
 };
 
-export default StockOutReport;
+export default StockOutCharts;
