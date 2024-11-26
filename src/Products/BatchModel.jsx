@@ -1,27 +1,25 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Swal from "sweetalert2"; // Import SweetAlert2
-import "../css/BatchModel.css"; // Ensure to create a corresponding CSS file
+import Swal from "sweetalert2";
+import "../css/BatchModel.css"; // Ensure the CSS file exists
+import batchImage from "../assets/images/batch.png"; // Placeholder image for batches
 
 export default function BatchModel({ UserName, store }) {
   const [batchName, setBatchName] = useState("");
   const [batches, setBatches] = useState([]);
   const [editingBatchId, setEditingBatchId] = useState(null);
   const [editedBatchName, setEditedBatchName] = useState("");
-  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [batchesPerPage] = useState(8); // Number of batches per page
+  const [batchesPerPage] = useState(30); // Number of batches per page
 
-  // Fetch batches when the component mounts
   useEffect(() => {
     const fetchBatches = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/batches/get_batches");
         setBatches(response.data);
       } catch (err) {
-        console.error("Error fetching batches:", err);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -33,7 +31,7 @@ export default function BatchModel({ UserName, store }) {
   }, []);
 
   const handleSave = async () => {
-    if (batchName.trim() === "") {
+    if (!batchName.trim()) {
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -66,22 +64,18 @@ export default function BatchModel({ UserName, store }) {
         const newBatch = {
           id: response.data.id,
           batchName,
-          user: UserName,
           store,
-          saveTime: new Date().toISOString(), // Add save time
+          saveTime: new Date().toISOString().slice(0, 10), // Add save time (YYYY-MM-DD format)
         };
 
         setBatches([...batches, newBatch]);
         setBatchName(""); // Clear the input
-        setError("");
 
         Swal.fire({
           icon: "success",
           title: "Batch Saved",
           text: "Batch has been added successfully!",
         });
-      } else {
-        throw new Error("Failed to save batch");
       }
     } catch (error) {
       Swal.fire({
@@ -98,54 +92,33 @@ export default function BatchModel({ UserName, store }) {
   };
 
   const handleUpdateClick = async (batchId) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to update this batch?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, update it!",
-      cancelButtonText: "No, cancel",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await axios.put(
-            `http://localhost:5000/api/batches/update_batch/${batchId}`,
-            { batchName: editedBatchName }
-          );
-  
-          if (response.status === 200) {
-            setBatches(
-              batches.map((batch) =>
-                batch.id === batchId ? { ...batch, batchName: editedBatchName } : batch
-              )
-            );
-            setEditingBatchId(null);
-            Swal.fire({
-              icon: "success",
-              title: "Batch Updated",
-              text: "Batch and related products have been updated successfully!",
-            });
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 400 && error.response.data.message === 'Batch name already available') {
-            Swal.fire({
-              icon: "error",
-              title: "Duplicate Entry",
-              text: "The batch name already exists. Please choose a different name.",
-            });
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: `Error updating batch: ${error.message}`,
-            });
-          }
-        }
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/batches/update_batch/${batchId}`,
+        { batchName: editedBatchName }
+      );
+
+      if (response.status === 200) {
+        setBatches(
+          batches.map((batch) =>
+            batch.id === batchId ? { ...batch, batchName: editedBatchName } : batch
+          )
+        );
+        setEditingBatchId(null);
+        Swal.fire({
+          icon: "success",
+          title: "Batch Updated",
+          text: "Batch has been updated successfully!",
+        });
       }
-    });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.message || "Error updating batch",
+      });
+    }
   };
-  
-  
 
   const handleDelete = async (batchName) => {
     Swal.fire({
@@ -170,7 +143,7 @@ export default function BatchModel({ UserName, store }) {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: `Failed to delete batch: ${err.response?.data?.message || err.message}`,
+            text: err.response?.data?.message || "Failed to delete batch",
           });
         }
       }
@@ -190,7 +163,6 @@ export default function BatchModel({ UserName, store }) {
   return (
     <div className="batch-model">
       <div className="batch-form">
-        <label htmlFor="batchName">Batch Name</label>
         <input
           type="text"
           id="batchName"
@@ -199,14 +171,9 @@ export default function BatchModel({ UserName, store }) {
           onChange={(e) => setBatchName(e.target.value)}
           placeholder="Enter batch name"
         />
-        {error && <p className="error-message">{error}</p>}
-
-        <div className="button-group">
-          <button className="saveButton" onClick={handleSave}>
-            Save
-          </button>
-        </div>
-
+        <button className="save-button" onClick={handleSave}>
+          Save
+        </button>
         <div className="search-box">
           <input
             type="text"
@@ -217,80 +184,57 @@ export default function BatchModel({ UserName, store }) {
         </div>
       </div>
 
-      <div className="batch-grid">
-        <table>
-          <thead id="batch-grid-batch-model">
-            <tr>
-              <th>No</th>
-              <th>Batch Name</th>
-              <th>User</th>
-              <th>Store</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentBatches.map((batch, index) => (
-              <tr key={batch.id}>
-                <td>{indexOfFirstBatch + index + 1}</td>
-                <td>
-                  {editingBatchId === batch.id ? (
-                    <input
-                      type="text"
-                      value={editedBatchName}
-                      onChange={(e) => setEditedBatchName(e.target.value)}
-                    />
-                  ) : (
-                    batch.batchName
-                  )}
-                </td>
-                <td>{batch.user}</td>
-                <td>{batch.store}</td>
-                <td className="button-td">
-                  {editingBatchId === batch.id ? (
-                    <button
-                      className="update-button"
-                      onClick={() => handleUpdateClick(batch.id)}
-                    >
-                      Update
-                    </button>
-                  ) : (
-                    <button
-                      className="edit-button"
-                      onClick={() => handleEditClick(batch.id, batch.batchName)}
-                    >
-                      Edit
-                    </button>
-                  )}
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDelete(batch.batchName)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="batch-cards">
+        {currentBatches.map((batch) => (
+          <div className="batch-card" key={batch.id}>
+            <img src={batchImage} alt="Batch" className="batch-image" />
+            {editingBatchId === batch.id ? (
+              <input
+                type="text"
+                value={editedBatchName}
+                onChange={(e) => setEditedBatchName(e.target.value)}
+                className="edit-input"
+              />
+            ) : (
+              <h4>{batch.batchName}</h4>
+            )}
+            <p>Store: {batch.store}</p>
+            <div className="batch-actions">
+              {editingBatchId === batch.id ? (
+                <button className="update-button" onClick={() => handleUpdateClick(batch.id)}>
+                  Update
+                </button>
+              ) : (
+                <button
+                  className="edit-button"
+                  onClick={() => handleEditClick(batch.id, batch.batchName)}
+                >
+                  Edit
+                </button>
+              )}
+              <button className="delete-button" onClick={() => handleDelete(batch.batchName)}>
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
 
-        {/* Pagination */}
-        <div className="pagination">
-          {[...Array(Math.ceil(filteredBatches.length / batchesPerPage)).keys()].map((number) => (
-            <button
-              key={number + 1}
-              onClick={() => paginate(number + 1)}
-              className={currentPage === number + 1 ? "active" : ""}
-            >
-              {number + 1}
-            </button>
-          ))}
-        </div>
+      <div className="pagination">
+        {[...Array(Math.ceil(filteredBatches.length / batchesPerPage)).keys()].map((number) => (
+          <button
+            key={number + 1}
+            onClick={() => paginate(number + 1)}
+            className={currentPage === number + 1 ? "active" : ""}
+          >
+            {number + 1}
+          </button>
+        ))}
       </div>
     </div>
   );
 }
 
-// Validate props with PropTypes
 BatchModel.propTypes = {
   UserName: PropTypes.string.isRequired,
   store: PropTypes.string.isRequired,

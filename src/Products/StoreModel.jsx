@@ -1,27 +1,25 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Swal from "sweetalert2"; // Import SweetAlert2
-import "../css/StoreModel.css"; // Ensure to create a corresponding CSS file
+import Swal from "sweetalert2";
+import "../css/storeModel.css"; // Import the CSS file
+import storeImage from "../assets/images/store.png"; // Placeholder image for stores
 
 export default function StoreModel({ UserName, store }) {
   const [storeName, setStoreName] = useState("");
   const [stores, setStores] = useState([]);
   const [editingStoreId, setEditingStoreId] = useState(null);
   const [editedStoreName, setEditedStoreName] = useState("");
-  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [storesPerPage] = useState(8); // Number of stores per page
+  const [storesPerPage] = useState(8);
 
-  // Fetch stores when the component mounts
   useEffect(() => {
     const fetchStores = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/stores/get_stores");
         setStores(response.data);
       } catch (err) {
-        console.error("Error fetching stores:", err);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -33,7 +31,7 @@ export default function StoreModel({ UserName, store }) {
   }, []);
 
   const handleSave = async () => {
-    if (storeName.trim() === "") {
+    if (!storeName.trim()) {
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -68,20 +66,17 @@ export default function StoreModel({ UserName, store }) {
           id: response.data.id,
           storeName,
           user: UserName,
-          store,
+          storeImage: storeImage, // Add placeholder image
         };
 
         setStores([...stores, newStore]);
-        setStoreName(""); // Clear the input
-        setError("");
+        setStoreName("");
 
         Swal.fire({
           icon: "success",
           title: "Store Saved",
           text: "Store has been added successfully!",
         });
-      } else {
-        throw new Error("Failed to save store");
       }
     } catch (error) {
       Swal.fire({
@@ -103,7 +98,7 @@ export default function StoreModel({ UserName, store }) {
         `http://localhost:5000/api/stores/update_store/${storeId}`,
         { storeName: editedStoreName }
       );
-  
+
       if (response.status === 200) {
         setStores(
           stores.map((store) =>
@@ -116,12 +111,9 @@ export default function StoreModel({ UserName, store }) {
           title: "Store Updated",
           text: "Store has been updated successfully!",
         });
-      } else {
-        throw new Error("Failed to update store");
       }
     } catch (error) {
-      // Check for duplicate error message from the API
-      if (error.response && error.response.status === 400 && error.response.data.message === 'Store name already exists') {
+      if (error.response && error.response.status === 400) {
         Swal.fire({
           icon: "error",
           title: "Duplicate Entry",
@@ -136,7 +128,6 @@ export default function StoreModel({ UserName, store }) {
       }
     }
   };
-  
 
   const handleDelete = async (storeId, storeName) => {
     Swal.fire({
@@ -177,25 +168,18 @@ export default function StoreModel({ UserName, store }) {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="batch-model">
-      <div className="batch-form">
-        <label htmlFor="storeName">Store Name</label>
+    <div className="store-model">
+      <div className="store-form">
         <input
           type="text"
           autoComplete="off"
-          id="storeName"
           value={storeName}
           onChange={(e) => setStoreName(e.target.value)}
           placeholder="Enter store name"
         />
-        {error && <p className="error-message">{error}</p>}
-
-        <div className="button-group">
-          <button className="saveButton" onClick={handleSave}>
-            Save
-          </button>
-        </div>
-
+        <button className="save-button" onClick={handleSave}>
+          Save
+        </button>
         <div className="search-box">
           <input
             type="text"
@@ -207,78 +191,64 @@ export default function StoreModel({ UserName, store }) {
         </div>
       </div>
 
-      <div className="batch-grid">
-        <table id="batch-grid-header">
-          <thead>
-            <tr id="batch-grid-">
-              <th>No</th>
-              <th>Store Name</th>
-              <th>User</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentStores.map((store, index) => (
-              <tr key={store.id}>
-                <td>{indexOfFirstStore + index + 1}</td>
-                <td>
-                  {editingStoreId === store.id ? (
-                    <input
-                      type="text"
-                      value={editedStoreName}
-                      onChange={(e) => setEditedStoreName(e.target.value)}
-                    />
-                  ) : (
-                    store.storeName
-                  )}
-                </td>
-                <td>{store.user}</td>
-                <td className="button-td">
-                  {editingStoreId === store.id ? (
-                    <button
-                      className="update-button"
-                      onClick={() => handleUpdateClick(store.id)}
-                    >
-                      Update
-                    </button>
-                  ) : (
-                    <button
-                      className="edit-button"
-                      onClick={() => handleEditClick(store.id, store.storeName)}
-                    >
-                      Edit
-                    </button>
-                  )}
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDelete(store.id, store.storeName)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="store-cards">
+        {currentStores.map((store) => (
+          <div className="store-card" key={store.id}>
+            <img
+              src={store.storeImage || storeImage} // Use dynamic or placeholder image
+              alt="Store"
+              className="store-image"
+            />
+            {editingStoreId === store.id ? (
+              <input
+                type="text"
+                value={editedStoreName}
+                onChange={(e) => setEditedStoreName(e.target.value)}
+                className="edit-input"
+              />
+            ) : (
+              <h4>{store.storeName}</h4>
+            )}
+            <p>User: {store.user}</p>
+           {/*} <div className="store-actions">
+              {editingStoreId === store.id ? (
+                <button className="update-button" onClick={() => handleUpdateClick(store.id)}>
+                  Update
+                </button>
+              ) : (
+                <button
+                  className="edit-button"
+                  onClick={() => handleEditClick(store.id, store.storeName)}
+                >
+                  Edit
+                </button>
+              )}
+              <button
+                className="delete-button"
+                onClick={() => handleDelete(store.id, store.storeName)}
+              >
+                Delete
+              </button>
+            </div>*/}
+          </div>
+        ))}
+      </div>
 
-        {/* Pagination */}
-        <div className="pagination">
-          {[...Array(Math.ceil(filteredStores.length / storesPerPage)).keys()].map((number) => (
-            <button
-              key={number + 1}
-              onClick={() => paginate(number + 1)}
-              className={currentPage === number + 1 ? "active" : ""}
-            >
-              {number + 1}
-            </button>
-          ))}
-        </div>
+      <div className="pagination">
+        {[...Array(Math.ceil(filteredStores.length / storesPerPage)).keys()].map((number) => (
+          <button
+            key={number + 1}
+            onClick={() => paginate(number + 1)}
+            className={currentPage === number + 1 ? "active" : ""}
+          >
+            {number + 1}
+          </button>
+        ))}
       </div>
     </div>
   );
 }
 
-// Validate props with PropTypes
 StoreModel.propTypes = {
   UserName: PropTypes.string.isRequired,
   store: PropTypes.string.isRequired,
