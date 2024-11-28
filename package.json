@@ -1,5 +1,6 @@
 {
   "name": "possystem-v1",
+  "homePage": "./",
   "private": true,
   "version": "0.0.0",
   "type": "module",
