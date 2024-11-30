@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 
 
 // Import the edit and delete images
-import editimage from "../assets/icons/edit.png";
 import deleteimage from "../assets/icons/bin.png";
 
 const SalesTable = ({ store }) => {
