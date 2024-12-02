@@ -27,8 +27,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
     if (show) {
       setDiscountPercent("0");
       setDiscountAmount("0");
-      setCashPayment("0");
-      setCardPayment("0");
+      setCashPayment("");
+      setCardPayment("");
       setNetAmount(totalAmount);
       setBalance(totalAmount);
 
