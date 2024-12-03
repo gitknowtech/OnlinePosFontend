@@ -173,29 +173,49 @@ const CreditSales = ({ store }) => {
 
   const handleModalInputChange = (field, value) => {
     const numericValue = value === "" ? 0 : parseFloat(value);
-
-    setModalData((prevData) => {
-      const updatedData = { ...prevData, [field]: numericValue };
-
-      const cashPay = parseFloat(updatedData.CashPay) || 0;
-      const cardPay = parseFloat(updatedData.CardPay) || 0;
-      const grossTotal = parseFloat(updatedData.GrossTotal) || 0;
-
-      updatedData.Balance = (grossTotal - (cashPay + cardPay)).toFixed(2);
-
-      // Ensure balance is not negative
-      if (updatedData.Balance < 0) {
-        Swal.fire({
-          icon: "warning",
-          title: "Invalid Balance",
-          text: "Balance cannot be negative.",
-        });
-        updatedData.Balance = prevData.Balance; // Revert to previous balance
-      }
-
-      return updatedData;
-    });
+  
+    // Determine the new CashPay and CardPay values based on the field being updated
+    let newCashPay = parseFloat(modalData.CashPay) || 0;
+    let newCardPay = parseFloat(modalData.CardPay) || 0;
+  
+    if (field === "CashPay") {
+      newCashPay = numericValue;
+    } else if (field === "CardPay") {
+      newCardPay = numericValue;
+    }
+  
+    const netAmount = parseFloat(modalData.netAmount) || 0;
+    const totalPayments = newCashPay + newCardPay;
+  
+    // Validate that total payments do not exceed Net Amount
+    if (totalPayments > netAmount) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Payment",
+        text: `The total of Cash Pay (${newCashPay.toFixed(
+          2
+        )}) and Card Pay (${newCardPay.toFixed(
+          2
+        )}) cannot exceed the Net Amount (${netAmount.toFixed(2)}).`,
+      }).then(() => {
+        // Revert the changed field to its previous value
+        setModalData((prevData) => ({
+          ...prevData,
+          [field]: oldValues[field],
+        }));
+      });
+      return; // Exit the function to prevent updating the state with invalid values
+    }
+  
+    // If validation passes, update the modalData with new values and calculate the Balance
+    setModalData((prevData) => ({
+      ...prevData,
+      [field]: numericValue,
+      Balance: (netAmount - totalPayments).toFixed(2),
+    }));
   };
+  
+  
 
 
 
@@ -497,9 +517,10 @@ const CreditSales = ({ store }) => {
               <input type="text" value={modalData.invoiceId || ""} readOnly />
             </div>
             <div className="modal-field">
-              <label>Gross Total:</label>
-              <input type="text" value={modalData.GrossTotal || ""} readOnly />
+              <label>Net Amount:</label>
+              <input type="text" value={modalData.netAmount || ""} readOnly />
             </div>
+
             <div className="modal-field">
               <label>Cash Pay:</label>
               <input

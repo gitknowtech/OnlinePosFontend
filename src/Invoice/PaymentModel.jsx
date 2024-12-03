@@ -354,6 +354,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
               placeholder="Enter Cash Payment"
               value={cashPayment}
               onChange={handleCashPaymentChange}
+              disabled={paymentType === "Return Payment"}
             />
           </div>
           <div id="card-payment-group">
@@ -366,6 +367,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
               placeholder="Enter Card Payment"
               value={cardPayment}
               onChange={handleCardPaymentChange}
+              disabled={paymentType === "Return Payment"}
             />
           </div>
 

@@ -1,25 +1,20 @@
-// Import necessary modules and components
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-import PropTypes from "prop-types";
-
-// Importing Modal Components
 import OtherItemModel from "../models/OtherItemModel";
 import ReturnModel from "../models/ReturnModel";
 import StockModel from "../models/StockModel";
 import ExpensesModel from "../models/ExpensesModel";
+import "../css1/invoice.css";
 import PaymentModel from "./PaymentModel";
 import Calculator from "../models/Calculator";
 import TodaySales from "./TodaySales";
 import TodayIssueBillCheck from "./TodayIssueBillCheck";
-import CustomerBalance from "../CustomerFile/customerBalance";
 
-// Importing CSS
-import "../css1/invoice.css";
 
-// Importing Images
+
+// Ensure these image paths are correct in your project structure
 import productimage from "../assets/images/products.png";
 import bill from "../assets/images/bill.png";
 import customer from "../assets/images/customer.png";
@@ -34,20 +29,13 @@ import discount from "../assets/images/discount.png";
 import wholesale from "../assets/images/wholesale.png";
 import removeImage from "../assets/images/remove.png";
 import calculatorImage from "../assets/icons/calculator.png";
-import addCashImage from "../assets/icons/addCash.png"; // Ensure this path is correct
-
-// Define the base URL for the backend API
-const API_BASE_URL = "http://localhost:5000"; // Adjust this if your backend runs on a different URL or port
+import CustomerBalance from "../CustomerFile/customerBalance";
 
 export default function Invoice() {
   const location = useLocation();
-
-  // User and Store Information
   const [user, setUser] = useState("Guest");
   const [store, setStore] = useState("Default Store");
   const [startTime, setStartTime] = useState("");
-
-  // Product and Invoice Data
   const [price, setPrice] = useState("");
   const [barcode, setBarcode] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -71,29 +59,18 @@ export default function Invoice() {
   });
   const [percentage, setPercentage] = useState(""); // State for percentage input
 
-  // References for Input Fields
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
   const barcodeInputRef = useRef(null);
 
-  // Modal Visibility States
-  const [isTodaySalesOpen, setIsTodaySalesOpen] = useState(false);
-  const [isTodayIssueBillCheckOpen, setIsTodayIssueBillCheckOpen] = useState(false);
-  const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);
-  const [isExpensesModalOpen, setIsExpensesModalOpen] = useState(false);
-  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
-  const [isStockModalOpen, setIsStockModalOpen] = useState(false);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
-  const [isCustomerBalanceModalOpen, setIsCustomerBalanceModalOpen] = useState(false);
+  const [isTodaySalesOpen, setIsTodaySalesOpen] = useState(false); // State for modal
 
-  // New State for Display Mode
-  const [displayMode, setDisplayMode] = useState("Normal"); // "Normal" or "Promode"
-
-  // Handlers to Open and Close Modals
   const handleTodaySalesClick = () => {
     setIsTodaySalesOpen(true);
   };
+
+  const [isTodayIssueBillCheckOpen, setIsTodayIssueBillCheckOpen] =
+    useState(false); // State for the modal
 
   const handleTodayIssueBillCheckClick = () => {
     setIsTodayIssueBillCheckOpen(true);
@@ -107,11 +84,29 @@ export default function Invoice() {
     setIsTodaySalesOpen(false);
   };
 
+
+  // OtherItem model related contents
+  const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);
   const handleOtherItemClick = () => setIsOtherItemModalOpen(true);
   const handleCloseOtherItemModal = () => setIsOtherItemModalOpen(false);
-
+  // State to control expenses modal visibility
+  const [isExpensesModalOpen, setIsExpensesModalOpen] = useState(false);
   const handleExpensesClick = () => setIsExpensesModalOpen(true);
   const handleCloseExpensesModal = () => setIsExpensesModalOpen(false);
+  // State to control the visibility of the ReturnModel
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  // State to control the visibility of the StockModel
+  const [isStockModalOpen, setIsStockModalOpen] = useState(false);
+
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+
+  const handleCalculatorClick = () => setIsCalculatorOpen(true);
+  const handleCloseCalculator = () => setIsCalculatorOpen(false);  
+  const [isCustomerBalanceModalOpen, setIsCustomerBalanceModalOpen] =
+  useState(false);
+
 
   const handleOpenCustomerBalanceModal = () => {
     setIsCustomerBalanceModalOpen(true);
@@ -120,6 +115,7 @@ export default function Invoice() {
   const handleCloseCustomerBalanceModal = () => {
     setIsCustomerBalanceModalOpen(false);
   };
+
 
   const handleOpenPaymentModal = () => {
     console.log("Payment button clicked");
@@ -139,16 +135,15 @@ export default function Invoice() {
 
   const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
 
+  // Function to open the StockModel
   const handleStockClick = () => {
     setIsStockModalOpen(true);
   };
 
+  // Function to close the StockModel
   const handleCloseStockModal = () => {
     setIsStockModalOpen(false);
   };
-
-  const handleCalculatorClick = () => setIsCalculatorOpen(true);
-  const handleCloseCalculator = () => setIsCalculatorOpen(false);
 
   const handleProductSelect = (product) => {
     if (!product || !product.barcode) {
@@ -165,7 +160,6 @@ export default function Invoice() {
     barcodeInputRef.current.focus();
   };
 
-  // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
       switch (e.key) {
@@ -202,8 +196,6 @@ export default function Invoice() {
           setIsPaymentModalOpen(false);
           setIsTodaySalesOpen(false);
           setIsTodayIssueBillCheckOpen(false);
-          setIsCalculatorOpen(false);
-          setIsCustomerBalanceModalOpen(false);
           break;
         default:
           break;
@@ -216,7 +208,6 @@ export default function Invoice() {
     };
   }, []);
 
-  // Initialize User and Store Information
   useEffect(() => {
     if (location.state) {
       const { UserName, Store } = location.state;
@@ -233,12 +224,10 @@ export default function Invoice() {
     setStartTime(formattedTime);
   }, [location.state]);
 
-  // Calculate Totals Whenever tableData Changes
   useEffect(() => {
     calculateTotals();
   }, [tableData]);
 
-  // Handle Wholesale and Discount Toggle via Keyboard
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "F9") {
@@ -260,17 +249,16 @@ export default function Invoice() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isWholesale, isDiscount]);
+  }, [isWholesale, isDiscount]); // Add dependencies to keep the hook up-to-date
 
-  // Function to Add Other Item to Invoice
   const handleAddOtherItem = (item) => {
-    const { productName, productCost, productMRP, productRate, qty, discount, imageLink } = item;
+    const { productName, productCost, productMRP, productRate, qty, discount } =
+      item;
     const amount = parseFloat(productRate) * parseFloat(qty); // Calculate amount based on Rate and Quantity
 
     setTableData((prevData) => [
       ...prevData,
       {
-        productId: item.productId || "", // Ensure productId is included
         name: productName,
         cost: parseFloat(productCost).toFixed(2), // Cost
         mrp: parseFloat(productMRP).toFixed(2), // MRP
@@ -278,16 +266,13 @@ export default function Invoice() {
         rate: parseFloat(productRate).toFixed(2), // Rate
         quantity: parseFloat(qty).toFixed(2), // Quantity
         amount: amount.toFixed(2), // Total amount (Rate * Quantity)
-        barcode: item.barcode || "", // Include barcode if available
-        imageLink: imageLink || "", // Include imageLink
-        type: "new",
       },
     ]);
 
     setIsOtherItemModalOpen(false); // Close the modal after adding the item
   };
 
-  // Function to Handle Return Button Click
+  // Function to handle when the "Return" button is clicked
   const handleReturnClick = () => {
     console.log("Return button clicked"); // Debugging log
     setIsReturnModalOpen(true);
@@ -297,32 +282,30 @@ export default function Invoice() {
     setIsReturnModalOpen(false);
   };
 
-  // Function to Add Return Item to Invoice
   const handleAddReturnItem = (item) => {
     // Adjust the data to have negative values
-    const amount = -Math.abs(parseFloat(item.productSale) * parseFloat(item.qty));
+    const amount = -Math.abs(
+      parseFloat(item.productSale) * parseFloat(item.qty)
+    );
 
     setTableData((prevData) => [
       ...prevData,
       {
-        productId: item.productId || "", // Add productId
+        productId: item.productId, // Add productId
         name: item.productName,
         cost: (-Math.abs(parseFloat(item.productCost))).toFixed(2),
-        mrp: (-Math.abs(parseFloat(item.mrp))).toFixed(2), // Ensure MRP retains original value
+        mrp: -Math.abs(parseFloat(item.mrp).toFixed(2)), // Ensure MRP retains original value
         discount: (-Math.abs(parseFloat(item.discount))).toFixed(2),
         rate: (-Math.abs(parseFloat(item.productSale))).toFixed(2),
         quantity: (-Math.abs(parseFloat(item.qty))).toFixed(2),
         amount: amount.toFixed(2),
         type: "return", // Add a 'type' field to mark this as a return
-        barcode: item.barcode || "", // Include barcode
-        imageLink: item.imageLink || "", // Include imageLink
       },
     ]);
 
     setIsReturnModalOpen(false);
   };
 
-  // Function to Handle Quantity Change in Editable Cell
   const handleQuantityChange = (e, index) => {
     const newQuantity = e.target.value;
     setTableData((prevData) => {
@@ -332,7 +315,6 @@ export default function Invoice() {
     });
   };
 
-  // Function to Clear the Invoice Table
   const clearInvoiceTable = () => {
     setTableData([]); // Clears the table data
     setTotalAmount("0.00");
@@ -341,7 +323,6 @@ export default function Invoice() {
     setItemCount(0);
   };
 
-  // Function to Handle Quantity Editing with Enter Key
   const handleQuantityEditEnterKeyPress = async (e, index) => {
     if (e.key === "Enter") {
       const updatedQuantity = parseFloat(tableData[index].quantity);
@@ -391,7 +372,7 @@ export default function Invoice() {
       try {
         // Fetch available stock for the product
         const response = await axios.get(
-          `${API_BASE_URL}/api/invoices/stock_quantity?barcode=${barcode}`
+          `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
         );
         const availableStock = response.data.stockQuantity;
 
@@ -457,7 +438,6 @@ export default function Invoice() {
     }
   };
 
-  // Function to Handle Barcode Input Change and Fetch Suggestions
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
@@ -465,18 +445,17 @@ export default function Invoice() {
     if (input.length > 1) {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/api/products/search_invoice_by_store?query=${input}&store=${store}`
+          `http://localhost:5000/api/products/search_invoice_by_store?query=${input}&store=${store}`
         );
 
         const products = response.data;
 
         if (products.length === 0) {
-          // Optionally, you can remove the Swal alert to avoid spamming alerts
-          // Swal.fire(
-          //   "Not Found",
-          //   "No products found for this barcode.",
-          //   "warning"
-          // );
+          Swal.fire(
+            "Not Found",
+            "No products found for this barcode.",
+            "warning"
+          );
         } else {
           setSuggestions(products);
         }
@@ -489,12 +468,10 @@ export default function Invoice() {
     }
   };
 
-  // Function to Handle Percentage Input Change
   const handlePercentageChange = (value) => {
     setPercentage(value);
   };
 
-  // Function to Apply Percentage Discount
   const handlePercentageEnter = () => {
     const enteredPercentage = parseFloat(percentage);
 
@@ -514,7 +491,6 @@ export default function Invoice() {
     qtyInputRef.current.focus(); // Move focus to the quantity input
   };
 
-  // Function to Validate and Set Price
   const handlePriceEnter = () => {
     const enteredPrice = parseFloat(price);
     const originalPrice = parseFloat(suggestedPrice);
@@ -534,11 +510,10 @@ export default function Invoice() {
     qtyInputRef.current.focus();
   };
 
-  // Function to Handle Enter Key on Barcode Input
   const handleBarcodeEnter = async () => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/api/products/search_by_barcode?query=${barcode}`
+        `http://localhost:5000/api/products/search_by_barcode?query=${barcode}`
       );
 
       if (response.data.length > 0) {
@@ -547,6 +522,7 @@ export default function Invoice() {
         setLockedPrice(product.lockedPrice);
         setSuggestedPrice(product.mrpPrice);
         setProductId(product.productId); // Save productId to state
+        setBarcode(product.barcode);
 
         // Set the default price but allow user to edit
         if (isWholesale) {
@@ -589,7 +565,6 @@ export default function Invoice() {
                 quantity: "1.00",
                 amount: parseFloat(product.mrpPrice).toFixed(2),
                 barcode: product.barcode,
-                imageLink: product.imageLink || "", // Include imageLink
                 type: "new",
               },
             ];
@@ -607,12 +582,10 @@ export default function Invoice() {
         );
       }
     } catch (error) {
-      Swal.fire("Error", "Failed to fetch product by barcode", "error");
-      console.error("Error fetching product by barcode:", error);
+      Swal.fire("Error", "Failed to fetch product by barcode", error.message);
     }
   };
 
-  // Function to Handle Enter Key on Quantity Input
   const handleQtyEnter = async () => {
     if (!qty || isNaN(parseFloat(qty)) || parseFloat(qty) <= 0) {
       Swal.fire("Invalid Quantity", "Please enter a valid quantity.", "error");
@@ -630,7 +603,7 @@ export default function Invoice() {
     try {
       // Fetch available stock for the product
       const response = await axios.get(
-        `${API_BASE_URL}/api/invoices/stock_quantity?barcode=${barcode}`
+        `http://localhost:5000/api/invoices/stock_quantity?barcode=${barcode}`
       );
 
       const availableQuantity = response.data.stockQuantity;
@@ -662,13 +635,10 @@ export default function Invoice() {
           name: productName,
           cost: parseFloat(costPrice || 0).toFixed(2),
           mrp: parseFloat(suggestedPrice || 0).toFixed(2),
-          discount: (
-            parseFloat(suggestedPrice || 0) - enteredPrice
-          ).toFixed(2),
+          discount: (parseFloat(suggestedPrice || 0) - enteredPrice).toFixed(2),
           rate: enteredPrice.toFixed(2),
           quantity: requestedQuantity.toFixed(2),
           amount: (requestedQuantity * enteredPrice).toFixed(2),
-          imageLink: "", // You can set imageLink if available
           type: "new",
         },
       ]);
@@ -687,12 +657,10 @@ export default function Invoice() {
     }
   };
 
-  // Function to Delete a Row from the Invoice Table
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
 
-  // Function to Calculate Totals
   const calculateTotals = () => {
     // Filter out items with negative discount or quantity
     const validItems = tableData.filter(
@@ -721,7 +689,6 @@ export default function Invoice() {
     setItemCount(validItems.length);
   };
 
-  // Function to Handle Virtual Keyboard Enter
   const handleVirtualEnter = () => {
     if (document.activeElement === barcodeInputRef.current) {
       handleBarcodeEnter();
@@ -732,7 +699,6 @@ export default function Invoice() {
     }
   };
 
-  // Function to Handle Checkbox Changes
   const handleCheckboxChange = (type) => {
     if (type === "wholesale") {
       setIsWholesale(!isWholesale);
@@ -743,23 +709,22 @@ export default function Invoice() {
     }
   };
 
-  // Function to Handle Suggestion Click
   const handleSuggestionClick = (suggestion) => {
     // Set all necessary fields from the selected suggestion
     setBarcode(suggestion.barcode);
-    setProductId(suggestion.productId || ""); // Save productId to state
-    setCostPrice(suggestion.costPrice || "");
-    setLockedPrice(suggestion.lockedPrice || "");
-    setProductName(suggestion.productName || "");
-    setSuggestedPrice(suggestion.mrpPrice || "");
+    setProductId(suggestion.productId); // Save productId to state
+    setCostPrice(suggestion.costPrice);
+    setLockedPrice(suggestion.lockedPrice);
+    setProductName(suggestion.productName);
+    setSuggestedPrice(suggestion.mrpPrice);
 
     // Determine the default price based on conditions
     if (isWholesale) {
-      setPrice(suggestion.wholesalePrice || suggestion.mrpPrice);
+      setPrice(suggestion.wholesalePrice);
     } else if (isDiscount) {
-      setPrice(suggestion.discountPrice || suggestion.mrpPrice);
+      setPrice(suggestion.discountPrice);
     } else {
-      setPrice(suggestion.mrpPrice || "");
+      setPrice(suggestion.mrpPrice);
     }
 
     // Clear the suggestions dropdown
@@ -774,7 +739,6 @@ export default function Invoice() {
     }, 100); // Delay ensures focus works even after state updates
   };
 
-  // Functions to Handle Virtual Keyboard Inputs
   const handleNumericInput = (value) => {
     if (document.activeElement) {
       document.activeElement.value += value;
@@ -802,18 +766,9 @@ export default function Invoice() {
     }
   };
 
-  // Function to Handle Add Payment Click (for both table and card views)
-  const handleAddPaymentClick = (item) => {
-    // Implement payment logic here
-    // For example, you might want to pre-fill payment modal with item details
-    // This function is currently a placeholder
-    handleOpenPaymentModal();
-  };
-
   return (
     <div className="invoice-container">
       <div className="left-panel">
-        {/* Header Information */}
         <div className="header-info" id="header-info-invoice">
           <div>
             <label id="user-label">
@@ -832,7 +787,6 @@ export default function Invoice() {
           </div>
         </div>
 
-        {/* Barcode Scanning Section */}
         <div className="scan-barcode">
           <input
             type="text"
@@ -876,12 +830,11 @@ export default function Invoice() {
             ref={qtyInputRef}
           />
 
-          {/* Suggestions Dropdown */}
           {suggestions.length > 0 && (
             <div id="suggestions_dropdown" className="suggestions-dropdown">
               {suggestions.map((suggestion) => (
                 <div
-                  key={suggestion.productId} // Use unique identifier
+                  key={suggestion.id}
                   className="suggestion-item"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
@@ -897,230 +850,109 @@ export default function Invoice() {
           )}
         </div>
 
-        {/* Display Mode Selector */}
-        <div className="display-mode-selector" style={{ marginBottom: "20px" }}>
-          <label style={{ marginRight: "20px" }}>
-            <input
-              type="radio"
-              value="Normal"
-              checked={displayMode === "Normal"}
-              onChange={() => setDisplayMode("Normal")}
-            />
-            Normal
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="Promode"
-              checked={displayMode === "Promode"}
-              onChange={() => setDisplayMode("Promode")}
-            />
-            Promode
-          </label>
-        </div>
-
-        {/* Conditional Rendering: Table or Cards */}
-        {displayMode === "Normal" ? (
-          <div className="table-container" id="table_container_div">
-            <table className="product-table" id="product-table-invoice">
-              <thead>
-                <tr>
-                  <th>Product ID</th> {/* Add Product ID Column */}
-                  <th>Name</th>
-                  <th style={{ textAlign: "center", display: "none" }}>Cost</th>
-                  <th>MRP</th>
-                  <th>Discount</th>
-                  <th>Rate</th>
-                  <th>Qty</th>
-                  <th>Amount</th>
-                  <th>Actions</th> {/* Add Actions Column */}
-                </tr>
-              </thead>
-              <tbody>
-                {tableData.map((item, index) => (
-                  <tr
-                    key={index}
-                    className={
-                      item.type === "return"
-                        ? "return-row"
-                        : item.type === "new"
-                        ? "new-row"
-                        : ""
-                    }
-                    style={
-                      item.type === "return"
-                        ? { backgroundColor: "#fcd8d8" } // Light red for return
-                        : item.type === "new"
-                        ? { backgroundColor: "#d8fcdb" } // Light green for new items
-                        : {}
-                    }
-                  >
-                    <td>{item.productId}</td> {/* Render Product ID */}
-                    <td>{item.name}</td>
-                    <td style={{ textAlign: "center", display: "none" }}>
-                      {item.cost}
-                    </td>
-                    <td style={{ textAlign: "center" }}>{item.mrp}</td>
-                    <td style={{ textAlign: "center" }}>{item.discount}</td>
-                    <td style={{ textAlign: "center" }}>{item.rate}</td>
-                    {/* Quantity Cell */}
-                    <td
-                      style={{ textAlign: "center" }}
-                      onDoubleClick={() =>
-                        setEditingCell({ rowIndex: index, field: "quantity" })
-                      }
-                    >
-                      {editingCell.rowIndex === index &&
-                      editingCell.field === "quantity" ? (
-                        <input
-                          type="text"
-                          value={item.quantity}
-                          onChange={(e) => handleQuantityChange(e, index)}
-                          onKeyDown={(e) =>
-                            handleQuantityEditEnterKeyPress(e, index)
-                          }
-                          onBlur={() =>
-                            setEditingCell({ rowIndex: null, field: null })
-                          }
-                          style={{ width: "50px", textAlign: "center" }}
-                          autoFocus
-                        />
-                      ) : (
-                        item.quantity
-                      )}
-                    </td>
-                    <td style={{ textAlign: "center" }}>{item.amount}</td>
-                    {/* Actions Cell */}
-                    <td style={{ width: "10px" }}>
-                      <img
-                        src={removeImage}
-                        alt="Delete"
-                        onClick={() => {
-                          Swal.fire({
-                            title: "Are you sure?",
-                            text: "You won't be able to revert this!",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#3085d6",
-                            cancelButtonColor: "#d33",
-                            confirmButtonText: "Yes, delete it!",
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              handleDeleteRow(index); // Call the delete function if confirmed
-                              Swal.fire(
-                                "Deleted!",
-                                "The row has been deleted.",
-                                "success"
-                              );
-                            }
-                          });
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          width: "20px",
-                          height: "20px",
-                        }}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div id="invoice_promode" className="card-container">
-            {tableData.map((item, index) => (
-              <div
-                key={index}
-                className="product-card"
-                style={{
-                  border: "1px solid #ccc",
-                  borderRadius: "8px",
-                  padding: "16px",
-                  margin: "10px",
-                  width: "200px",
-                  boxShadow: "2px 2px 12px rgba(0,0,0,0.1)",
-                  backgroundColor: "#fff",
-                }}
-              >
-                {item.imageLink ? (
-                  <img
-                    src={
-                      item.imageLink.startsWith('http')
-                        ? item.imageLink
-                        : `${API_BASE_URL}${item.imageLink}`
-                    }
-                    alt={item.name}
-                    loading="lazy"
-                    style={{
-                      width: "150px",
-                      height: "150px",
-                      objectFit: "cover",
-                      borderRadius: "4px",
-                      margin: "0 auto",
-                      display: "block",
-                    }}
-                    onError={(e) => {
-                      e.target.onerror = null; // Prevents infinite loop
-                      e.target.src = `${API_BASE_URL}/images/placeholder.png`; // Path to your placeholder image
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: "150px",
-                      height: "150px",
-                      backgroundColor: "#f0f0f0",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: "4px",
-                      color: "#888",
-                      margin: "0 auto",
-                    }}
-                  >
-                    No Image
-                  </div>
-                )}
-                <h3 style={{ fontSize: "16px", margin: "10px 0 5px 0", textAlign: "center" }}>
-                  {item.name}
-                </h3>
-                <p style={{ margin: "5px 0", textAlign: "center" }}>MRP: Rs. {item.mrp}</p>
-                <p style={{ margin: "5px 0", textAlign: "center" }}>Discount: Rs. {item.discount}</p>
-                <p style={{ margin: "5px 0", textAlign: "center" }}>Rate: Rs. {item.rate}</p>
-                {/* Quantity Cell */}
-                <div
-                  style={{ textAlign: "center", margin: "5px 0", cursor: "pointer" }}
-                  onDoubleClick={() =>
-                    setEditingCell({ rowIndex: index, field: "quantity" })
+        <div className="table-container" id="table_container_div">
+          <table className="product-table" id="product-table-invoice">
+            <thead>
+              <tr>
+                <th>Product ID</th> {/* Add Product ID Column */}
+                <th>Name</th>
+                <th style={{ textAlign: "center", display:"none"}}>Cost</th>
+                <th>MRP</th>
+                <th>Discount</th>
+                <th>Rate</th>
+                <th>Qty</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.map((item, index) => (
+                <tr
+                  key={index}
+                  className={
+                    item.type === "return"
+                      ? "return-row"
+                      : item.type === "new"
+                      ? "new-row"
+                      : ""
+                  }
+                  style={
+                    item.type === "return"
+                      ? { backgroundColor: "#fcd8d8" } // Light red for return
+                      : item.type === "new"
+                      ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                      : {}
                   }
                 >
-                  {editingCell.rowIndex === index &&
-                  editingCell.field === "quantity" ? (
-                    <input
-                      type="text"
-                      value={item.quantity}
-                      onChange={(e) => handleQuantityChange(e, index)}
-                      onKeyDown={(e) =>
-                        handleQuantityEditEnterKeyPress(e, index)
-                      }
-                      onBlur={() =>
-                        setEditingCell({ rowIndex: null, field: null })
-                      }
-                      style={{ width: "50px", textAlign: "center" }}
-                      autoFocus
+                  <td>{item.productId}</td> {/* Render Product ID */}
+                  <td>{item.name}</td>
+                  <td style={{ textAlign: "center", display:"none"}}>{item.cost}</td>
+                  <td style={{ textAlign: "center" }}>{item.mrp}</td>
+                  <td style={{ textAlign: "center" }}>{item.discount}</td>
+                  <td style={{ textAlign: "center" }}>{item.rate}</td>
+                  {/* Quantity Cell */}
+                  <td
+                    style={{ textAlign: "center" }}
+                    onDoubleClick={() =>
+                      setEditingCell({ rowIndex: index, field: "quantity" })
+                    }
+                  >
+                    {editingCell.rowIndex === index &&
+                    editingCell.field === "quantity" ? (
+                      <input
+                        type="text"
+                        value={item.quantity}
+                        onChange={(e) => handleQuantityChange(e, index)}
+                        onKeyDown={(e) =>
+                          handleQuantityEditEnterKeyPress(e, index)
+                        } // Call the async function here
+                        onBlur={() =>
+                          setEditingCell({ rowIndex: null, field: null })
+                        }
+                        style={{ width: "50px", textAlign: "center" }}
+                        autoFocus
+                      />
+                    ) : (
+                      item.quantity
+                    )}
+                  </td>
+                  <td style={{ textAlign: "center" }}>{item.amount}</td>
+                  <td style={{ width: "10px" }}>
+                    <img
+                      src={removeImage}
+                      alt="Delete"
+                      onClick={() => {
+                        Swal.fire({
+                          title: "Are you sure?",
+                          text: "You won't be able to revert this!",
+                          icon: "warning",
+                          showCancelButton: true,
+                          confirmButtonColor: "#3085d6",
+                          cancelButtonColor: "#d33",
+                          confirmButtonText: "Yes, delete it!",
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            handleDeleteRow(index); // Call the delete function if confirmed
+                            Swal.fire(
+                              "Deleted!",
+                              "The row has been deleted.",
+                              "success"
+                            );
+                          }
+                        });
+                      }}
+                      style={{
+                        cursor: "pointer",
+                        width: "20px",
+                        height: "20px",
+                      }}
                     />
-                  ) : (
-                    <span>Qty: {item.quantity}</span>
-                  )}
-                </div>
-                <p style={{ margin: "5px 0", textAlign: "center" }}>Amount: Rs. {item.amount}</p>
-              </div>
-            ))}
-          </div>
-        )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        {/* Product Information (Hidden) */}
         <div className="product-info" style={{ display: "none" }}>
           {productName && (
             <div>
@@ -1134,7 +966,6 @@ export default function Invoice() {
           )}
         </div>
 
-        {/* Totals Display */}
         <div className="total-display">
           <div className="item-count" style={{ marginRight: "40px" }}>
             <span>{itemCount} Item(s)</span>
@@ -1143,14 +974,13 @@ export default function Invoice() {
             <span>{totalQuantity} Quantity(s)</span>
           </div>
           <div className="total-discount" style={{ marginRight: "40px" }}>
-            <span>Discount: Rs. {totalDiscount}</span>
+            <span>Discount: {totalDiscount}</span>
           </div>
           <div className="total-amount">
-            <span>Total: Rs. {totalAmount}</span>
+            <span>{totalAmount}</span>
           </div>
         </div>
 
-        {/* Footer Options */}
         <div className="footer-container">
           <div className="footer-options">
             <div className="option-box">
@@ -1213,11 +1043,7 @@ export default function Invoice() {
             </div>
             <div className="option-box">
               <label htmlFor="dayend">
-                <img
-                  src={dayend}
-                  alt="Day End"
-                  style={{ marginLeft: "5px" }}
-                />
+                <img src={dayend} alt="Day End" style={{ marginLeft: "5px" }} />
                 <br />
                 <span>Day End</span>
               </label>
@@ -1237,7 +1063,7 @@ export default function Invoice() {
         </div>
       </div>
 
-      {/* Right Side - Virtual Keyboards */}
+      {/* Right Side - Numeric and Alphabet Keyboards */}
       <div className="right-panel">
         <div className="display-panels" style={{ display: "none" }}>
           <div className="keyboard-toggle">
@@ -1345,12 +1171,11 @@ export default function Invoice() {
           )}
         </div>
 
-        {/* Action Buttons with Icons */}
         <div className="button-grid">
+          {/* Action buttons with icons */}
           <button onClick={handleOtherItemClick}>
             <img
               src={otheritem}
-              alt="Other Item"
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
             Other Item (F4)
@@ -1358,24 +1183,21 @@ export default function Invoice() {
           <button>
             <img
               src={quatation}
-              alt="Quotation List"
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
             Quotation List
           </button>
           <button onClick={handleOpenCustomerBalanceModal}>
-            <img
-              src={customer}
-              alt="Customer Balance"
-              style={{ width: "20px", height: "20px", marginRight: "5px" }}
-            />
-            Customer Balance
-          </button>
+          <img
+            src={customer}
+            style={{ width: "20px", height: "20px", marginRight: "5px" }}
+          />
+          Customer Balance
+        </button>
 
           <button onClick={handleTodayIssueBillCheckClick}>
             <img
               src={bill}
-              alt="Issue Bill Check"
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
             Issue Bill Check
@@ -1383,7 +1205,6 @@ export default function Invoice() {
           <button onClick={handleExpensesClick}>
             <img
               src={expensesImage}
-              alt="My Expenses"
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
             My Expenses (F3)
@@ -1391,7 +1212,6 @@ export default function Invoice() {
           <button onClick={handleTodaySalesClick}>
             <img
               src={salesimage}
-              alt="Today Sale"
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
             Today Sale
@@ -1399,14 +1219,12 @@ export default function Invoice() {
           <button onClick={handleCalculatorClick}>
             <img
               src={calculatorImage}
-              alt="Calculator"
               style={{ width: "20px", height: "20px", marginRight: "5px" }}
             />
-            Calculator
+            Calculater
           </button>
         </div>
 
-        {/* Modal Components */}
         <ExpensesModel
           show={isExpensesModalOpen}
           onClose={handleCloseExpensesModal}
@@ -1415,18 +1233,21 @@ export default function Invoice() {
           onAdd={() => {}}
         />
 
+        {/* Render the OtherItemModel */}
         <OtherItemModel
           show={isOtherItemModalOpen}
           onClose={handleCloseOtherItemModal}
           onAdd={handleAddOtherItem}
         />
 
+        {/* Render the ReturnModel */}
         <ReturnModel
           show={isReturnModalOpen}
           onClose={handleCloseReturnModal}
           onAdd={handleAddReturnItem}
         />
 
+        {/* Render the StockModel */}
         <StockModel
           show={isStockModalOpen}
           onClose={handleCloseStockModal}
@@ -1445,38 +1266,38 @@ export default function Invoice() {
 
         <Calculator show={isCalculatorOpen} onClose={handleCloseCalculator} />
 
+        {/* Include the TodaySales modal */}
         <TodaySales
           show={isTodaySalesOpen}
           onClose={handleCloseTodaySales}
           store={store} // Pass the store prop
         />
 
+        {/* Include the TodayIssueBillCheck modal */}
         <TodayIssueBillCheck
           show={isTodayIssueBillCheckOpen}
           onClose={handleCloseTodayIssueBillCheck}
           store={store} // Pass the store prop
         />
 
-        {/* Customer Balance Modal */}
-        {isCustomerBalanceModalOpen && (
-          <div id="modal-overlay-customer-balance-invoice">
-            <div id="modal-content-customer-balance-invoice">
-              <button
-                id="close-modal-button-customer-balance"
-                onClick={handleCloseCustomerBalanceModal}
-              >
-                X
-              </button>
-              <CustomerBalance /> {/* Render the CustomerBalance component */}
-            </div>
+          {/* Customer Balance Modal */}
+      {isCustomerBalanceModalOpen && (
+        <div id="modal-overlay-customer-balance-invoice">
+          <div id="modal-content-customer-balance-invoice">
+          <button
+              id="close-modal-button-customer-balance"
+              onClick={handleCloseCustomerBalanceModal}
+            >
+              X
+            </button>
+            <CustomerBalance /> {/* Render the CustomerBalance component */}
+            
           </div>
-        )}
+          
+        </div>
+      )}
+
       </div>
     </div>
   );
 }
-
-// PropTypes for the component (if needed)
-Invoice.propTypes = {
-  // Define PropTypes if necessary
-};
