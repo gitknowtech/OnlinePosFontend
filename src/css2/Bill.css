@@ -1,0 +1,46 @@
+/* General styling for receipt */
+.receipt-container {
+  width: 80mm;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0 auto;
+  color: #000;
+}
+
+.receipt-header {
+  text-align: center;
+}
+
+.store-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.divider {
+  text-align: center;
+  margin: 5px 0;
+  font-size: 10px;
+}
+
+.items-section .item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.items-section .item-row span {
+  width: 25%; /* Adjust based on your column needs */
+  text-align: right;
+}
+
+.totals-section {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 12px;
+}

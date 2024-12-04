@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-import PropTypes from "prop-types";
 
 // Importing Modal Components
 import OtherItemModel from "../models/OtherItemModel";
@@ -34,7 +33,6 @@ import discount from "../assets/images/discount.png";
 import wholesale from "../assets/images/wholesale.png";
 import removeImage from "../assets/images/remove.png";
 import calculatorImage from "../assets/icons/calculator.png";
-import addCashImage from "../assets/icons/addCash.png"; // Ensure this path is correct
 
 // Define the base URL for the backend API
 const API_BASE_URL = "http://localhost:5000"; // Adjust this if your backend runs on a different URL or port
@@ -61,7 +59,7 @@ export default function Invoice() {
   const [isWholesale, setIsWholesale] = useState(false);
   const [isDiscount, setIsDiscount] = useState(false);
   const [totalQuantity, setTotalQuantity] = useState(0);
-  const [productId, setProductId] = useState(""); // State to store productId
+  const [productId, setProductId] = useState("");
   const [totalDiscount, setTotalDiscount] = useState("0.00");
   const [itemCount, setItemCount] = useState(0);
   const [activeKeyboard, setActiveKeyboard] = useState("numeric");
@@ -69,7 +67,8 @@ export default function Invoice() {
     rowIndex: null,
     field: null,
   });
-  const [percentage, setPercentage] = useState(""); // State for percentage input
+  const [percentage, setPercentage] = useState("");
+  const [imageLink, setImageLink] = useState(""); // Added imageLink state
 
   // References for Input Fields
   const priceInputRef = useRef(null);
@@ -78,14 +77,16 @@ export default function Invoice() {
 
   // Modal Visibility States
   const [isTodaySalesOpen, setIsTodaySalesOpen] = useState(false);
-  const [isTodayIssueBillCheckOpen, setIsTodayIssueBillCheckOpen] = useState(false);
+  const [isTodayIssueBillCheckOpen, setIsTodayIssueBillCheckOpen] =
+    useState(false);
   const [isOtherItemModalOpen, setIsOtherItemModalOpen] = useState(false);
   const [isExpensesModalOpen, setIsExpensesModalOpen] = useState(false);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
-  const [isCustomerBalanceModalOpen, setIsCustomerBalanceModalOpen] = useState(false);
+  const [isCustomerBalanceModalOpen, setIsCustomerBalanceModalOpen] =
+    useState(false);
 
   // New State for Display Mode
   const [displayMode, setDisplayMode] = useState("Normal"); // "Normal" or "Promode"
@@ -161,6 +162,7 @@ export default function Invoice() {
     setPrice(product.salePrice);
     setSuggestedPrice(product.mrpPrice);
     setLockedPrice(product.lockedPrice);
+    setImageLink(product.imageLink || ""); // Set imageLink
 
     barcodeInputRef.current.focus();
   };
@@ -264,32 +266,40 @@ export default function Invoice() {
 
   // Function to Add Other Item to Invoice
   const handleAddOtherItem = (item) => {
-    const { productName, productCost, productMRP, productRate, qty, discount, imageLink } = item;
-    const amount = parseFloat(productRate) * parseFloat(qty); // Calculate amount based on Rate and Quantity
+    const {
+      productName,
+      productCost,
+      productMRP,
+      productRate,
+      qty,
+      discount,
+      imageLink,
+    } = item;
+    const amount = parseFloat(productRate) * parseFloat(qty);
 
     setTableData((prevData) => [
       ...prevData,
       {
-        productId: item.productId || "", // Ensure productId is included
+        productId: item.productId || "",
         name: productName,
-        cost: parseFloat(productCost).toFixed(2), // Cost
-        mrp: parseFloat(productMRP).toFixed(2), // MRP
-        discount: parseFloat(discount).toFixed(2), // Discount calculated as MRP - Rate
-        rate: parseFloat(productRate).toFixed(2), // Rate
-        quantity: parseFloat(qty).toFixed(2), // Quantity
-        amount: amount.toFixed(2), // Total amount (Rate * Quantity)
-        barcode: item.barcode || "", // Include barcode if available
-        imageLink: imageLink || "", // Include imageLink
+        cost: parseFloat(productCost).toFixed(2),
+        mrp: parseFloat(productMRP).toFixed(2),
+        discount: parseFloat(discount).toFixed(2),
+        rate: parseFloat(productRate).toFixed(2),
+        quantity: parseFloat(qty).toFixed(2),
+        amount: amount.toFixed(2),
+        barcode: item.barcode || "",
+        imageLink: imageLink || "",
         type: "new",
       },
     ]);
 
-    setIsOtherItemModalOpen(false); // Close the modal after adding the item
+    setIsOtherItemModalOpen(false);
   };
 
   // Function to Handle Return Button Click
   const handleReturnClick = () => {
-    console.log("Return button clicked"); // Debugging log
+    console.log("Return button clicked");
     setIsReturnModalOpen(true);
   };
 
@@ -299,23 +309,22 @@ export default function Invoice() {
 
   // Function to Add Return Item to Invoice
   const handleAddReturnItem = (item) => {
-    // Adjust the data to have negative values
     const amount = -Math.abs(parseFloat(item.productSale) * parseFloat(item.qty));
 
     setTableData((prevData) => [
       ...prevData,
       {
-        productId: item.productId || "", // Add productId
+        productId: item.productId || "",
         name: item.productName,
         cost: (-Math.abs(parseFloat(item.productCost))).toFixed(2),
-        mrp: (-Math.abs(parseFloat(item.mrp))).toFixed(2), // Ensure MRP retains original value
+        mrp: (-Math.abs(parseFloat(item.mrp))).toFixed(2),
         discount: (-Math.abs(parseFloat(item.discount))).toFixed(2),
         rate: (-Math.abs(parseFloat(item.productSale))).toFixed(2),
         quantity: (-Math.abs(parseFloat(item.qty))).toFixed(2),
         amount: amount.toFixed(2),
-        type: "return", // Add a 'type' field to mark this as a return
-        barcode: item.barcode || "", // Include barcode
-        imageLink: item.imageLink || "", // Include imageLink
+        type: "return",
+        barcode: item.barcode || "",
+        imageLink: item.imageLink || "",
       },
     ]);
 
@@ -334,7 +343,7 @@ export default function Invoice() {
 
   // Function to Clear the Invoice Table
   const clearInvoiceTable = () => {
-    setTableData([]); // Clears the table data
+    setTableData([]);
     setTotalAmount("0.00");
     setTotalQuantity(0);
     setTotalDiscount("0.00");
@@ -345,8 +354,8 @@ export default function Invoice() {
   const handleQuantityEditEnterKeyPress = async (e, index) => {
     if (e.key === "Enter") {
       const updatedQuantity = parseFloat(tableData[index].quantity);
-      const barcode = tableData[index].barcode; // Retrieve barcode from row data
-      const productId = tableData[index].productId; // Retrieve productId from row data
+      const barcode = tableData[index].barcode;
+      const productId = tableData[index].productId;
       const productName = tableData[index].name;
       const rate = parseFloat(tableData[index].rate);
 
@@ -376,15 +385,15 @@ export default function Invoice() {
           const newData = [...prevData];
           newData[index] = {
             ...newData[index],
-            quantity: (-Math.abs(updatedQuantity)).toFixed(2), // Make quantity negative and format
-            amount: (-Math.abs(positiveAmount)).toFixed(2), // Make amount negative and format
+            quantity: (-Math.abs(updatedQuantity)).toFixed(2),
+            amount: (-Math.abs(positiveAmount)).toFixed(2),
           };
           return newData;
         });
 
         // Exit editing mode
         setEditingCell({ rowIndex: null, field: null });
-        return; // Skip further checks
+        return;
       }
 
       // For non-negative rates, proceed with stock checking
@@ -400,7 +409,7 @@ export default function Invoice() {
           .filter((item) => item.productId === productId)
           .reduce((total, item, idx) => {
             if (idx === index) {
-              return total; // Exclude the current row's quantity
+              return total;
             }
             return total + parseFloat(item.quantity);
           }, 0);
@@ -440,9 +449,9 @@ export default function Invoice() {
           const newData = [...prevData];
           newData[index] = {
             ...newData[index],
-            quantity: updatedQuantity.toFixed(2), // Ensure float with two decimals
-            amount: newAmount.toFixed(2), // Ensure float with two decimals
-            previousQuantity: updatedQuantity, // Save as new previous value
+            quantity: updatedQuantity.toFixed(2),
+            amount: newAmount.toFixed(2),
+            previousQuantity: updatedQuantity,
             previousAmount: newAmount,
           };
           return newData;
@@ -472,11 +481,6 @@ export default function Invoice() {
 
         if (products.length === 0) {
           // Optionally, you can remove the Swal alert to avoid spamming alerts
-          // Swal.fire(
-          //   "Not Found",
-          //   "No products found for this barcode.",
-          //   "warning"
-          // );
         } else {
           setSuggestions(products);
         }
@@ -509,9 +513,9 @@ export default function Invoice() {
 
     const calculatedPrice = parseFloat(price) * (1 - enteredPercentage / 100);
 
-    setPrice(calculatedPrice.toFixed(2)); // Update the price based on percentage
-    setPercentage(""); // Clear the percentage input
-    qtyInputRef.current.focus(); // Move focus to the quantity input
+    setPrice(calculatedPrice.toFixed(2));
+    setPercentage("");
+    qtyInputRef.current.focus();
   };
 
   // Function to Validate and Set Price
@@ -546,7 +550,10 @@ export default function Invoice() {
         setBarcode(product.barcode);
         setLockedPrice(product.lockedPrice);
         setSuggestedPrice(product.mrpPrice);
-        setProductId(product.productId); // Save productId to state
+        setProductId(product.productId);
+        setProductName(product.productName || "");
+        setCostPrice(product.costPrice || "");
+        setImageLink(product.imageLink || "");
 
         // Set the default price but allow user to edit
         if (isWholesale) {
@@ -557,47 +564,7 @@ export default function Invoice() {
           setPrice(product.mrpPrice);
         }
 
-        setTableData((prevData) => {
-          const existingIndex = prevData.findIndex(
-            (item) => item.barcode === product.barcode
-          );
-
-          if (existingIndex !== -1) {
-            const existingItem = prevData[existingIndex];
-            const updatedQuantity = parseFloat(existingItem.quantity) + 1;
-            const updatedAmount =
-              updatedQuantity * parseFloat(existingItem.rate);
-
-            const updatedItem = {
-              ...existingItem,
-              quantity: updatedQuantity.toFixed(2),
-              amount: updatedAmount.toFixed(2),
-            };
-
-            const updatedData = [...prevData];
-            updatedData[existingIndex] = updatedItem;
-            return updatedData;
-          } else {
-            return [
-              ...prevData,
-              {
-                productId: product.productId, // Fetched directly from backend
-                name: product.productName,
-                mrp: parseFloat(product.mrpPrice).toFixed(2),
-                discount: 0,
-                rate: parseFloat(product.mrpPrice).toFixed(2),
-                quantity: "1.00",
-                amount: parseFloat(product.mrpPrice).toFixed(2),
-                barcode: product.barcode,
-                imageLink: product.imageLink || "", // Include imageLink
-                type: "new",
-              },
-            ];
-          }
-        });
-
         setSuggestions([]);
-        // Focus on price input to allow editing
         priceInputRef.current.focus();
       } else {
         Swal.fire(
@@ -657,8 +624,8 @@ export default function Invoice() {
       setTableData((prevData) => [
         ...prevData,
         {
-          productId, // Use productId from state
-          barcode, // Optionally keep barcode for reference
+          productId,
+          barcode,
           name: productName,
           cost: parseFloat(costPrice || 0).toFixed(2),
           mrp: parseFloat(suggestedPrice || 0).toFixed(2),
@@ -668,7 +635,7 @@ export default function Invoice() {
           rate: enteredPrice.toFixed(2),
           quantity: requestedQuantity.toFixed(2),
           amount: (requestedQuantity * enteredPrice).toFixed(2),
-          imageLink: "", // You can set imageLink if available
+          imageLink: imageLink || "",
           type: "new",
         },
       ]);
@@ -678,8 +645,9 @@ export default function Invoice() {
       setBarcode("");
       setPrice("");
       setQty("");
-      setProductId(""); // Clear productId
+      setProductId("");
       setSuggestedPrice("");
+      setImageLink("");
       barcodeInputRef.current.focus();
     } catch (error) {
       Swal.fire("Error", "Failed to check stock availability.", "error");
@@ -694,9 +662,9 @@ export default function Invoice() {
 
   // Function to Calculate Totals
   const calculateTotals = () => {
-    // Filter out items with negative discount or quantity
     const validItems = tableData.filter(
-      (item) => parseFloat(item.discount) >= 0 && parseFloat(item.quantity) >= 0
+      (item) =>
+        parseFloat(item.discount) >= 0 && parseFloat(item.quantity) >= 0
     );
 
     const totalAmount = tableData.reduce(
@@ -745,15 +713,14 @@ export default function Invoice() {
 
   // Function to Handle Suggestion Click
   const handleSuggestionClick = (suggestion) => {
-    // Set all necessary fields from the selected suggestion
     setBarcode(suggestion.barcode);
-    setProductId(suggestion.productId || ""); // Save productId to state
+    setProductId(suggestion.productId || "");
     setCostPrice(suggestion.costPrice || "");
     setLockedPrice(suggestion.lockedPrice || "");
     setProductName(suggestion.productName || "");
     setSuggestedPrice(suggestion.mrpPrice || "");
+    setImageLink(suggestion.imageLink || ""); // Set imageLink
 
-    // Determine the default price based on conditions
     if (isWholesale) {
       setPrice(suggestion.wholesalePrice || suggestion.mrpPrice);
     } else if (isDiscount) {
@@ -762,16 +729,14 @@ export default function Invoice() {
       setPrice(suggestion.mrpPrice || "");
     }
 
-    // Clear the suggestions dropdown
     setSuggestions([]);
 
-    // Refocus the price input field reliably
     setTimeout(() => {
       if (priceInputRef.current) {
         priceInputRef.current.focus();
-        priceInputRef.current.select(); // Highlight the price for easy overwrite
+        priceInputRef.current.select();
       }
-    }, 100); // Delay ensures focus works even after state updates
+    }, 100);
   };
 
   // Functions to Handle Virtual Keyboard Inputs
@@ -800,14 +765,6 @@ export default function Invoice() {
         new Event("input", { bubbles: true })
       );
     }
-  };
-
-  // Function to Handle Add Payment Click (for both table and card views)
-  const handleAddPaymentClick = (item) => {
-    // Implement payment logic here
-    // For example, you might want to pre-fill payment modal with item details
-    // This function is currently a placeholder
-    handleOpenPaymentModal();
   };
 
   return (
@@ -881,7 +838,7 @@ export default function Invoice() {
             <div id="suggestions_dropdown" className="suggestions-dropdown">
               {suggestions.map((suggestion) => (
                 <div
-                  key={suggestion.productId} // Use unique identifier
+                  key={suggestion.productId}
                   className="suggestion-item"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
@@ -898,7 +855,10 @@ export default function Invoice() {
         </div>
 
         {/* Display Mode Selector */}
-        <div className="display-mode-selector" style={{ marginBottom: "20px" }}>
+        <div
+          className="display-mode-selector"
+          style={{ marginBottom: "20px" }}
+        >
           <label style={{ marginRight: "20px" }}>
             <input
               type="radio"
@@ -925,15 +885,17 @@ export default function Invoice() {
             <table className="product-table" id="product-table-invoice">
               <thead>
                 <tr>
-                  <th>Product ID</th> {/* Add Product ID Column */}
+                  <th>Product ID</th>
                   <th>Name</th>
-                  <th style={{ textAlign: "center", display: "none" }}>Cost</th>
+                  <th style={{ textAlign: "center", display: "none" }}>
+                    Cost
+                  </th>
                   <th>MRP</th>
                   <th>Discount</th>
                   <th>Rate</th>
                   <th>Qty</th>
                   <th>Amount</th>
-                  <th>Actions</th> {/* Add Actions Column */}
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -949,13 +911,13 @@ export default function Invoice() {
                     }
                     style={
                       item.type === "return"
-                        ? { backgroundColor: "#fcd8d8" } // Light red for return
+                        ? { backgroundColor: "#fcd8d8" }
                         : item.type === "new"
-                        ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                        ? { backgroundColor: "#d8fcdb" }
                         : {}
                     }
                   >
-                    <td>{item.productId}</td> {/* Render Product ID */}
+                    <td>{item.productId}</td>
                     <td>{item.name}</td>
                     <td style={{ textAlign: "center", display: "none" }}>
                       {item.cost}
@@ -1006,7 +968,7 @@ export default function Invoice() {
                             confirmButtonText: "Yes, delete it!",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              handleDeleteRow(index); // Call the delete function if confirmed
+                              handleDeleteRow(index);
                               Swal.fire(
                                 "Deleted!",
                                 "The row has been deleted.",
@@ -1028,7 +990,11 @@ export default function Invoice() {
             </table>
           </div>
         ) : (
-          <div id="invoice_promode" className="card-container">
+          <div
+            id="invoice_promode"
+            className="card-container"
+            style={{ cursor: "pointer" }}
+          >
             {tableData.map((item, index) => (
               <div
                 key={index}
@@ -1038,38 +1004,74 @@ export default function Invoice() {
                   borderRadius: "8px",
                   padding: "16px",
                   margin: "10px",
-                  width: "200px",
+                  width: "180px",
                   boxShadow: "2px 2px 12px rgba(0,0,0,0.1)",
                   backgroundColor: "#fff",
+                  position: "relative", // Added to position the delete icon
                 }}
               >
+                {/* Delete Icon */}
+                <img
+                  src={removeImage}
+                  alt="Delete"
+                  onClick={() => {
+                    Swal.fire({
+                      title: "Are you sure?",
+                      text: "You won't be able to revert this!",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonColor: "#3085d6",
+                      cancelButtonColor: "#d33",
+                      confirmButtonText: "Yes, delete it!",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        handleDeleteRow(index);
+                        Swal.fire(
+                          "Deleted!",
+                          "The item has been deleted.",
+                          "success"
+                        );
+                      }
+                    });
+                  }}
+                  style={{
+                    cursor: "pointer",
+                    width: "20px",
+                    height: "20px",
+                    position: "absolute",
+                    top: "5px",
+                    right: "5px",
+                  }}
+                />
                 {item.imageLink ? (
                   <img
                     src={
-                      item.imageLink.startsWith('http')
+                      item.imageLink.startsWith("data:image")
                         ? item.imageLink
-                        : `${API_BASE_URL}${item.imageLink}`
+                        : item.imageLink.startsWith("http")
+                        ? item.imageLink
+                        : `${API_BASE_URL}/${item.imageLink}`
                     }
                     alt={item.name}
                     loading="lazy"
                     style={{
-                      width: "150px",
-                      height: "150px",
+                      width: "60px",
+                      height: "60px",
                       objectFit: "cover",
                       borderRadius: "4px",
                       margin: "0 auto",
                       display: "block",
                     }}
                     onError={(e) => {
-                      e.target.onerror = null; // Prevents infinite loop
-                      e.target.src = `${API_BASE_URL}/images/placeholder.png`; // Path to your placeholder image
+                      e.target.onerror = null;
+                      e.target.src = `${API_BASE_URL}/images/placeholder.png`;
                     }}
                   />
                 ) : (
                   <div
                     style={{
-                      width: "150px",
-                      height: "150px",
+                      width: "60px",
+                      height: "60px",
                       backgroundColor: "#f0f0f0",
                       display: "flex",
                       alignItems: "center",
@@ -1082,15 +1084,52 @@ export default function Invoice() {
                     No Image
                   </div>
                 )}
-                <h3 style={{ fontSize: "16px", margin: "10px 0 5px 0", textAlign: "center" }}>
+                <h3
+                  style={{
+                    fontSize: "12px",
+                    margin: "10px 0 5px 0",
+                    textAlign: "center",
+                  }}
+                >
                   {item.name}
                 </h3>
-                <p style={{ margin: "5px 0", textAlign: "center" }}>MRP: Rs. {item.mrp}</p>
-                <p style={{ margin: "5px 0", textAlign: "center" }}>Discount: Rs. {item.discount}</p>
-                <p style={{ margin: "5px 0", textAlign: "center" }}>Rate: Rs. {item.rate}</p>
+                <p
+                  style={{
+                    margin: "5px 0",
+                    textAlign: "center",
+                    fontSize: "10px",
+                    display: "none",
+                  }}
+                >
+                  MRP: Rs. {item.mrp}
+                </p>
+                <p
+                  style={{
+                    margin: "5px 0",
+                    textAlign: "center",
+                    fontSize: "10px",
+                    display: "none",
+                  }}
+                >
+                  Discount: Rs. {item.discount}
+                </p>
+                <p
+                  style={{
+                    margin: "5px 0",
+                    textAlign: "center",
+                    fontSize: "10px",
+                  }}
+                >
+                  Rate: Rs. {item.rate}
+                </p>
                 {/* Quantity Cell */}
                 <div
-                  style={{ textAlign: "center", margin: "5px 0", cursor: "pointer" }}
+                  style={{
+                    textAlign: "center",
+                    margin: "5px 0",
+                    cursor: "pointer",
+                    fontSize: "10px",
+                  }}
                   onDoubleClick={() =>
                     setEditingCell({ rowIndex: index, field: "quantity" })
                   }
@@ -1114,7 +1153,15 @@ export default function Invoice() {
                     <span>Qty: {item.quantity}</span>
                   )}
                 </div>
-                <p style={{ margin: "5px 0", textAlign: "center" }}>Amount: Rs. {item.amount}</p>
+                <p
+                  style={{
+                    margin: "5px 0",
+                    textAlign: "center",
+                    fontSize: "10px",
+                  }}
+                >
+                  Amount: Rs. {item.amount}
+                </p>
               </div>
             ))}
           </div>
@@ -1475,8 +1522,3 @@ export default function Invoice() {
     </div>
   );
 }
-
-// PropTypes for the component (if needed)
-Invoice.propTypes = {
-  // Define PropTypes if necessary
-};

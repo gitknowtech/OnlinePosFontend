@@ -11,7 +11,17 @@ import discountPriceImage from "../assets/icons/discounts.png";
 import paymentTypeImage from "../assets/icons/paymentType.png";
 import netAmountImage from "../assets/icons/netAmount.png";
 
-export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceTable, tableData, user, store }) {
+import Bill from "./Bill"; // Import the Bill component
+
+export default function PaymentModel({
+  show,
+  onClose,
+  totalAmount,
+  clearInvoiceTable,
+  tableData,
+  user,
+  store,
+}) {
   const [customerMobile, setCustomerMobile] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [discountPercent, setDiscountPercent] = useState("0");
@@ -21,6 +31,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
   const [netAmount, setNetAmount] = useState(totalAmount);
   const [balance, setBalance] = useState(totalAmount);
   const [paymentType, setPaymentType] = useState("Credit Payment");
+  const [invoiceData, setInvoiceData] = useState(null);
+  const [invoiceId, setInvoiceId] = useState(null); 
 
   // Reset values when modal loads
   useEffect(() => {
@@ -37,7 +49,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
         setCardPayment("0");
         setPaymentType("Return Payment");
       } else {
-        updatePaymentTypeForZeroValues(); // Check payment type on reset
+        updatePaymentTypeForZeroValues();
       }
     }
   }, [show, totalAmount]);
@@ -64,7 +76,8 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
         const data = await response.json();
         setSuggestions(data);
       } catch (error) {
-        Swal.fire("Error", "Failed to fetch customer suggestions", error.message);
+        Swal.fire("Error", "Failed to fetch customer suggestions", "error");
+        console.error("Error fetching customer suggestions:", error);
       }
     } else {
       setSuggestions([]);
@@ -112,7 +125,6 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
 
         clearInvoiceTable();
         onClose();
-        Swal.fire("Closed!", "The invoice has been cleared.", "success");
       }
     });
   };
@@ -130,22 +142,17 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       setPaymentType("Credit Payment");
     }
 
-    updatePaymentTypeForZeroValues(); // Re-check payment type
+    updatePaymentTypeForZeroValues();
   };
 
   const handleCashPaymentChange = (e) => {
     const inputValue = e.target.value;
-
-    if (!/^\d*\.?\d*$/.test(inputValue)) {
-      return; // Ignore invalid input
-    }
+    if (!/^\d*\.?\d*$/.test(inputValue)) return;
 
     const cash = parseFloat(inputValue) || 0;
     const net = parseFloat(netAmount) || 0;
 
     setCashPayment(inputValue);
-
-    // Calculate balance and update payment type
     const balanceAmount = cash - net;
     setBalance(balanceAmount.toFixed(2));
 
@@ -155,15 +162,12 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       setPaymentType("Credit Payment");
     }
 
-    updatePaymentTypeForZeroValues(); // Re-check payment type
+    updatePaymentTypeForZeroValues();
   };
 
   const handleCardPaymentChange = (e) => {
     const inputValue = e.target.value;
-
-    if (!/^\d*\.?\d*$/.test(inputValue)) {
-      return; // Ignore invalid input
-    }
+    if (!/^\d*\.?\d*$/.test(inputValue)) return;
 
     const card = parseFloat(inputValue) || 0;
     const cash = parseFloat(cashPayment) || 0;
@@ -171,7 +175,6 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
 
     setCardPayment(inputValue);
 
-    // Calculate balance and update payment type
     const balanceAmount = cash + card - net;
     setBalance(balanceAmount.toFixed(2));
 
@@ -187,7 +190,7 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       setPaymentType("Credit Payment");
     }
 
-    updatePaymentTypeForZeroValues(); // Re-check payment type
+    updatePaymentTypeForZeroValues();
   };
 
   const handlePayment = async () => {
@@ -215,45 +218,69 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
       user,
       store,
     };
-  
+
     try {
-      const salesResponse = await fetch("http://localhost:5000/api/invoices/add_sales", {
+      // Save invoice data
+      const saveResponse = await fetch("http://localhost:5000/api/invoices/add_sales", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(paymentData),
       });
-  
-      if (!salesResponse.ok) {
-        const error = await salesResponse.json();
+
+      if (!saveResponse.ok) {
+        const error = await saveResponse.json();
         Swal.fire("Error", `Failed to save payment: ${error.message}`, "error");
         return;
       }
-  
-      const salesResult = await salesResponse.json();
-      const { invoiceId } = salesResult;
-  
-      Swal.fire("Success", `Payment and invoice saved successfully! Invoice ID: ${invoiceId}`, "success");
-  
-      // Reset fields
-      setCustomerMobile("");
-      setSuggestions([]);
-      setDiscountPercent("0");
-      setDiscountAmount("0");
-      setCashPayment("0");
-      setCardPayment("0");
-      setNetAmount(totalAmount);
-      setBalance(totalAmount);
-      setPaymentType("Credit Payment");
-  
-      clearInvoiceTable();
-      onClose();
+
+      // Fetch the latest saved invoice
+      const fetchResponse = await fetch("http://localhost:5000/api/invoices/last");
+      if (!fetchResponse.ok) {
+        throw new Error("Failed to fetch the last invoice");
+      }
+
+      const lastInvoice = await fetchResponse.json();
+      if (!Array.isArray(lastInvoice) || lastInvoice.length === 0) {
+        Swal.fire("Error", "No invoice data found!", "error");
+        return;
+      }
+
+      setInvoiceId(lastInvoice[0].invoiceId);
+      Swal.close(); // Close any SweetAlert modals
     } catch (error) {
-      Swal.fire("Error", "An unexpected error occurred.", error.message);
+      console.error("Error processing payment:", error);
+      Swal.fire("Error", "An unexpected error occurred while processing payment.", "error");
     }
   };
-  
+
+  const resetFields = () => {
+    setCustomerMobile("");
+    setSuggestions([]);
+    setDiscountPercent("0");
+    setDiscountAmount("0");
+    setCashPayment("0");
+    setCardPayment("0");
+    setNetAmount(totalAmount);
+    setBalance(totalAmount);
+    setPaymentType("Credit Payment");
+    setInvoiceId(null); // Reset invoice ID
+  };
+
+  const handlePrintComplete = () => {
+    setCustomerMobile("");
+    setSuggestions([]);
+    setDiscountPercent("0");
+    setDiscountAmount("0");
+    setCashPayment("0");
+    setCardPayment("0");
+    setNetAmount(totalAmount);
+    setBalance(totalAmount);
+    setPaymentType("Credit Payment");
+
+    clearInvoiceTable();
+    setInvoiceData(null);
+    onClose();
+  };
 
   const getBalanceStyle = () => {
     if (balance < 0) return { backgroundColor: "red", color: "white" };
@@ -263,137 +290,183 @@ export default function PaymentModel({ show, onClose, totalAmount, clearInvoiceT
 
   return (
     show && (
-      <div id="payment-modal">
-        <div id="payment-container">
-          <h1 id="total-amount-payment-model">RS: {parseFloat(totalAmount || 0).toFixed(2)}</h1>
+      <>
+        <div id="payment-modal">
+          <div id="payment-container">
+            <h1 id="total-amount-payment-model">
+              RS: {parseFloat(totalAmount || 0).toFixed(2)}
+            </h1>
 
-          {/* Customer Mobile */}
-          <div id="customer-mobile-group">
-            <label>
-              <img id="customer-payment-image" src={customerPaymentImage} alt="Customer" />
-              Customer Mobile
-            </label>
-            <input
-              type="text"
-              placeholder="Enter Mobile / ID / Name"
-              value={customerMobile}
-              onChange={handleCustomerMobileChange}
-            />
-            {suggestions.length > 0 && (
-              <div id="suggestions-dropdown">
-                {suggestions.map((customer) => (
-                  <div
-                    key={customer.id}
-                    id="suggestion-item"
-                    onClick={() => handleSuggestionClick(customer)}
-                  >
-                    {customer.cusId} - {customer.cusName} - {customer.mobile1 || customer.mobile2}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+            {/* Customer Mobile */}
+            <div id="customer-mobile-group">
+              <label>
+                <img
+                  id="customer-payment-image"
+                  src={customerPaymentImage}
+                  alt="Customer"
+                />
+                Customer Mobile
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Mobile / ID / Name"
+                value={customerMobile}
+                onChange={handleCustomerMobileChange}
+              />
+              {suggestions.length > 0 && (
+                <div id="suggestions-dropdown">
+                  {suggestions.map((customer) => (
+                    <div
+                      key={customer.id}
+                      id="suggestion-item"
+                      onClick={() => handleSuggestionClick(customer)}
+                    >
+                      {customer.cusId} - {customer.cusName} -{" "}
+                      {customer.mobile1 || customer.mobile2}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          {/* Discount Section */}
-          <div id="discount-percent-group">
-            <label>
-              <img id="discount-percentage-image" src={discountPercentageImage} alt="Discount Percent" />
-              Discount (%)
-            </label>
-            <input
-              type="text"
-              placeholder="Enter Discount (%)"
-              value={discountPercent}
-              onChange={(e) => {
-                const value = e.target.value;
-                setDiscountPercent(value);
-                const percent = parseFloat(value);
-                const discountValue = isNaN(percent) ? 0 : (totalAmount * percent) / 100;
-                setDiscountAmount(discountValue.toFixed(2));
-                calculateNetAmount(discountValue);
-              }}
-            />
-          </div>
-          <div id="discount-amount-group">
-            <label>
-              <img id="discount-price-image" src={discountPriceImage} alt="Discount Amount" />
-              Discount Amount
-            </label>
-            <input
-              type="text"
-              placeholder="Enter Discount Amount"
-              value={discountAmount}
-              onChange={(e) => {
-                const value = e.target.value;
-                setDiscountAmount(value);
-                const amount = parseFloat(value);
-                const percent = isNaN(amount) || amount > totalAmount ? 0 : (amount / totalAmount) * 100;
-                setDiscountPercent(percent.toFixed(2));
-                calculateNetAmount(amount);
-              }}
-            />
-          </div>
+            {/* Discount Section */}
+            <div id="discount-percent-group">
+              <label>
+                <img
+                  id="discount-percentage-image"
+                  src={discountPercentageImage}
+                  alt="Discount Percent"
+                />
+                Discount (%)
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Discount (%)"
+                value={discountPercent}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setDiscountPercent(value);
+                  const percent = parseFloat(value);
+                  const discountValue = isNaN(percent)
+                    ? 0
+                    : (totalAmount * percent) / 100;
+                  setDiscountAmount(discountValue.toFixed(2));
+                  calculateNetAmount(discountValue);
+                }}
+              />
+            </div>
+            <div id="discount-amount-group">
+              <label>
+                <img
+                  id="discount-price-image"
+                  src={discountPriceImage}
+                  alt="Discount Amount"
+                />
+                Discount Amount
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Discount Amount"
+                value={discountAmount}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setDiscountAmount(value);
+                  const amount = parseFloat(value);
+                  const percent =
+                    isNaN(amount) || amount > totalAmount
+                      ? 0
+                      : (amount / totalAmount) * 100;
+                  setDiscountPercent(percent.toFixed(2));
+                  calculateNetAmount(amount);
+                }}
+              />
+            </div>
 
-          {/* Net Amount Section */}
-          <div id="net-amount-group">
-            <label>
-              <img id="net-amount-image" src={netAmountImage} alt="Net Amount" />
-              Net Amount
-            </label>
-            <input type="text" value={netAmount} readOnly />
-          </div>
+            {/* Net Amount Section */}
+            <div id="net-amount-group">
+              <label>
+                <img
+                  id="net-amount-image"
+                  src={netAmountImage}
+                  alt="Net Amount"
+                />
+                Net Amount
+              </label>
+              <input type="text" value={netAmount} readOnly />
+            </div>
 
-          {/* Payment Section */}
-          <div id="cash-payment-group">
-            <label>
-              <img id="cash-payment-image" src={cashImage} alt="Cash Payment" />
-              Cash Payment
-            </label>
-            <input
-              type="text"
-              placeholder="Enter Cash Payment"
-              value={cashPayment}
-              onChange={handleCashPaymentChange}
-              disabled={paymentType === "Return Payment"}
-            />
-          </div>
-          <div id="card-payment-group">
-            <label>
-              <img id="card-payment-image" src={cardImage} alt="Card Payment" />
-              Card Payment
-            </label>
-            <input
-              type="text"
-              placeholder="Enter Card Payment"
-              value={cardPayment}
-              onChange={handleCardPaymentChange}
-              disabled={paymentType === "Return Payment"}
-            />
-          </div>
+            {/* Payment Section */}
+            <div id="cash-payment-group">
+              <label>
+                <img
+                  id="cash-payment-image"
+                  src={cashImage}
+                  alt="Cash Payment"
+                />
+                Cash Payment
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Cash Payment"
+                value={cashPayment}
+                onChange={handleCashPaymentChange}
+                disabled={paymentType === "Return Payment"}
+              />
+            </div>
+            <div id="card-payment-group">
+              <label>
+                <img
+                  id="card-payment-image"
+                  src={cardImage}
+                  alt="Card Payment"
+                />
+                Card Payment
+              </label>
+              <input
+                type="text"
+                placeholder="Enter Card Payment"
+                value={cardPayment}
+                onChange={handleCardPaymentChange}
+                disabled={paymentType === "Return Payment"}
+              />
+            </div>
 
-          {/* Payment Type */}
-          <div id="payment-type-group">
-            <label>
-              <img id="payment-type-image" src={paymentTypeImage} alt="Payment Type" />
-              Payment Type
-            </label>
-            <input type="text" value={paymentType} readOnly />
-          </div>
+            {/* Payment Type */}
+            <div id="payment-type-group">
+              <label>
+                <img
+                  id="payment-type-image"
+                  src={paymentTypeImage}
+                  alt="Payment Type"
+                />
+                Payment Type
+              </label>
+              <input type="text" value={paymentType} readOnly />
+            </div>
 
-          {/* Balance Section */}
-          <div id="balance-group">
-            <label>Balance</label>
-            <input type="text" value={balance} readOnly style={getBalanceStyle()} />
-          </div>
+            {/* Balance Section */}
+            <div id="balance-group">
+              <label>Balance</label>
+              <input
+                type="text"
+                value={balance}
+                readOnly
+                style={getBalanceStyle()}
+              />
+            </div>
 
-          {/* Action Buttons */}
-          <div id="action-buttons">
-            <button onClick={handlePayment}>Complete Payment</button>
-            <button onClick={handleBackToEdit}>Back to Edit</button>
-            <button onClick={handleCloseBill}>Close Bill</button>
+            {/* Action Buttons */}
+            <div id="action-buttons">
+              <button onClick={handlePayment}>Complete Payment</button>
+              <button onClick={handleBackToEdit}>Back to Edit</button>
+              <button onClick={handleCloseBill}>Close Bill</button>
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* Conditionally render the Bill component */}
+        {invoiceId && <Bill invoiceId={invoiceId} onPrintComplete={handlePrintComplete} />}
+      </>
     )
   );
 }
