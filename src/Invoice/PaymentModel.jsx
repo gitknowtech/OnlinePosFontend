@@ -31,8 +31,9 @@ export default function PaymentModel({
   const [netAmount, setNetAmount] = useState(totalAmount);
   const [balance, setBalance] = useState(totalAmount);
   const [paymentType, setPaymentType] = useState("Credit Payment");
-  const [invoiceData, setInvoiceData] = useState(null);
-  const [invoiceId, setInvoiceId] = useState(null); 
+  const [invoiceId, setInvoiceId] = useState(null);
+  const [isInvoiceDataLoaded, setIsInvoiceDataLoaded] = useState(false);
+  const [printAfterConfirm, setPrintAfterConfirm] = useState(false); // Flag to print after user confirms success message
 
   // Reset values when modal loads
   useEffect(() => {
@@ -113,20 +114,24 @@ export default function PaymentModel({
       confirmButtonText: "Yes, close it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        setCustomerMobile("");
-        setSuggestions([]);
-        setDiscountPercent("0");
-        setDiscountAmount("0");
-        setCashPayment("0");
-        setCardPayment("0");
-        setNetAmount(totalAmount);
-        setBalance(totalAmount);
-        setPaymentType("Credit Payment");
-
-        clearInvoiceTable();
-        onClose();
+        resetAfterPrint();
       }
     });
+  };
+
+  const resetAfterPrint = () => {
+    setCustomerMobile("");
+    setSuggestions([]);
+    setDiscountPercent("0");
+    setDiscountAmount("0");
+    setCashPayment("0");
+    setCardPayment("0");
+    setNetAmount(totalAmount);
+    setBalance(totalAmount);
+    setPaymentType("Credit Payment");
+
+    clearInvoiceTable();
+    onClose();
   };
 
   const calculateNetAmount = (discountValue) => {
@@ -246,40 +251,89 @@ export default function PaymentModel({
       }
 
       setInvoiceId(lastInvoice[0].invoiceId);
-      Swal.close(); // Close any SweetAlert modals
+
+      // Show success message and wait for user to click OK
+      Swal.fire("Success", "Invoice saved successfully!", "success").then(
+        (result) => {
+          if (result.isConfirmed) {
+            // User clicked OK, now we want to print the invoice
+            // If invoice data is already loaded, print now
+            // If not, set a flag to print after data loads
+            if (isInvoiceDataLoaded) {
+              handlePrintInvoice();
+            } else {
+              setPrintAfterConfirm(true);
+            }
+          }
+        }
+      );
     } catch (error) {
       console.error("Error processing payment:", error);
-      Swal.fire("Error", "An unexpected error occurred while processing payment.", "error");
+      Swal.fire(
+        "Error",
+        "An unexpected error occurred while processing payment.",
+        "error"
+      );
     }
   };
 
-  const resetFields = () => {
-    setCustomerMobile("");
-    setSuggestions([]);
-    setDiscountPercent("0");
-    setDiscountAmount("0");
-    setCashPayment("0");
-    setCardPayment("0");
-    setNetAmount(totalAmount);
-    setBalance(totalAmount);
-    setPaymentType("Credit Payment");
-    setInvoiceId(null); // Reset invoice ID
-  };
+  const handlePrintInvoice = () => {
+    const printContent = document.getElementById("printable-receipt");
+    if (!printContent) {
+      Swal.fire("Error", "Unable to find invoice content to print.", "error");
+      return;
+    }
 
-  const handlePrintComplete = () => {
-    setCustomerMobile("");
-    setSuggestions([]);
-    setDiscountPercent("0");
-    setDiscountAmount("0");
-    setCashPayment("0");
-    setCardPayment("0");
-    setNetAmount(totalAmount);
-    setBalance(totalAmount);
-    setPaymentType("Credit Payment");
+    const printWindow = window.open("", "_blank", "width=300,height=600");
+    printWindow.document.open();
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Receipt</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              width: 80mm;
+              margin: 0;
+              padding: 0;
+            }
+            .receipt-container {
+              width: 80mm;
+              margin: auto;
+              font-size: 12px;
+              line-height: 1.4;
+              color: #000;
+            }
+            .divider {
+              text-align: center;
+              margin: 5px 0;
+              font-size: 10px;
+            }
+            .item-row {
+              display: flex;
+              justify-content: space-between;
+            }
+            .item-row span {
+              font-size: 12px;
+            }
+            .totals-section, .footer {
+              text-align: center;
+              margin-top: 10px;
+            }
+          </style>
+        </head>
+        <body>
+          ${printContent.innerHTML}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
 
-    clearInvoiceTable();
-    setInvoiceData(null);
-    onClose();
+    // After printing, reset and close Payment Model
+    resetAfterPrint();
   };
 
   const getBalanceStyle = () => {
@@ -287,6 +341,13 @@ export default function PaymentModel({
     if (balance > 0) return { backgroundColor: "yellow", color: "black" };
     return { backgroundColor: "green", color: "white" };
   };
+
+  // When Bill data is loaded, if user already confirmed success message and wants to print, print now
+  useEffect(() => {
+    if (isInvoiceDataLoaded && printAfterConfirm) {
+      handlePrintInvoice();
+    }
+  }, [isInvoiceDataLoaded, printAfterConfirm]);
 
   return (
     show && (
@@ -465,7 +526,11 @@ export default function PaymentModel({
         </div>
 
         {/* Conditionally render the Bill component */}
-        {invoiceId && <Bill invoiceId={invoiceId} onPrintComplete={handlePrintComplete} />}
+        {invoiceId && (
+          <div style={{ display: "none" }}>
+            <Bill invoiceId={invoiceId} onDataLoaded={() => setIsInvoiceDataLoaded(true)} />
+          </div>
+        )}
       </>
     )
   );

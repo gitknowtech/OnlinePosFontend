@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import "../css2/bill.css"; // Ensure this CSS contains styles for 80mm layout
+import "../css2/bill.css";
 
-const Bill = ({ invoiceId, onPrintComplete }) => {
+const Bill = ({ invoiceId, onDataLoaded }) => {
   const [invoiceData, setInvoiceData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch invoice data from the backend using invoiceId
     const fetchInvoiceData = async () => {
       try {
         const response = await fetch(
@@ -20,9 +19,9 @@ const Bill = ({ invoiceId, onPrintComplete }) => {
         const data = await response.json();
         setInvoiceData(data);
         setLoading(false);
-
-        // Trigger print after data is loaded
-        setTimeout(() => printReceipt(data), 500);
+        if (onDataLoaded) {
+          onDataLoaded();
+        }
       } catch (error) {
         console.error("Error fetching invoice data:", error);
         setLoading(false);
@@ -30,62 +29,7 @@ const Bill = ({ invoiceId, onPrintComplete }) => {
     };
 
     fetchInvoiceData();
-  }, [invoiceId]);
-
-  const printReceipt = (data) => {
-    const printContent = document.getElementById("printable-receipt");
-    const printWindow = window.open("", "_blank", "width=300,height=600");
-    printWindow.document.open();
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Receipt</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              width: 80mm;
-              margin: 0;
-              padding: 0;
-            }
-            .receipt-container {
-              width: 80mm;
-              margin: auto;
-              font-size: 12px;
-              line-height: 1.4;
-              color: #000;
-            }
-            .divider {
-              text-align: center;
-              margin: 5px 0;
-              font-size: 10px;
-            }
-            .item-row {
-              display: flex;
-              justify-content: space-between;
-            }
-            .item-row span {
-              font-size: 12px;
-            }
-            .totals-section, .footer {
-              text-align: center;
-              margin-top: 10px;
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-
-    if (onPrintComplete) {
-      onPrintComplete();
-    }
-  };
+  }, [invoiceId, onDataLoaded]);
 
   if (loading) {
     return <p>Loading receipt...</p>;
@@ -98,7 +42,7 @@ const Bill = ({ invoiceId, onPrintComplete }) => {
   const { company, sales, invoices } = invoiceData;
 
   return (
-    <div id="printable-receipt" className="receipt-container">
+    <div id="printable-receipt" className="receipt-container" >
       {/* Header Section */}
       <div className="receipt-header">
         <h2 className="store-name">{company.Comname || "Store Name"}</h2>
@@ -158,7 +102,7 @@ const Bill = ({ invoiceId, onPrintComplete }) => {
 
 Bill.propTypes = {
   invoiceId: PropTypes.string.isRequired,
-  onPrintComplete: PropTypes.func.isRequired,
+  onDataLoaded: PropTypes.func.isRequired,
 };
 
 export default Bill;

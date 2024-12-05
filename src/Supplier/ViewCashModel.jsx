@@ -54,6 +54,8 @@ const ViewCashModel = ({ supplierId, onClose }) => {
     }
   };
 
+
+  
   const handleDeletePayment = async (paymentId, generatedId, paymentAmount) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -107,6 +109,8 @@ const ViewCashModel = ({ supplierId, onClose }) => {
     )}`;
     window.open(url, "_blank");
   };
+
+  
 
   const handleViewDocumentNew = (filePath) => {
     if (!filePath) {
@@ -253,7 +257,7 @@ const ViewCashModel = ({ supplierId, onClose }) => {
                           <td>
                             {payment.filePath ? (
                               <button
-                                onClick={() => handleViewDocumentNew(payment.filePath)}
+                                onClick={() => handleViewDocument(payment.filePath)}
                               >
                                 View
                               </button>
