@@ -210,13 +210,12 @@ const Dashboard = () => {
               <ul className="nav-links">
                 <li>
                   <div className="icon-link">
-                    <a href="#">
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faDashboard}
-                      />
+                    <Link 
+                      to="MainDashboard"
+                      state={{ UserName: username, Store:store, Type: type, Email: email, LastLogin}}>
+                      <FontAwesomeIcon className="nav-icon" icon={faDashboard} />
                       <span className="link-name">DASHBOARD</span>
-                    </a>
+                    </Link>
                   </div>
                   <hr />
                 </li>
@@ -235,7 +234,7 @@ const Dashboard = () => {
                   <Link 
                       to="sales"
                       state={{ UserName: username, Store:store, Type: type, Email: email, LastLogin}}>
-                      <FontAwesomeIcon className="nav-icon" icon={faReceipt} />
+                      <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
                       <span className="link-name">SALES</span>
                     </Link>
                   </div>
