@@ -1,4 +1,5 @@
 // src/components/MainDashboard.js
+
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "../css2/maindashboard.css";
@@ -8,49 +9,80 @@ import supplierImage from "../assets/images/supplier.png";
 import productImage from "../assets/images/products.png";
 import customerImage from "../assets/images/customer.png";
 import billImage from "../assets/images/bill.png";
+import companyImage from "../assets/images/mainLogo.jpg"; // Add your company image here
 
 const MainDashboard = () => {
   const [currentDate, setCurrentDate] = useState("");
   const [currentTime, setCurrentTime] = useState("");
   const [greeting, setGreeting] = useState("");
 
-  const [todaySales, setTodaySales] = useState(0);
-  const [todayInvoice, setTodayInvoice] = useState(0);
-  const [supplierCount, setSupplierCount] = useState(0);
-  const [productCount, setProductCount] = useState(0);
-  const [customerCount, setCustomerCount] = useState(0);
-  const [lastInvoice, setLastInvoice] = useState("");
-  const [loading, setLoading] = useState(true);
-
   const location = useLocation();
   const { UserName } = location.state || { UserName: "Guest" };
 
-  // Fetch dashboard stats
+  const [todayInvoiceCount, setTodayInvoiceCount] = useState(0);
+  const [supplierCount, setSupplierCount] = useState(0);
+  const [customerCount, setCustomerCount] = useState(0);
+  const [productCount, setProductCount] = useState(0);
+  const [lastInvoiceId, setLastInvoiceId] = useState('');
+  const [todaySales, setTodaySales] = useState(0.00); // New state for Today Sales
+
+  // Fetch counts from backend endpoints
   useEffect(() => {
-    const fetchDashboardStats = async () => {
-      setLoading(true);
+    const fetchCounts = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/invoices/dashboard-stats`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log('Fetched dashboard stats:', data); // Debugging log
-        setTodaySales(data.todaySales);
-        setTodayInvoice(data.todayInvoice);
-        setSupplierCount(data.supplierCount);
-        setProductCount(data.productCount);
-        setCustomerCount(data.customerCount);
-        setLastInvoice(data.lastInvoice || "No Invoices Yet");
+        const [invoiceRes, supplierRes, customerRes, productRes] = await Promise.all([
+          fetch("http://localhost:5000/api/invoices/today_invoices_count"),
+          fetch("http://localhost:5000/api/invoices/suppliercount"),
+          fetch("http://localhost:5000/api/invoices/customercount"),
+          fetch("http://localhost:5000/api/invoices/productcount"),
+        ]);
+
+        if (!invoiceRes.ok) throw new Error(`Invoice Count Fetch Error: ${invoiceRes.status}`);
+        if (!supplierRes.ok) throw new Error(`Supplier Count Fetch Error: ${supplierRes.status}`);
+        if (!customerRes.ok) throw new Error(`Customer Count Fetch Error: ${customerRes.status}`);
+        if (!productRes.ok) throw new Error(`Product Count Fetch Error: ${productRes.status}`);
+
+        const invoiceData = await invoiceRes.json();
+        const supplierData = await supplierRes.json();
+        const customerData = await customerRes.json();
+        const productData = await productRes.json();
+
+        setTodayInvoiceCount(invoiceData.count);
+        setSupplierCount(supplierData.count);
+        setCustomerCount(customerData.count);
+        setProductCount(productData.count);
       } catch (error) {
-        console.error("Error fetching dashboard stats:", error);
-        // Optionally, set default or error states here
-      } finally {
-        setLoading(false);
+        console.error("Error fetching counts:", error);
       }
     };
 
-    fetchDashboardStats();
+    const fetchLastInvoice = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/invoices/lastInvoiceId");
+        if (!response.ok) throw new Error(`Last Invoice Fetch Error: ${response.status}`);
+        const data = await response.json();
+        setLastInvoiceId(data.invoiceId || 'N/A');
+      } catch (error) {
+        console.error("Error fetching last invoice:", error);
+        setLastInvoiceId('Error');
+      }
+    };
+
+    const fetchTodaySales = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/invoices/CurrentMonthSales");
+        if (!response.ok) throw new Error(`Today Sales Fetch Error: ${response.status}`);
+        const data = await response.json();
+        setTodaySales(data.todaySales || 0.00);
+      } catch (error) {
+        console.error("Error fetching today sales:", error);
+        setTodaySales('Error');
+      }
+    };
+
+    fetchCounts();
+    fetchLastInvoice();
+    fetchTodaySales();
   }, []);
 
   // Update Date and Time
@@ -86,44 +118,40 @@ const MainDashboard = () => {
 
   return (
     <div id="dashboard-container">
-      {loading ? (
-        <div className="loading">Loading dashboard...</div>
-      ) : (
-        <section id="dashboard-panels">
-          <div className="dashboard-panel">
-            <img src={salesImage} alt="Today Sale" className="panel-icon" />
-            <p>Today Sale</p>
-            <h2>{todaySales.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-          </div>
-          <div className="dashboard-panel">
-            <img src={invoiceImage} alt="Today Invoice" className="panel-icon" />
-            <p>Today Invoice</p>
-            <h2>{todayInvoice}</h2>
-          </div>
-          <div className="dashboard-panel">
-            <img src={supplierImage} alt="Supplier" className="panel-icon" />
-            <p>Supplier</p>
-            <h2>{supplierCount}</h2>
-          </div>
-          <div className="dashboard-panel">
-            <img src={productImage} alt="Product" className="panel-icon" />
-            <p>Product</p>
-            <h2>{productCount}</h2>
-          </div>
-          <div className="dashboard-panel">
-            <img src={customerImage} alt="Customer" className="panel-icon" />
-            <p>Customer</p>
-            <h2>{customerCount}</h2>
-          </div>
-          <div className="dashboard-panel">
-            <img src={billImage} alt="Last Invoice" className="panel-icon" />
-            <p>Last Invoice</p>
-            <h2>{lastInvoice}</h2>
-          </div>
-        </section>
-      )}
+      <section id="dashboard-panels">
+        <div className="dashboard-panel">
+          <img src={salesImage} alt="Today Sale" className="panel-icon" />
+          <p>Today Sale</p>
+          <h2>{todaySales !== 'Error' ? parseFloat(todaySales).toFixed(2) : 'Error'}</h2>
+        </div>
+        <div className="dashboard-panel">
+          <img src={invoiceImage} alt="Today Invoice" className="panel-icon" />
+          <p>Today Invoice</p>
+          <h2>{todayInvoiceCount}</h2>
+        </div>
+        <div className="dashboard-panel">
+          <img src={supplierImage} alt="Supplier" className="panel-icon" />
+          <p>Supplier</p>
+          <h2>{supplierCount}</h2>
+        </div>
+        <div className="dashboard-panel">
+          <img src={productImage} alt="Product" className="panel-icon" />
+          <p>Product</p>
+          <h2>{productCount}</h2>
+        </div>
+        <div className="dashboard-panel">
+          <img src={customerImage} alt="Customer" className="panel-icon" />
+          <p>Customer</p>
+          <h2>{customerCount}</h2>
+        </div>
+        <div className="dashboard-panel">
+          <img src={billImage} alt="Last Invoice" className="panel-icon" />
+          <p>Last Invoice</p>
+          <h2>{lastInvoiceId}</h2>
+        </div>
+      </section>
 
-      {/* Date/Time and December Summary in one row */}
+      {/* Date/Time, December Summary, and Company Details in one row */}
       <section id="info-row">
         {/* Date and Time Section */}
         <div id="dashboard-date-time">
@@ -144,6 +172,20 @@ const MainDashboard = () => {
             <li>December Expenses: <span className="summary-red">0.00</span></li>
             <li>December Net Profit: <span className="summary-blue">3,525.82</span></li>
           </ul>
+        </div>
+
+        {/* Company Details Section */}
+        <div className="summary-card company-details">
+          <img src={companyImage} alt="Company Logo" className="company-icon" />
+          <div className="company-info">
+            <h3>Company Details</h3>
+            <ul>
+              <li>Company Name: <span className="summary-blue">Gitknow Technologies</span></li>
+              <li>Proprietor: <span className="summary-blue">Mr Abdul Rahman</span></li>
+              <li>Address: <span className="summary-blue">No43, Laksiriyuana, Rathmale, Ewwariyapola</span></li>
+              <li>Tel: <span className="summary-blue">074 334 7776</span></li>
+            </ul>
+          </div>
         </div>
       </section>
 
