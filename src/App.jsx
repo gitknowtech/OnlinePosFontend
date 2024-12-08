@@ -18,6 +18,8 @@ import SalesManage from "./Sales/sales";
 import Qutation from "./Invoice/invoiceNew";
 import Charts from "./Charts/Charts";
 import MainDashboard from "./Dashboard/MainDashboard";
+import ReportsWindow from "./ReportsFile/Report";
+import SettingWindow from "./SettingFile/Setting";
 
 
 function App() {
@@ -47,6 +49,8 @@ function App() {
           <Route path="invoiceNew" element={<Qutation/>} />
           <Route path="Charts" element={<Charts />} />
           <Route path="MainDashboard" element={<MainDashboard/>}/> 
+          <Route path="Reports" element={<ReportsWindow/>} />
+          <Route path="Setting" element={<SettingWindow/>} />
         </Route> 
 
       </Routes>

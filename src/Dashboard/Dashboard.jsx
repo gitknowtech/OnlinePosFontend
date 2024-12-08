@@ -1,9 +1,9 @@
 import "../css/Dashboard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom"; // Import useLocation hook
+import { useLocation, useNavigate } from "react-router-dom"; // Import useLocation hook
 import { Link, Outlet } from "react-router-dom"; // Use Outlet to load child routes dynamically
-
+import Swal from "sweetalert2";
 
 import {
   faStore,
@@ -36,7 +36,8 @@ const Dashboard = () => {
   const [LastLogin, setlastLogin] = useState("N/A"); // Last login
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
-  
+  const navigate = useNavigate(); // Initialize useNavigate for redirection
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
@@ -45,7 +46,6 @@ const Dashboard = () => {
     date: "",
     time: "",
   });
-
 
   // Combine user data and time update in one useEffect
   useEffect(() => {
@@ -93,7 +93,7 @@ const Dashboard = () => {
       // Set an error message if location.state does not exist
       setError("No user data available");
     }
-    
+
     setLoading(false); // Stop loading after processing data
 
     // Cleanup interval on component unmount
@@ -107,13 +107,45 @@ const Dashboard = () => {
   if (error) {
     return <div className="error">{error}</div>; // Show error message if there is an error
   }
-  
-  
 
+  // Function to check access and navigate
+  const handleAccessCheck = async (section, route) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/access/${username}/${section}`
+      );
+      const data = await response.json();
 
-
- 
-
+      if (data.access) {
+        // Navigate if access is granted
+        navigate(route, {
+          state: {
+            UserName: username,
+            Store: store,
+            Type: type,
+            Email: email,
+            LastLogin,
+          },
+        });
+      } else {
+        // Show SweetAlert if access is denied
+        Swal.fire({
+          title: "Access Denied",
+          text: "You cannot access this. Please ask admin for permission.",
+          icon: "info",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.error("Error checking access:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to check access. Please try again later.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
 
   return (
     <div className="dashboard_wrapper">
@@ -195,11 +227,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-
-
-
-      
-
       {/* Sidebar and main container */}
       <div className="dashboard_main">
         {/* Dashboard side bar */}
@@ -209,11 +236,26 @@ const Dashboard = () => {
             <div className="scrollbox-inner">
               <ul className="nav-links">
                 <li>
-                  <div className="icon-link">
-                    <Link 
+                  <div
+                    className="icon-link"
+                    onClick={() =>
+                      handleAccessCheck("Dashboard", "/dashboard/MainDashboard")
+                    }
+                  >
+                    <Link
                       to="MainDashboard"
-                      state={{ UserName: username, Store:store, Type: type, Email: email, LastLogin}}>
-                      <FontAwesomeIcon className="nav-icon" icon={faDashboard} />
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        className="nav-icon"
+                        icon={faDashboard}
+                      />
                       <span className="link-name">DASHBOARD</span>
                     </Link>
                   </div>
@@ -221,9 +263,16 @@ const Dashboard = () => {
                 </li>
                 <li>
                   <div className="icon-link">
-                  <Link 
+                    <Link
                       to="invoice"
-                      state={{ UserName: username, Store:store, Type: type, Email: email, LastLogin}}>
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
                       <FontAwesomeIcon className="nav-icon" icon={faReceipt} />
                       <span className="link-name">INVOICE</span>
                     </Link>
@@ -231,9 +280,16 @@ const Dashboard = () => {
                 </li>
                 <li>
                   <div className="icon-link">
-                  <Link 
+                    <Link
                       to="sales"
-                      state={{ UserName: username, Store:store, Type: type, Email: email, LastLogin}}>
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
                       <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
                       <span className="link-name">SALES</span>
                     </Link>
@@ -241,9 +297,16 @@ const Dashboard = () => {
                 </li>
                 <li>
                   <div className="icon-link">
-                    <Link 
+                    <Link
                       to="stock"
-                      state={{ UserName: username, Store:store, Type: type, Email: email, LastLogin}}>
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
                       <FontAwesomeIcon className="nav-icon" icon={faCartPlus} />
                       <span className="link-name">STOCK</span>
                     </Link>
@@ -252,40 +315,77 @@ const Dashboard = () => {
                 <hr />
                 <li>
                   <div className="icon-link">
-                  <Link
-                    to="products"
-                    state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
-                    <FontAwesomeIcon className="nav-icon" icon={faArchive} />
-                    <span className="link-name">PRODUCTS</span>
-                  </Link>
+                    <Link
+                      to="products"
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
+                      <FontAwesomeIcon className="nav-icon" icon={faArchive} />
+                      <span className="link-name">PRODUCTS</span>
+                    </Link>
                   </div>
                 </li>
                 <li>
                   <div className="icon-link">
-                  <Link
-                    to="purchasing"
-                    state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
-                      <FontAwesomeIcon className="nav-icon" icon={faUserSecret}/>
+                    <Link
+                      to="purchasing"
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        className="nav-icon"
+                        icon={faUserSecret}
+                      />
                       <span className="link-name">PURCHESING</span>
                     </Link>
                   </div>
                 </li>
                 <li>
                   <div className="icon-link">
-                  <Link
-                    to="ManageUser"
-                    state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
-                      <FontAwesomeIcon className="nav-icon" icon={faUserSecret}/>
+                    <Link
+                      to="ManageUser"
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        className="nav-icon"
+                        icon={faUserSecret}
+                      />
                       <span className="link-name">User</span>
                     </Link>
-                    </div>
+                  </div>
                 </li>
                 <li>
                   <div className="icon-link">
-                  <Link
-                    to="customer"
-                    state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
-                      <FontAwesomeIcon className="nav-icon" icon={faUserSecret}/>
+                    <Link
+                      to="customer"
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        className="nav-icon"
+                        icon={faUserSecret}
+                      />
                       <span className="link-name">CUSTOMER</span>
                     </Link>
                   </div>
@@ -294,37 +394,72 @@ const Dashboard = () => {
                 <li>
                   <div className="icon-link">
                     <Link
-                    to="invoiceNew"
-                    state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
-                      <FontAwesomeIcon className="nav-icon" icon={faUserSecret}/>
+                      to="invoiceNew"
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        className="nav-icon"
+                        icon={faUserSecret}
+                      />
                       <span className="link-name">QUOTATION</span>
                     </Link>
                   </div>
                 </li>
                 <li>
                   <div className="icon-link">
-                  <Link
-                    to="Charts"
-                    state={{ UserName: username, Store: store, Type: type, Email: email, LastLogin }}>
-                      <FontAwesomeIcon className="nav-icon" icon={faFileText}/>
+                    <Link
+                      to="Charts"
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
+                      <FontAwesomeIcon className="nav-icon" icon={faFileText} />
                       <span className="link-name">CHARTS</span>
                     </Link>
                   </div>
                 </li>
                 <li>
                   <div className="icon-link">
-                    <a href="#">
+                    <Link
+                      to="Reports"
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
                       <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
-                      <span className="link-name">REPORT</span>
-                    </a>
+                      <span className="link-name">REPORTS</span>
+                    </Link>
                   </div>
                 </li>
                 <li>
                   <div className="icon-link">
-                    <a href="#">
+                    <Link
+                      to="Setting"
+                      state={{
+                        UserName: username,
+                        Store: store,
+                        Type: type,
+                        Email: email,
+                        LastLogin,
+                      }}
+                    >
                       <FontAwesomeIcon className="nav-icon" icon={faWrench} />
                       <span className="link-name">SETTING</span>
-                    </a>
+                    </Link>
                   </div>
                 </li>
                 <li>

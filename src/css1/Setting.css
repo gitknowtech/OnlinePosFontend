@@ -1,0 +1,47 @@
+/* src/css1/Setting.css */
+
+#settings-panel-user-setting {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  #button-list-user-setting {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  #user-setting-button-user-setting,
+  #bill-setting-button-user-setting,
+  #barcode-setting-button-user-setting {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  #user-setting-button-user-setting:hover,
+  #bill-setting-button-user-setting:hover,
+  #barcode-setting-button-user-setting:hover {
+    background-color: #0056b3;
+  }
+  
+  #button-icon-user-setting {
+    margin-right: 5px;
+  }
+  
+  #setting-content-user-setting {
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  

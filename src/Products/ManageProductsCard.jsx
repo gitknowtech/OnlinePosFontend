@@ -60,7 +60,8 @@ export default function ManageProductsCard({ store }) {
             <div className="product-info-manage-product-design">
               <h3 className="product-name-manage-product-design">{product.productName}</h3>
               <p className="product-id-manage-product-design">ID: {product.productId}</p>
-              <p className="product-price-manage-product-design">Price: {product.mrpPrice} RS</p>
+              <p className="product-price-manage-product-design">Price: {product.mrpPrice}</p>
+              <p className="product-price-manage-product-design">Stock: {product.stockQuantity}</p>
             </div>
           </div>
         ))}
