@@ -5,6 +5,7 @@
   margin: auto;
   background-color: #fff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box; /* Ensure padding is included in width calculations */
 }
 
 /* Panels Section */
@@ -19,7 +20,7 @@
   position: relative;
   background: linear-gradient(135deg, #3a7bd5, #3a6073);
   color: white;
-  padding: 15px;
+  padding: 20px; /* Increased padding for better touch targets */
   cursor: pointer;
   border-radius: 15px;
   text-align: center;
@@ -33,22 +34,23 @@
 
 .dashboard-panel:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 .panel-icon {
-  width: 32px;
-  height: 32px;
+  width: 40px; /* Increased size for better visibility */
+  height: 40px;
+  margin-bottom: 10px; /* Space between icon and text */
 }
 
 .dashboard-panel p {
-  font-size: 14px;
+  font-size: 16px; /* Increased font size for readability */
   margin: 5px 0;
   color: #dbeafe;
 }
 
 .dashboard-panel h2 {
-  font-size: 24px;
+  font-size: 28px; /* Increased font size for emphasis */
   margin: 0;
   font-weight: bold;
   color: #fff;
@@ -62,7 +64,17 @@
   flex-wrap: wrap;
 }
 
-/* Date and Time */
+.greeting-image {
+  width: 100%; /* Makes the image take the full width of the container */
+  max-width: 100px; /* Ensures it doesn't become too large */
+  height: auto; /* Maintains aspect ratio */
+  border-radius: 10px; /* Adds rounded corners */
+  margin: 0 auto 15px auto; /* Centers the image and adds spacing below */
+  display: block; /* Ensures proper alignment */
+  object-fit: cover; /* Ensures the image fits nicely without distortion */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds a soft shadow for better appearance */
+}
+
 #dashboard-date-time {
   flex: 1;
   background: linear-gradient(to bottom right, #ffffff, #f0f0f0);
@@ -71,7 +83,7 @@
   text-align: center;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   border: 2px solid #ddd;
-  min-width: 300px;
+  min-width: 280px; /* Adjusted min-width for better responsiveness */
 }
 
 #dashboard-date-time h2 {
@@ -93,21 +105,6 @@
   font-weight: bold;
 }
 
-#store-switcher {
-  margin-top: 10px;
-}
-
-#store-switcher select {
-  padding: 5px;
-}
-
-#store-switcher #switch-btn {
-  margin-left: 10px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-/* Summary Card */
 .summary-card {
   flex: 1;
   background: linear-gradient(to bottom right, #ffffff, #f0f0f0);
@@ -115,50 +112,67 @@
   border-radius: 15px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   border: 2px solid #ddd;
-  min-width: 300px;
+  min-width: 280px; /* Adjusted min-width for better responsiveness */
 }
 
 .summary-card h3 {
   margin-top: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
 }
 
 .summary-card ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.summary-card li {
-  font-size: 14px;
-  margin: 5px 0;
+.summary-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px; /* Increased font size for readability */
+  margin: 10px 0;
+}
+
+.summary-label {
+  flex: 1;
+  margin-left: 30px;
+  font-weight: 600;
+}
+
+.summary-value {
+  flex: 0;
+  margin-right: 20px; /* Reduced margin for better alignment */
+  font-weight: bold;
 }
 
 .summary-green {
   color: green;
-  font-weight: bold;
 }
 
 .summary-red {
   color: red;
-  font-weight: bold;
 }
 
 .summary-blue {
   color: blue;
-  font-weight: bold;
 }
 
 /* Company Details Section */
 .company-details {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 .company-icon {
-  width: 80px;
+  width: 100px; /* Increased size for better visibility */
   height: auto;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .company-info {
@@ -166,22 +180,37 @@
 }
 
 .company-info h3 {
-  margin-top: 0;
+  margin: 0 0 15px 0;
+  font-size: 20px; /* Increased font size for emphasis */
+  font-weight: bold;
+  color: #333;
 }
 
-.company-info ul {
+.company-details-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.company-info li {
-  font-size: 14px;
+.company-details-list li {
+  display: flex;
+  justify-content: space-between;
   margin: 5px 0;
+  font-size: 16px; /* Increased font size for readability */
 }
 
-.company-info .summary-blue {
-  color: blue;
+.details-label {
+  flex: 1;
+  text-align: left;
   font-weight: bold;
+  color: #333;
+}
+
+.details-value {
+  flex: 2;
+  text-align: left;
+  font-weight: normal;
+  color: #555;
 }
 
 /* Charts row: Profit summary and Sales summary side by side */
@@ -194,36 +223,37 @@
 
 #charts-row .summary-card {
   flex: 1;
-  min-width: 300px;
+  min-width: 280px; /* Adjusted min-width for better responsiveness */
 }
 
-/* Tables row: Invoices and Products side by side */
+
+/* Tables Row: Last 5 Invoices, Top 5 Products, and Last 5 Credit Sales */
 #tables-row {
-  display: flex;
-  gap: 20px;
+  display: grid; /* Switch to CSS Grid for better control */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Two columns layout with responsive adjustment */
+  gap: 20px; /* Space between grid items */
   margin: 20px 0;
-  align-items: flex-start;
-  flex-wrap: wrap;
 }
 
-#dashboard-invoices, #top-products, #last-credit-sales, #supplier-due-payment {
-  flex: 1;
-  min-width: 300px;
-}
-
-#dashboard-invoices h3,
-#top-products h3,
-#last-credit-sales h3,
-#supplier-due-payment h3 {
-  margin-top: 0;
-}
-
-/* Updated Table Styles with Light Background Colors */
-#dashboard-invoices table,
-#top-products table,
-#last-credit-sales table,
-#supplier-due-payment table {
+/* Ensure each table container takes full width of the grid column */
+#dashboard-invoices,
+#top-products,
+#last-credit-sales,
+#supplier-due-payment {
   width: 100%;
+  box-sizing: border-box;
+}
+
+/* Table Responsive Wrapper */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto; /* Enable horizontal scroll on small screens */
+}
+
+/* Table Styling */
+.table-responsive table {
+  width: 100%;
+  min-width: 600px; /* Ensure tables have a minimum width */
   border-collapse: collapse;
   margin-top: 10px;
   background: #f9f9f9; /* Light background for tables */
@@ -232,136 +262,213 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-#dashboard-invoices th, #dashboard-invoices td,
-#top-products th, #top-products td,
-#last-credit-sales th, #last-credit-sales td,
-#supplier-due-payment th, #supplier-due-payment td {
-  text-align: left;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  font-size: 14px;
-}
-
-#dashboard-invoices th, #top-products th,
-#last-credit-sales th, #supplier-due-payment th {
+/* Table Headers */
+#tables-row th {
   background: #e0f7fa; /* Light blue for headers */
   font-weight: bold;
   color: #333;
+  text-align: left;
+  padding: 12px; /* Increased padding for better touch targets */
+  border-bottom: 1px solid #ddd;
+  font-size: 12px; /* Increased font size for readability */
 }
 
-#dashboard-invoices td, #top-products td,
-#last-credit-sales td, #supplier-due-payment td {
+/* Table Data Cells */
+#tables-row td {
   color: #555;
+  text-align: left;
+  padding: 12px; /* Increased padding for better touch targets */
+  border-bottom: 1px solid #ddd;
+  font-weight: 600;
+  font-size: 12px; /* Increased font size for readability */
 }
 
 /* Alternate Row Coloring */
-#dashboard-invoices tr:nth-child(even),
-#top-products tr:nth-child(even),
-#last-credit-sales tr:nth-child(even),
-#supplier-due-payment tr:nth-child(even) {
+#tables-row tr:nth-child(even) {
   background: #f1f1f1; /* Light grey for even rows */
 }
 
-.amount-green {
-  color: green;
-  font-weight: bold;
+/* Hover Effects for Table Rows */
+#tables-row tr:hover {
+  background-color: #e0f7fa; /* Light blue background on hover */
+  cursor: pointer;
 }
 
-.amount-red {
-  color: red;
-  font-weight: bold;
-}
-
-/* Extra tables row for Last Credit Sales and Supplier Due Payment */
-#extra-tables-row {
-  display: flex;
-  gap: 20px;
-  margin: 20px 0;
-  align-items: flex-start;
-  flex-wrap: wrap;
+/* Make tables horizontally scrollable on small devices */
+@media (max-width: 768px) {
+  #dashboard-invoices table,
+  #top-products table,
+  #last-credit-sales table,
+  #supplier-due-payment table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   #dashboard-panels {
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
   
   #dashboard-date-time h2 {
-      font-size: 20px;
+    font-size: 20px;
   }
   
   #dashboard-date-time h3 {
-      font-size: 18px;
+    font-size: 18px;
   }
   
   #dashboard-date-time p {
-      font-size: 16px;
+    font-size: 16px;
+  }
+
+  .summary-list li, .company-details-list li {
+    font-size: 14px; /* Slightly smaller font on medium screens */
+  }
+
+  .panel-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .dashboard-panel h2 {
+    font-size: 24px;
+  }
+
+  .dashboard-panel p {
+    font-size: 14px;
+  }
+
+  #tables-row {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjust min-width for medium screens */
+  }
+
+  /* Adjust table font sizes for medium screens */
+  #tables-row th,
+  #tables-row td {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* Adjust min-width of tables */
+  .table-responsive table {
+    min-width: 500px;
   }
 }
 
 @media (max-width: 768px) {
   #dashboard-panels {
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   }
   
   #info-row, #charts-row, #tables-row, #extra-tables-row {
-      flex-direction: column;
+    flex-direction: column;
   }
   
   .summary-card, #dashboard-date-time {
-      margin-bottom: 20px;
+    margin-bottom: 20px;
   }
   
   #dashboard-date-time, .summary-card {
-      min-width: unset;
+    min-width: unset;
   }
   
   .company-details {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
   
   .company-info {
-      align-items: center;
+    align-items: center;
+  }
+
+  .company-details-list li {
+    justify-content: center;
+  }
+
+  .summary-list li, .company-details-list li {
+    font-size: 14px;
+  }
+
+  #tables-row {
+    grid-template-columns: 1fr; /* Single column on small screens */
+  }
+
+  /* Ensure tables can scroll horizontally on small screens */
+  .table-responsive table {
+    min-width: 600px; /* Maintain readability */
+  }
+
+  /* Adjust padding and font sizes for better readability */
+  #tables-row th,
+  #tables-row td {
+    font-size: 12px;
+    padding: 8px;
   }
 }
 
 @media (max-width: 480px) {
   #dashboard-container {
-      padding: 10px;
+    padding: 10px;
   }
   
   #dashboard-date-time h2 {
-      font-size: 18px;
+    font-size: 18px;
   }
   
   #dashboard-date-time h3 {
-      font-size: 16px;
+    font-size: 16px;
   }
   
   #dashboard-date-time p {
-      font-size: 14px;
+    font-size: 14px;
   }
   
   .dashboard-panel h2 {
-      font-size: 18px;
+    font-size: 20px;
   }
   
   .dashboard-panel p {
-      font-size: 12px;
+    font-size: 12px;
   }
   
   th, td {
-      font-size: 12px;
+    font-size: 14px; /* Increased to 14px for better readability on small screens */
+    padding: 10px; /* Adjusted padding */
   }
   
   .company-details {
-      flex-direction: column;
+    flex-direction: column;
   }
   
   .company-info ul {
-      text-align: center;
+    text-align: center;
+  }
+
+  .panel-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .summary-card h3, .company-info h3 {
+    font-size: 16px;
+  }
+
+  .summary-list li, .company-details-list li {
+    font-size: 14px;
+  }
+
+  #tables-row {
+    grid-template-columns: 1fr; /* Maintain single column on extra small screens */
+  }
+
+  /* Further adjust table styles for very small screens */
+  #tables-row th,
+  #tables-row td {
+    font-size: 10px;
+    padding: 6px;
   }
 }

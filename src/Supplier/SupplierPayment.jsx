@@ -1,3 +1,5 @@
+// src/components/SupplierPayment.jsx
+
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
@@ -9,6 +11,7 @@ import ViewCashModel from "../Supplier/ViewCashModel"; // Modal for adding cash
 // Import the images
 import addLoanImage from "../assets/icons/addLoan.png";
 import addCashImage from "../assets/icons/addCash.png";
+import reloadImage from "../assets/icons/reload.png"; // Reload icon
 
 export default function SupplierPayment({ store }) {
   const [suppliers, setSuppliers] = useState([]);
@@ -23,6 +26,9 @@ export default function SupplierPayment({ store }) {
 
   // Balance state
   const [balances, setBalances] = useState({}); // Keeps track of balances for each supplier
+
+  // Loan Display state: { [supplierId]: 'idle' | 'loading' | 'displayed' }
+  const [loanDisplay, setLoanDisplay] = useState({});
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,33 +63,55 @@ export default function SupplierPayment({ store }) {
       );
       Swal.fire("Success", response.data.message, "success");
       setShowLoanModal(false); // Close modal after successful save
+      // Optionally, refresh suppliers or balances here
     } catch (error) {
       console.error("Error saving loan:", error);
       Swal.fire("Error", "Failed to save loan details.", "error");
     }
   };
 
-  
   // Open cash modal for selected supplier
   const handleViewCashClick = (supplier) => {
     setSelectedSupplier(supplier);
     setShowCashModal(true);
   };
 
-
-  // Fetch and display balance for a supplier
+  // Fetch and display total loan amount for a supplier
   const handleViewBalance = async (supplierId) => {
+    // If already loading or displayed, do not fetch again
+    if (
+      loanDisplay[supplierId] === "loading" ||
+      loanDisplay[supplierId] === "displayed"
+    ) {
+      return;
+    }
+
+    // Set the status to 'loading'
+    setLoanDisplay((prev) => ({ ...prev, [supplierId]: "loading" }));
+
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/suppliers/get_balance?supplierId=${supplierId}`
+        "http://localhost:5000/api/suppliers/get_total_loan",
+        { params: { supplierId } }
       );
+      const totalLoan = parseFloat(response.data.totalLoan).toFixed(2);
       setBalances((prevBalances) => ({
         ...prevBalances,
-        [supplierId]: response.data.balance || "0.00", // Update the balance or default to "0.00"
+        [supplierId]: totalLoan, // Update with the totalLoan
       }));
+
+      // Set the status to 'displayed'
+      setLoanDisplay((prev) => ({ ...prev, [supplierId]: "displayed" }));
+
+      // Optionally, you can set a timeout to hide the balance after some time
+      // setTimeout(() => {
+      //   setLoanDisplay((prev) => ({ ...prev, [supplierId]: "idle" }));
+      // }, 5000);
     } catch (error) {
-      console.error("Error fetching balance:", error);
-      Swal.fire("Error", "Failed to fetch balance for supplier.", "error");
+      console.error("Error fetching total loan:", error);
+      Swal.fire("Error", "Failed to fetch loan amount for supplier.", "error");
+      // Revert the status back to 'idle' in case of error
+      setLoanDisplay((prev) => ({ ...prev, [supplierId]: "idle" }));
     }
   };
 
@@ -92,8 +120,6 @@ export default function SupplierPayment({ store }) {
     setSelectedSupplier(supplier);
     setShowLoanModal(true);
   };
-
-
 
   // Pagination logic
   const filteredSuppliers = suppliers.filter((supplier) =>
@@ -113,8 +139,7 @@ export default function SupplierPayment({ store }) {
   const handleNextPage = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
-
-   const getDisplayedPages = () => {
+  const getDisplayedPages = () => {
     const pages = [];
     if (currentPage === 1) {
       // First three pages
@@ -159,7 +184,7 @@ export default function SupplierPayment({ store }) {
               <th>Address</th>
               <th>Mobile</th>
               <th>Company</th>
-              <th>Balance</th>
+              <th>BALANCE</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -177,17 +202,35 @@ export default function SupplierPayment({ store }) {
                 </td>
                 <td>{supplier.mobile1 || "N/A"}</td>
                 <td>{supplier.company || "N/A"}</td>
-                <td>
-                  {balances[supplier.Supid] !== undefined ? (
-                    `$${balances[supplier.Supid]}`
-                  ) : (
-                    <button
-                      className="view-balance-button"
-                      onClick={() => handleViewBalance(supplier.Supid)}
-                    >
-                      View
-                    </button>
-                  )}
+                <td style={{width:"10px"}}>
+                  <div
+                    className="balance-container" style={{cursor:"pointer"}}
+                    onMouseEnter={() => handleViewBalance(supplier.Supid)}
+                    onMouseLeave={() =>
+                      setLoanDisplay((prev) => ({
+                        ...prev,
+                        [supplier.Supid]: "idle",
+                      }))
+                    }
+                  >
+                    {loanDisplay[supplier.Supid] === "loading" ? (
+                      <img
+                        src={reloadImage}
+                        alt="Loading"
+                        className="reload-icon spinning"
+                      />
+                    ) : loanDisplay[supplier.Supid] === "displayed" ? (
+                      <span className="loan-amount-red">
+                        ${balances[supplier.Supid]}
+                      </span>
+                    ) : (
+                      <img
+                        src={reloadImage}
+                        alt="Reload"
+                        className="reload-icon"
+                      />
+                    )}
+                  </div>
                 </td>
                 <td>
                   <button
@@ -196,7 +239,7 @@ export default function SupplierPayment({ store }) {
                   >
                     <img src={addLoanImage} alt="Add Loan" />
                   </button>
-                   <button
+                  <button
                     className="icon-button"
                     onClick={() => handleViewCashClick(supplier)}
                   >

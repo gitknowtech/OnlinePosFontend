@@ -1,3 +1,5 @@
+/* src/css/SupplierPayment.css */
+
 /* Container Styling */
 #supplier_payment_container {
     padding: 20px;
@@ -10,6 +12,12 @@
 }
 
 /* Search Bar */
+#search_box_supplier_payment {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
 #search_box_supplier_payment input {
     width: 100%;
     max-width: 400px;
@@ -26,12 +34,17 @@
 }
 
 /* Table Styling */
+#supplier_table_supplier_payment {
+    overflow-x: auto;
+}
+
 #table_supplier_payment {
     width: 100%;
     border-collapse: collapse;
     background-color: #fff;
     border-radius: 8px;
     overflow: hidden;
+    transition: all 0.3s ease-in-out;
 }
 
 #table_supplier_payment th,
@@ -40,6 +53,7 @@
     border: 1px solid #dee2e6;
     text-align: left;
     vertical-align: middle;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 #table_supplier_payment th {
@@ -58,6 +72,35 @@
     background-color: #f8faff;
 }
 
+/* Loan Amount in Red */
+.loan-amount-red {
+    color: red;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+/* Reload Icon Styling */
+.reload-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.reload-icon:hover {
+    transform: rotate(180deg);
+}
+
+/* Spinning Animation */
+.spinning {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Icon Button Styling */
 .icon-button {
     background: none;
@@ -65,6 +108,7 @@
     cursor: pointer;
     padding: 5px;
     transition: transform 0.3s ease-in-out;
+    margin-right: 8px;
 }
 
 .icon-button img {
@@ -78,10 +122,103 @@
 }
 
 
+/* Balance Container */
+.balance-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Reload Icon Hover Effect */
+.reload-icon:hover {
+    transform: rotate(180deg);
+}
+
+/* Spinning Animation */
+.spinning {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Responsive Styling */
-@media (max-width: 768px) {
+
+/* Desktop */
+@media (min-width: 1366px) and (max-width: 1920px) {
+    #supplier_payment_container {
+        font-size: 12px;
+    }
+
     #table_supplier_payment th,
     #table_supplier_payment td {
+        padding: 12px;
+        font-size: 12px;
+    }
+
+    .reload-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .loan-amount-red {
+        font-size: 12px;
+    }
+}
+
+/* Tablet and Small Desktop */
+@media (max-width: 1366px) and (min-width: 769px) {
+    #supplier_payment_container {
+        font-size: 14px;
+    }
+
+    #table_supplier_payment th,
+    #table_supplier_payment td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .reload-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .loan-amount-red {
+        font-size: 14px;
+    }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+    #supplier_payment_container {
+        font-size: 13px;
+    }
+
+    #search_box_supplier_payment input {
+        max-width: 350px;
+    }
+
+    #table_supplier_payment th,
+    #table_supplier_payment td {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .reload-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .loan-amount-red {
+        font-size: 13px;
+    }
+}
+
+/* Mobile Devices */
+@media (max-width: 768px) {
+    #supplier_payment_container {
         font-size: 12px;
         padding: 10px;
     }
@@ -91,4 +228,50 @@
         padding: 8px;
     }
 
+    #table_supplier_payment th,
+    #table_supplier_payment td {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .reload-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .loan-amount-red {
+        font-size: 12px;
+    }
+}
+
+/* Extra Small Devices */
+@media (max-width: 480px) {
+    #supplier_payment_container {
+        font-size: 11px;
+        padding: 8px;
+    }
+
+    #search_box_supplier_payment input {
+        padding: 6px;
+    }
+
+    #table_supplier_payment th,
+    #table_supplier_payment td {
+        padding: 6px;
+        font-size: 10px;
+    }
+
+    .reload-icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    .loan-amount-red {
+        font-size: 10px;
+    }
+
+    .pagination button {
+        padding: 6px 12px;
+        font-size: 10px;
+    }
 }
