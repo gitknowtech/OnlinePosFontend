@@ -1,3 +1,5 @@
+// src/components/Dashboard.jsx
+
 import "../css/Dashboard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
@@ -28,28 +30,37 @@ import adminImage from "../assets/images/user.png";
 
 const Dashboard = () => {
   const location = useLocation(); // Get location object
+  const navigate = useNavigate(); // Initialize useNavigate for redirection
+
+  // State variables for user information
   const [isOpen, setIsOpen] = useState(true); // Sidebar state
   const [username, setUsername] = useState(""); // User's name
   const [store, setStore] = useState("Berty Sport Corner"); // Store name
   const [type, setType] = useState("N/A"); // User type
   const [email, setEmail] = useState("N/A"); // Email address
-  const [LastLogin, setlastLogin] = useState("N/A"); // Last login
+  const [lastLogin, setLastLogin] = useState("N/A"); // Last login
+
+  // State variables for loading and error handling
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
-  const navigate = useNavigate(); // Initialize useNavigate for redirection
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
+  // State variables for current date and time
   const [currentDateTime, setCurrentDateTime] = useState({
     date: "",
     time: "",
   });
 
-  // Combine user data and time update in one useEffect
+  // State variables for access rights
+  const [accessRights, setAccessRights] = useState({});
+  const [loadingAccess, setLoadingAccess] = useState(true);
+
+  // Function to toggle sidebar visibility
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
+  // Function to update current date and time every second
   useEffect(() => {
-    // Function to get the current date and time in Sri Lanka timezone
     const updateDateTime = () => {
       const now = new Date();
       const options = {
@@ -63,12 +74,19 @@ const Dashboard = () => {
         hour12: true,
       };
 
-      // Format date and time based on Sri Lanka timezone
       const dateTimeFormatter = new Intl.DateTimeFormat("en-GB", options);
       const parts = dateTimeFormatter.formatToParts(now);
 
-      const formattedDate = `${parts[2].value} ${parts[0].value}, ${parts[4].value}`;
-      const formattedTime = `${parts[6].value}:${parts[8].value}:${parts[10].value} ${parts[12].value}`;
+      const day = parts.find(part => part.type === 'day')?.value;
+      const month = parts.find(part => part.type === 'month')?.value;
+      const year = parts.find(part => part.type === 'year')?.value;
+      const hour = parts.find(part => part.type === 'hour')?.value;
+      const minute = parts.find(part => part.type === 'minute')?.value;
+      const second = parts.find(part => part.type === 'second')?.value;
+      const dayPeriod = parts.find(part => part.type === 'dayPeriod')?.value;
+
+      const formattedDate = `${day} ${month}, ${year}`;
+      const formattedTime = `${hour}:${minute}:${second} ${dayPeriod}`;
 
       setCurrentDateTime({
         date: formattedDate,
@@ -76,11 +94,14 @@ const Dashboard = () => {
       });
     };
 
-    // Update time every second
     const intervalId = setInterval(updateDateTime, 1000); // Update every second
     updateDateTime(); // Set initial time
 
-    // Check if location.state exists and contains user data
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, []);
+
+  // Function to fetch user data from location.state
+  useEffect(() => {
     if (location.state) {
       const { UserName, Store, Type, Email, LastLogin } = location.state;
 
@@ -88,64 +109,107 @@ const Dashboard = () => {
       setStore(Store || "Berty Sport Corner");
       setType(Type || "N/A");
       setEmail(Email || "N/A");
-      setlastLogin(LastLogin || "N/A");
+      setLastLogin(LastLogin || "N/A");
     } else {
-      // Set an error message if location.state does not exist
       setError("No user data available");
     }
 
-    setLoading(false); // Stop loading after processing data
+    setLoading(false);
+  }, [location.state]);
 
-    // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
-  }, [location.state]); // Only re-run the effect when location.state changes
+  // Function to fetch access rights for all sections
+  useEffect(() => {
+    const fetchAccessRights = async () => {
+      try {
+        const sections = [
+          "Dashboard",
+          "Invoice",
+          "Sales",
+          "Stock",
+          "Products",
+          "Purchasing",
+          "ManageUser",
+          "Customer",
+          "Quotation",
+          "Charts",
+          "Reports",
+          "Setting",
+          "Backup",
+        ];
 
-  if (loading) {
-    return <div className="loading">Loading...</div>; // Show loading message
-  }
+        const accessPromises = sections.map((section) =>
+          fetch(`http://localhost:5000/api/access/${username}/${section}`)
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error(`Failed to fetch access for ${section}`);
+              }
+              return res.json();
+            })
+            .then((data) => ({ [section]: data.access }))
+            .catch((err) => {
+              console.error(err);
+              return { [section]: false }; // Default to no access on error
+            })
+        );
 
-  if (error) {
-    return <div className="error">{error}</div>; // Show error message if there is an error
-  }
+        const accessResults = await Promise.all(accessPromises);
+        const accessObject = accessResults.reduce(
+          (acc, curr) => ({ ...acc, ...curr }),
+          {}
+        );
 
-  // Function to check access and navigate
+        setAccessRights(accessObject);
+      } catch (error) {
+        console.error("Error fetching access rights:", error);
+        setError("Failed to fetch access rights.");
+      } finally {
+        setLoadingAccess(false);
+      }
+    };
+
+    if (username) {
+      fetchAccessRights();
+    }
+  }, [username]);
+
+  // Function to handle access check before navigation
   const handleAccessCheck = async (section, route) => {
     try {
       const response = await fetch(
         `http://localhost:5000/api/access/${username}/${section}`
       );
+      if (!response.ok) {
+        throw new Error(`Failed to fetch access for ${section}`);
+      }
       const data = await response.json();
 
       if (data.access) {
-        // Navigate if access is granted
         navigate(route, {
           state: {
             UserName: username,
             Store: store,
             Type: type,
             Email: email,
-            LastLogin,
+            LastLogin: lastLogin,
           },
         });
       } else {
-        // Show SweetAlert if access is denied
-        Swal.fire({
-          title: "Access Denied",
-          text: "You cannot access this. Please ask admin for permission.",
-          icon: "info",
-          confirmButtonText: "OK",
-        });
+        navigate("/ErrorAccess");
       }
     } catch (error) {
       console.error("Error checking access:", error);
-      Swal.fire({
-        title: "Error",
-        text: "Failed to check access. Please try again later.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+      navigate("/ErrorAccess");
     }
   };
+
+  // Render loading or error states
+  if (loading || loadingAccess) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="error">{error}</div>;
+  }
 
   return (
     <div className="dashboard_wrapper">
@@ -169,7 +233,7 @@ const Dashboard = () => {
               Today, {currentDateTime.date} /
             </span>
             <span className="current-time">
-              &nbsp;Time :{currentDateTime.time}
+              &nbsp;Time: {currentDateTime.time}
             </span>
           </div>
         </div>
@@ -220,7 +284,7 @@ const Dashboard = () => {
                   />
                   &nbsp;Last Login:
                 </strong>{" "}
-                {LastLogin}
+                {lastLogin}
               </p>
             </div>
           </div>
@@ -229,261 +293,406 @@ const Dashboard = () => {
 
       {/* Sidebar and main container */}
       <div className="dashboard_main">
-        {/* Dashboard side bar */}
+        {/* Dashboard sidebar */}
         <div className={`dashboard_sidebar ${isOpen ? "" : "close"}`}>
           {/* Sidebar links */}
           <div className="scrollbox">
             <div className="scrollbox-inner">
               <ul className="nav-links">
-                <li>
-                  <div
-                    className="icon-link"
-                    onClick={() =>
-                      handleAccessCheck("Dashboard", "/dashboard/MainDashboard")
-                    }
-                  >
-                    <Link
-                      to="MainDashboard"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                {accessRights["Dashboard"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Dashboard", "/dashboard/MainDashboard")
+                      }
                     >
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faDashboard}
-                      />
-                      <span className="link-name">DASHBOARD</span>
-                    </Link>
-                  </div>
-                  <hr />
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="invoice"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="MainDashboard"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          className="nav-icon"
+                          icon={faDashboard}
+                        />
+                        <span className="link-name">DASHBOARD</span>
+                      </Link>
+                    </div>
+                    <hr />
+                  </li>
+                )}
+
+                {accessRights["Invoice"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Invoice", "/dashboard/invoice")
+                      }
                     >
-                      <FontAwesomeIcon className="nav-icon" icon={faReceipt} />
-                      <span className="link-name">INVOICE</span>
-                    </Link>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="sales"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="invoice"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon className="nav-icon" icon={faReceipt} />
+                        <span className="link-name">INVOICE</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["Sales"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Sales", "/dashboard/sales")
+                      }
                     >
-                      <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
-                      <span className="link-name">SALES</span>
-                    </Link>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="stock"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="sales"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
+                        <span className="link-name">SALES</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["Stock"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Stock", "/dashboard/stock")
+                      }
                     >
-                      <FontAwesomeIcon className="nav-icon" icon={faCartPlus} />
-                      <span className="link-name">STOCK</span>
-                    </Link>
-                  </div>
-                </li>
+                      <Link
+                        to="stock"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon className="nav-icon" icon={faCartPlus} />
+                        <span className="link-name">STOCK</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
                 <hr />
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="products"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+
+                {accessRights["Products"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Products", "/dashboard/products")
+                      }
                     >
-                      <FontAwesomeIcon className="nav-icon" icon={faArchive} />
-                      <span className="link-name">PRODUCTS</span>
-                    </Link>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="purchasing"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="products"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon className="nav-icon" icon={faArchive} />
+                        <span className="link-name">PRODUCTS</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["Purchasing"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Purchasing", "/dashboard/purchasing")
+                      }
                     >
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faUserSecret}
-                      />
-                      <span className="link-name">PURCHESING</span>
-                    </Link>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="ManageUser"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="purchasing"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          className="nav-icon"
+                          icon={faUserSecret}
+                        />
+                        <span className="link-name">PURCHASING</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["ManageUser"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("ManageUser", "/dashboard/ManageUser")
+                      }
                     >
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faUserSecret}
-                      />
-                      <span className="link-name">User</span>
-                    </Link>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="customer"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="ManageUser"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          className="nav-icon"
+                          icon={faUserSecret}
+                        />
+                        <span className="link-name">USER</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["Customer"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Customer", "/dashboard/customer")
+                      }
                     >
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faUserSecret}
-                      />
-                      <span className="link-name">CUSTOMER</span>
-                    </Link>
-                  </div>
-                  <hr />
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="invoiceNew"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="customer"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          className="nav-icon"
+                          icon={faUserSecret}
+                        />
+                        <span className="link-name">CUSTOMER</span>
+                      </Link>
+                    </div>
+                    <hr />
+                  </li>
+                )}
+
+                {accessRights["Quotation"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Quotation", "/dashboard/invoiceNew")
+                      }
                     >
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faUserSecret}
-                      />
-                      <span className="link-name">QUOTATION</span>
-                    </Link>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="Charts"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="invoiceNew"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          className="nav-icon"
+                          icon={faTry}
+                        />
+                        <span className="link-name">QUOTATION</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["Charts"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Charts", "/dashboard/Charts")
+                      }
                     >
-                      <FontAwesomeIcon className="nav-icon" icon={faFileText} />
-                      <span className="link-name">CHARTS</span>
-                    </Link>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="Reports"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="Charts"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon className="nav-icon" icon={faFileText} />
+                        <span className="link-name">CHARTS</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["Reports"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Reports", "/dashboard/Reports")
+                      }
                     >
-                      <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
-                      <span className="link-name">REPORTS</span>
-                    </Link>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <Link
-                      to="Setting"
-                      state={{
-                        UserName: username,
-                        Store: store,
-                        Type: type,
-                        Email: email,
-                        LastLogin,
-                      }}
+                      <Link
+                        to="Reports"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
+                        <span className="link-name">REPORTS</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["Setting"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Setting", "/dashboard/Setting")
+                      }
                     >
-                      <FontAwesomeIcon className="nav-icon" icon={faWrench} />
-                      <span className="link-name">SETTING</span>
-                    </Link>
-                  </div>
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <a href="#">
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faTrashRestore}
-                      />
-                      <span className="link-name">BACKUP</span>
-                    </a>
-                  </div>
-                  <hr />
-                </li>
-                <li>
-                  <div className="icon-link">
-                    <a href="#">
-                      <FontAwesomeIcon
-                        className="nav-icon"
-                        icon={faRightFromBracket}
-                      />
-                      <span className="link-name">LOGOUT</span>
-                    </a>
-                  </div>
+                      <Link
+                        to="Setting"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon className="nav-icon" icon={faWrench} />
+                        <span className="link-name">SETTING</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["Reports"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Reports", "/dashboard/Reports")
+                      }
+                    >
+                      <Link
+                        to="Reports"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
+                        <span className="link-name">REPORTS</span>
+                      </Link>
+                    </div>
+                  </li>
+                )}
+
+                {accessRights["Backup"] && (
+                  <li>
+                    <div
+                      className="icon-link"
+                      onClick={() =>
+                        handleAccessCheck("Backup", "/dashboard/Backup")
+                      }
+                    >
+                      <Link
+                        to="Backup"
+                        state={{
+                          UserName: username,
+                          Store: store,
+                          Type: type,
+                          Email: email,
+                          LastLogin: lastLogin,
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          className="nav-icon"
+                          icon={faTrashRestore}
+                        />
+                        <span className="link-name">BACKUP</span>
+                      </Link>
+                    </div>
+                    <hr />
+                  </li>
+                )}
+
+                {/* Logout Button */}
+                <li style={{marginTop:"10px", marginLeft:"20px", padding:"5px" , fontSize: "12px"}}>
+                  <button
+                    className="icon-link logout-button"
+                    onClick={() => {
+                      // Handle logout functionality
+                      setUsername("");
+                      setStore("Berty Sport Corner");
+                      setType("N/A");
+                      setEmail("N/A");
+                      setLastLogin("N/A");
+                      setAccessRights({});
+                      navigate("/");
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      className="nav-icon"
+                      icon={faRightFromBracket}
+                    />
+                    <span className="link-name">LOGOUT</span>
+                  </button>
                 </li>
               </ul>
             </div>

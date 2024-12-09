@@ -20,6 +20,7 @@ import Charts from "./Charts/Charts";
 import MainDashboard from "./Dashboard/MainDashboard";
 import ReportsWindow from "./ReportsFile/Report";
 import SettingWindow from "./SettingFile/Setting";
+import ErrorAccess from "./Dashboard/ErrorAccess";
 
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
           <Route path="MainDashboard" element={<MainDashboard/>}/> 
           <Route path="Reports" element={<ReportsWindow/>} />
           <Route path="Setting" element={<SettingWindow/>} />
+          <Route path="ErrorAccess" element={<ErrorAccess/>} />
         </Route> 
 
       </Routes>

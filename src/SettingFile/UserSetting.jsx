@@ -13,12 +13,17 @@ const UserSetting = () => {
   // Fetch usernames on component mount
   useEffect(() => {
     const fetchUsernames = async () => {
+      setLoading(true);
+      setError("");
       try {
         const response = await axios.get("http://localhost:5000/api/users");
-        setUsernames(response.data);
+        // Extract the 'users' array from the response
+        setUsernames(response.data.users);
       } catch (error) {
         console.error("Error fetching usernames:", error);
         setError("Failed to fetch usernames.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -69,19 +74,27 @@ const UserSetting = () => {
       if (result.isConfirmed) {
         try {
           // Send PUT request to update the value in the backend
-          await axios.put(`http://localhost:5000/api/settings/${selectedUser}/${id}`, {
-            value: newValue,
-          });
-
-          // Update the local state to reflect the change
-          setUserSettings((prevSettings) =>
-            prevSettings.map((setting) =>
-              setting.id === id ? { ...setting, value: newValue } : setting
-            )
+          const response = await axios.put(
+            `http://localhost:5000/api/settings/${selectedUser}/${id}`,
+            {
+              value: newValue,
+            }
           );
 
-          // Success message using SweetAlert2
-          Swal.fire("Updated!", `The value has been changed to "${newValue}".`, "success");
+          // Check if the update was successful
+          if (response.status === 200) {
+            // Update the local state to reflect the change
+            setUserSettings((prevSettings) =>
+              prevSettings.map((setting) =>
+                setting.id === id ? { ...setting, value: newValue } : setting
+              )
+            );
+
+            // Success message using SweetAlert2
+            Swal.fire("Updated!", `The value has been changed to "${newValue}".`, "success");
+          } else {
+            throw new Error(response.data.error || "Unknown error");
+          }
         } catch (error) {
           console.error("Error updating setting value:", error);
 
@@ -103,6 +116,7 @@ const UserSetting = () => {
           id="userDropdown-user-setting"
           value={selectedUser}
           onChange={handleUserChange}
+          disabled={loading}
         >
           <option value="">-- Select a User --</option>
           {usernames.map((user) => (
@@ -116,7 +130,7 @@ const UserSetting = () => {
       {/* Display settings table */}
       <div id="settings-table-user-setting">
         {loading ? (
-          <p>Loading settings...</p>
+          <p>Loading...</p>
         ) : error ? (
           <p className="error-message">{error}</p>
         ) : userSettings.length > 0 ? (
@@ -143,7 +157,11 @@ const UserSetting = () => {
                         setting.value === "yes" ? "green" : "red",
                       textAlign: "center",
                       padding: "8px",
+                      borderRadius: "4px",
+                      userSelect: "none",
+                      transition: "background-color 0.3s",
                     }}
+                    title="Double-click to toggle value"
                   >
                     {setting.value}
                   </td>
