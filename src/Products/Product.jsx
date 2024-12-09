@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation } from "react-router-dom";
+import Swal from "sweetalert2"; // SweetAlert2 for alerts
 import {
   faBacteria,
   faCodeFork,
@@ -10,21 +11,98 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import "../css/ProductsMain.css";
-import CategoryModel from "../Products/CategoryModel"; // Import the CategoryModel component
+import CategoryModel from "../Products/CategoryModel";
 import UnitModel from "../Products/UnitModel";
 import AddProducts from "../Products/AddProducts";
-import ManageStore from "../Products/StoreModel"; 
+import ManageStore from "../Products/StoreModel";
 import ManageBatch from "../Products/BatchModel";
 import ManageProducts from "../Products/ManageProducts";
 import ManageProductsRemoved from "../Products/ManageProductsRemoved";
 import ManageProductCard from "../Products/ManageProductsCard";
 
 const Product = () => {
-  const location = useLocation(); // Get location object
+  const location = useLocation();
   const { UserName, Store } = location.state || {};
 
-  // Set default active content to "ManageProductsCard"
-  const [activeContent, setActiveContent] = useState("ManageProductsCard");
+  // State to manage active content and access rights
+  const [activeContent, setActiveContent] = useState(null); // Default to null
+  const [accessRights, setAccessRights] = useState({
+    ProductCard: false,
+    ProductList: false,
+    AddProduct: false,
+    ManageBatch: false,
+    ManageUnit: false,
+    ManageCategory: false,
+    RemovedProducts: false,
+  });
+  const [loading, setLoading] = useState(true); // Loading state
+
+  // Function to fetch access rights for all sections
+  useEffect(() => {
+    const fetchAccessRights = async () => {
+      try {
+        const sections = [
+          "ProductCard",
+          "ProductList",
+          "AddProduct",
+          "ManageBatch",
+          "ManageUnit",
+          "ManageCategory",
+          "RemovedProducts",
+        ];
+
+        // Fetch access rights for each section
+        const accessPromises = sections.map((section) =>
+          fetch(`http://localhost:5000/api/access/${UserName}/${section}`)
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error(`Failed to fetch access for ${section}`);
+              }
+              return res.json();
+            })
+            .then((data) => ({ [section]: data.access }))
+            .catch((err) => {
+              console.error(err);
+              return { [section]: false }; // Default to no access on error
+            })
+        );
+
+        const accessResults = await Promise.all(accessPromises);
+        const accessObject = accessResults.reduce(
+          (acc, curr) => ({ ...acc, ...curr }),
+          {}
+        );
+
+        setAccessRights(accessObject); // Update access rights state
+      } catch (error) {
+        console.error("Error fetching access rights:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to load access rights. Please try again later.",
+        });
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    };
+
+    if (UserName) {
+      fetchAccessRights();
+    }
+  }, [UserName]);
+
+  // Handle access check and toggle content
+  const handleAccessCheck = (section, toggleFunction) => {
+    if (accessRights[section]) {
+      toggleFunction(); // Toggle content if access is granted
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Access Denied",
+        text: "You do not have access to this section. Please request access.",
+      });
+    }
+  };
 
   // Toggle functions for each content
   const toggleCategoryContent = () => {
@@ -43,21 +121,25 @@ const Product = () => {
     setActiveContent(activeContent === "addProducts" ? null : "addProducts");
   };
 
-  const togglerManagaeStore = () => {
+  const togglerManageStore = () => {
     setActiveContent(activeContent === "manageStore" ? null : "manageStore");
   };
 
-  const togglermanageBatch = () => {
+  const togglerManageBatch = () => {
     setActiveContent(activeContent === "manageBatch" ? null : "manageBatch");
   };
 
-  const togglermanageProducts = () => {
+  const togglerManageProducts = () => {
     setActiveContent(activeContent === "ManageProducts" ? null : "ManageProducts");
   };
 
-  const togglermanageProductsCard = () => {
+  const togglerManageProductsCard = () => {
     setActiveContent(activeContent === "ManageProductsCard" ? null : "ManageProductsCard");
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Show loading state
+  }
 
   return (
     <div className="product-panel">
@@ -73,35 +155,35 @@ const Product = () => {
 
       {/* Button List */}
       <div className="button-list">
-        <button onClick={togglermanageProductsCard}>
+        <button onClick={() => handleAccessCheck("ProductCard", togglerManageProductsCard)}>
           <FontAwesomeIcon className="button-icon" icon={faCodeFork} />
           Product Card
         </button>
-        <button onClick={togglermanageProducts}>
+        <button onClick={() => handleAccessCheck("ProductList", togglerManageProducts)}>
           <FontAwesomeIcon className="button-icon" icon={faCodeFork} />
           Product List
         </button>
-        <button onClick={togglerAddProductsContent}>
+        <button onClick={() => handleAccessCheck("AddProduct", togglerAddProductsContent)}>
           <FontAwesomeIcon className="button-icon" icon={faPlus} />
           Add Products
         </button>
-        <button onClick={togglermanageBatch}>
+        <button onClick={() => handleAccessCheck("ManageBatch", togglerManageBatch)}>
           <FontAwesomeIcon className="button-icon" icon={faBacteria} />
           Manage Batch
         </button>
-        <button onClick={togglerManagaeStore}>
+        <button onClick={() => handleAccessCheck("ManageStore", togglerManageStore)}>
           <FontAwesomeIcon className="button-icon" icon={faStore} />
           Manage Store
         </button>
-        <button onClick={toggleUnitContent}>
+        <button onClick={() => handleAccessCheck("ManageUnit", toggleUnitContent)}>
           <FontAwesomeIcon className="button-icon" icon={faCodeFork} />
           Manage Unit
         </button>
-        <button onClick={toggleCategoryContent}>
+        <button onClick={() => handleAccessCheck("ManageCategory", toggleCategoryContent)}>
           <FontAwesomeIcon className="button-icon" icon={faSnowflake} />
           Manage Category
         </button>
-        <button id="removed-button" onClick={toggleRemovedProducts}>
+        <button onClick={() => handleAccessCheck("RemovedProducts", toggleRemovedProducts)}>
           <FontAwesomeIcon className="button-icon" icon={faTrash} />
           Removed Products
         </button>

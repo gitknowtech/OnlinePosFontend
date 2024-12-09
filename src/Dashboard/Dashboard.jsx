@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom"; // Import useLocation hook
 import { Link, Outlet } from "react-router-dom"; // Use Outlet to load child routes dynamically
-import Swal from "sweetalert2";
 
 import {
   faStore,
@@ -126,7 +125,7 @@ const Dashboard = () => {
           "Invoice",
           "Sales",
           "Stock",
-          "Products",
+          "Product",
           "Purchasing",
           "ManageUser",
           "Customer",
@@ -405,12 +404,12 @@ const Dashboard = () => {
 
                 <hr />
 
-                {accessRights["Products"] && (
+                {accessRights["Product"] && (
                   <li>
                     <div
                       className="icon-link"
                       onClick={() =>
-                        handleAccessCheck("Products", "/dashboard/products")
+                        handleAccessCheck("Product", "/dashboard/products")
                       }
                     >
                       <Link
@@ -568,31 +567,7 @@ const Dashboard = () => {
                   </li>
                 )}
 
-                {accessRights["Reports"] && (
-                  <li>
-                    <div
-                      className="icon-link"
-                      onClick={() =>
-                        handleAccessCheck("Reports", "/dashboard/Reports")
-                      }
-                    >
-                      <Link
-                        to="Reports"
-                        state={{
-                          UserName: username,
-                          Store: store,
-                          Type: type,
-                          Email: email,
-                          LastLogin: lastLogin,
-                        }}
-                      >
-                        <FontAwesomeIcon className="nav-icon" icon={faChartBar} />
-                        <span className="link-name">REPORTS</span>
-                      </Link>
-                    </div>
-                  </li>
-                )}
-
+              
                 {accessRights["Setting"] && (
                   <li>
                     <div
