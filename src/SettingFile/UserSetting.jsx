@@ -1,6 +1,7 @@
+// UserSetting.jsx
+
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Swal from "sweetalert2";
 import "../css1/UserSetting.css"; // Ensure the path is correct
 
 const UserSetting = () => {
@@ -61,48 +62,30 @@ const UserSetting = () => {
   const toggleValue = async (id, currentValue) => {
     const newValue = currentValue === "yes" ? "no" : "yes";
 
-    // Confirmation using SweetAlert2
-    Swal.fire({
-      title: "Are you sure?",
-      text: `Do you want to change this value to "${newValue}"?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, update it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          // Send PUT request to update the value in the backend
-          const response = await axios.put(
-            `http://localhost:5000/api/settings/${selectedUser}/${id}`,
-            {
-              value: newValue,
-            }
-          );
-
-          // Check if the update was successful
-          if (response.status === 200) {
-            // Update the local state to reflect the change
-            setUserSettings((prevSettings) =>
-              prevSettings.map((setting) =>
-                setting.id === id ? { ...setting, value: newValue } : setting
-              )
-            );
-
-            // Success message using SweetAlert2
-            Swal.fire("Updated!", `The value has been changed to "${newValue}".`, "success");
-          } else {
-            throw new Error(response.data.error || "Unknown error");
-          }
-        } catch (error) {
-          console.error("Error updating setting value:", error);
-
-          // Error message using SweetAlert2
-          Swal.fire("Error!", "Failed to update the value. Please try again.", "error");
+    try {
+      // Send PUT request to update the value in the backend
+      const response = await axios.put(
+        `http://localhost:5000/api/settings/${selectedUser}/${id}`,
+        {
+          value: newValue,
         }
+      );
+
+      // Check if the update was successful
+      if (response.status === 200) {
+        // Update the local state to reflect the change
+        setUserSettings((prevSettings) =>
+          prevSettings.map((setting) =>
+            setting.id === id ? { ...setting, value: newValue } : setting
+          )
+        );
+      } else {
+        throw new Error(response.data.error || "Unknown error");
       }
-    });
+    } catch (error) {
+      console.error("Error updating setting value:", error);
+      setError(`Failed to update setting ID ${id}. Please try again.`);
+    }
   };
 
   return (
@@ -150,17 +133,7 @@ const UserSetting = () => {
                   <td
                     onDoubleClick={() => toggleValue(setting.id, setting.value)}
                     id={`setting-value-${setting.id}-user-setting`}
-                    style={{
-                      cursor: "pointer",
-                      color: "white",
-                      backgroundColor:
-                        setting.value === "yes" ? "green" : "red",
-                      textAlign: "center",
-                      padding: "8px",
-                      borderRadius: "4px",
-                      userSelect: "none",
-                      transition: "background-color 0.3s",
-                    }}
+                    className={`setting-value ${setting.value}`}
                     title="Double-click to toggle value"
                   >
                     {setting.value}

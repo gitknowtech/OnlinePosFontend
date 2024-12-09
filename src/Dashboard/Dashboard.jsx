@@ -127,7 +127,7 @@ const Dashboard = () => {
           "Stock",
           "Product",
           "Purchasing",
-          "ManageUser",
+          "User",
           "Customer",
           "Quotation",
           "Charts",
@@ -457,12 +457,12 @@ const Dashboard = () => {
                   </li>
                 )}
 
-                {accessRights["ManageUser"] && (
+                {accessRights["User"] && (
                   <li>
                     <div
                       className="icon-link"
                       onClick={() =>
-                        handleAccessCheck("ManageUser", "/dashboard/ManageUser")
+                        handleAccessCheck("User", "/dashboard/ManageUser")
                       }
                     >
                       <Link
