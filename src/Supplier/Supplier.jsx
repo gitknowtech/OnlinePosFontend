@@ -24,7 +24,7 @@ const Supplier = () => {
   const { UserName, Store } = location.state || {}; // Default destructuring
 
   // State to manage active content and access rights
-  const [activeContent, setActiveContent] = useState(null); // Default to null
+  const [activeContent, setActiveContent] = useState("bank"); // Default to null
   const [accessRights, setAccessRights] = useState({
     SupplierList: false,
     AddSupplier: false,

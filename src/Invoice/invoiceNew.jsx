@@ -34,10 +34,14 @@ export default function InvoiceNew() {
   const [totalDiscount, setTotalDiscount] = useState("0.00");
   const [itemCount, setItemCount] = useState(0);
   const [percentage, setPercentage] = useState(""); // State for percentage input
+  const [productName, setProductName] = useState(""); // Added state for productName
+  const [costPrice, setCostPrice] = useState(""); // Added state for costPrice
+  const [isSelectingSuggestion, setIsSelectingSuggestion] = useState(false); // Flag for suggestion selection
 
   const barcodeInputRef = useRef(null);
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
+  const suggestionsRef = useRef(null); // Ref for suggestions dropdown
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
@@ -95,6 +99,23 @@ export default function InvoiceNew() {
     };
   }, [isWholesale, isDiscount, tableData]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target) &&
+        !barcodeInputRef.current.contains(event.target)
+      ) {
+        setSuggestions([]);
+      }
+    };
+
+    window.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      window.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const toggleWholesale = () => {
     setIsWholesale((prev) => !prev);
     if (!isWholesale) {
@@ -131,12 +152,16 @@ export default function InvoiceNew() {
     ]);
   };
 
-  const handlePaymentModal = () => {
+  const handleOpenPaymentModal = () => {
     if (tableData.length === 0) {
       Swal.fire("Error", "Please add products to the table before proceeding to payment.", "error");
       return;
     }
     setIsPaymentModalOpen(true);
+  };
+
+  const handlePaymentModal = () => {
+    handleOpenPaymentModal();
   };
 
   const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
@@ -160,6 +185,11 @@ export default function InvoiceNew() {
     const input = e.target.value;
     setBarcode(input);
 
+    if (isSelectingSuggestion) {
+      // If a suggestion is being selected, do not fetch suggestions
+      return;
+    }
+
     if (input.length > 1) {
       try {
         const response = await axios.get(
@@ -173,6 +203,7 @@ export default function InvoiceNew() {
 
         if (products.length === 0) {
           Swal.fire("Not Found", "No products found for this barcode.", "warning");
+          setSuggestions([]);
         } else {
           setSuggestions(products);
         }
@@ -186,6 +217,8 @@ export default function InvoiceNew() {
   };
 
   const handleSuggestionClick = (suggestion) => {
+    setIsSelectingSuggestion(true); // Indicate that a suggestion is being selected
+
     // Set all necessary fields from the selected suggestion
     setBarcode(suggestion.barcode);
     setProductId(suggestion.productId); // Save productId to state
@@ -208,6 +241,7 @@ export default function InvoiceNew() {
 
     // Refocus the price input field reliably
     setTimeout(() => {
+      setIsSelectingSuggestion(false); // Reset the flag
       if (priceInputRef.current) {
         priceInputRef.current.focus();
         priceInputRef.current.select(); // Highlight the price for easy overwrite
@@ -216,6 +250,11 @@ export default function InvoiceNew() {
   };
 
   const handleBarcodeEnter = async () => {
+    if (!barcode) {
+      Swal.fire("Invalid Barcode", "Please enter a barcode.", "error");
+      return;
+    }
+
     try {
       const response = await axios.get(
         `http://localhost:5000/api/products/search_by_barcode`,
@@ -230,7 +269,8 @@ export default function InvoiceNew() {
         setLockedPrice(product.lockedPrice);
         setSuggestedPrice(product.mrpPrice);
         setProductId(product.productId); // Save productId to state
-        setBarcode(product.barcode);
+        setProductName(product.productName); // Set product name
+        setCostPrice(product.costPrice); // Set cost price
 
         // Set the default price based on wholesale or discount
         if (isWholesale) {
@@ -501,7 +541,11 @@ export default function InvoiceNew() {
           />
 
           {suggestions.length > 0 && (
-            <div id="suggestions_dropdown" className="suggestions-dropdown">
+            <div
+              id="suggestions_dropdown"
+              className="suggestions-dropdown"
+              ref={suggestionsRef}
+            >
               {suggestions.map((suggestion) => (
                 <div
                   key={suggestion.id}
@@ -532,6 +576,7 @@ export default function InvoiceNew() {
                 <th>Rate</th>
                 <th>Qty</th>
                 <th>Amount</th>
+                <th style={{ width: "10px" }}>Actions</th> {/* Added header for actions */}
               </tr>
             </thead>
             <tbody>
@@ -571,7 +616,7 @@ export default function InvoiceNew() {
                     {item.quantity}
                   </td>
                   <td style={{ textAlign: "center" }}>{item.amount}</td>
-                  <td style={{ width: "10px" }}>
+                  <td style={{ textAlign: "center" }}>
                     <img
                       src={removeImage}
                       alt="Delete"

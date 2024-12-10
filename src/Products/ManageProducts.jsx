@@ -4,28 +4,31 @@ import Swal from "sweetalert2"; // For delete confirmation and alerts
 import PropTypes from "prop-types";
 import Modal from "react-modal"; // Modal component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "../css/ManageProducts.css"; // Assuming a separate CSS file for table design
-import { faBell, faPlusCircle } from "@fortawesome/free-solid-svg-icons"; // Icons
+import { faBell, faPlusCircle, faEye } from "@fortawesome/free-solid-svg-icons"; // Icons
+import "../css/ManageProducts.css"; // CSS for styling
 import ProductUpdate from "./ProductUpdate";
 
 export default function ManageProducts({ store }) {
+  // State Variables
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // Search state
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
-  const [productsPerPage, setProductsPerPage] = useState(10); // Number of products per page with combo box
+  const [productsPerPage, setProductsPerPage] = useState(10); // Number of products per page
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
-  const [selectedProduct, setSelectedProduct] = useState(null); // Product details state for the modal
+  const [selectedProduct, setSelectedProduct] = useState(null); // Selected product for modal
   const [modalType, setModalType] = useState(""); // Modal type state for different modals
-  const [largeImage, setLargeImage] = useState(null); // State for the large image
+  const [largeImage, setLargeImage] = useState(null); // State for large image
 
+  // Fetch Products on Component Mount
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/products/fetch_products");
-        console.log('Products fetched:', response.data); // Log to check data
+        const response = await axios.get(
+          "http://localhost:5000/api/products/fetch_products"
+        );
         setProducts(response.data);
       } catch (error) {
-        console.error("Error fetching products: ", error);
+        console.error("Error fetching products:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -33,19 +36,18 @@ export default function ManageProducts({ store }) {
         });
       }
     };
+
     fetchProducts();
   }, []);
 
-
-
-  // Open edit modal and set the selected product
+  // Open Edit Modal and Set Selected Product
   const handleEdit = (product) => {
     setSelectedProduct(product);
     setModalType("editProduct");
     setModalIsOpen(true);
   };
 
-  // Handle product update
+  // Handle Product Update
   const handleUpdate = async (updatedProduct) => {
     try {
       const response = await axios.put(
@@ -56,7 +58,9 @@ export default function ManageProducts({ store }) {
         Swal.fire("Success", "Product updated successfully!", "success");
         setProducts((prevProducts) =>
           prevProducts.map((product) =>
-            product.productId === updatedProduct.productId ? updatedProduct : product
+            product.productId === updatedProduct.productId
+              ? updatedProduct
+              : product
           )
         );
         setModalIsOpen(false); // Close modal after update
@@ -66,13 +70,14 @@ export default function ManageProducts({ store }) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: `Failed to update product: ${error.response?.data?.message || error.message}`,
+        text: `Failed to update product: ${
+          error.response?.data?.message || error.message
+        }`,
       });
     }
   };
 
-
-  // Function to handle status toggle on double-click
+  // Function to Handle Status Toggle on Double-Click
   const handleStatusToggle = async (productId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     try {
@@ -101,64 +106,77 @@ export default function ManageProducts({ store }) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: `Failed to update product status: ${error.response?.data?.message || error.message
-          }`,
+        text: `Failed to update product status: ${
+          error.response?.data?.message || error.message
+        }`,
       });
     }
   };
 
-  // Function to display Product Name (Sinhala) in the modal
+  // Function to Display Product Name (Sinhala) in Modal
   const handleViewProductNameSinhala = (productId) => {
     const product = products.find((p) => p.productId === productId);
-    setSelectedProduct(product);
-    setModalType("productNameSinhala");
-    setModalIsOpen(true); // Open modal
-  };
-
-  // Function to display MRP details in the modal
-  const handleViewMRPDetails = (productId) => {
-    const product = products.find((p) => p.productId === productId);
-    setSelectedProduct(product);
-    setModalType("mrpDetails");
-    setModalIsOpen(true); // Open modal
-  };
-
-  // Function to display Stock Alert in the modal
-  const handleViewStockAlert = (productId) => {
-    const product = products.find((p) => p.productId === productId);
-    setSelectedProduct(product);
-    setModalType("stockAlert");
-    setModalIsOpen(true); // Open modal
-  };
-
-  // Function to display profit percentage details
-  const handleViewProfitDetails = (productId) => {
-    const product = products.find((p) => p.productId === productId); // Find product by productId
     if (product) {
-      setSelectedProduct(product); // Set the selected product in state
-      setModalType("profitView"); // Set the modal type to profit view
-      setModalIsOpen(true); // Open the modal
+      setSelectedProduct(product);
+      setModalType("productNameSinhala");
+      setModalIsOpen(true);
     } else {
       console.error("Product not found");
     }
   };
 
-  // Function to display large image in the modal
+  // Function to Display MRP Details in Modal
+  const handleViewMRPDetails = (productId) => {
+    const product = products.find((p) => p.productId === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setModalType("mrpDetails");
+      setModalIsOpen(true);
+    } else {
+      console.error("Product not found");
+    }
+  };
+
+  // Function to Display Stock Alert in Modal
+  const handleViewStockAlert = (productId) => {
+    const product = products.find((p) => p.productId === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setModalType("stockAlert");
+      setModalIsOpen(true);
+    } else {
+      console.error("Product not found");
+    }
+  };
+
+  // Function to Display Profit Percentage Details in Modal
+  const handleViewProfitDetails = (productId) => {
+    const product = products.find((p) => p.productId === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setModalType("profitView");
+      setModalIsOpen(true);
+    } else {
+      console.error("Product not found");
+    }
+  };
+
+  // Function to Display Large Image in Modal
   const handleViewLargeImage = (imageLink) => {
     setLargeImage(imageLink);
     setModalType("largeImage");
-    setModalIsOpen(true); // Open modal
+    setModalIsOpen(true);
   };
 
-  // Function to close the modal
+  // Function to Close Modal
   const closeModal = () => {
     setModalIsOpen(false);
-    setSelectedProduct(null); // Clear product details when modal is closed
-    setLargeImage(null); // Clear large image
-    setModalType(""); // Reset modal type
+    setSelectedProduct(null);
+    setLargeImage(null);
+    setModalType("");
   };
 
-  //delete products
+  // Function to Delete Products
   const handleDelete = async (productId) => {
     Swal.fire({
       title: `Are you sure you want to delete product "${productId}"?`,
@@ -188,15 +206,16 @@ export default function ManageProducts({ store }) {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: `Failed to delete product: ${err.response?.data?.message || err.message
-              }`,
+            text: `Failed to delete product: ${
+              err.response?.data?.message || err.message
+            }`,
           });
         }
       }
     });
   };
 
-  // Enhanced filter products function for global search
+  // Enhanced Filter Products Function for Global Search
   const filteredProducts = products.filter((product) => {
     const isStoreMatch =
       store === "all" || product.store === store || product.store === "all";
@@ -215,8 +234,17 @@ export default function ManageProducts({ store }) {
     return isStoreMatch && isSearchMatch;
   });
 
+  // Calculate Totals Directly from Products
+  const totalCostPrice = products.reduce(
+    (acc, product) => acc + parseFloat(product.costPrice || 0),
+    0
+  );
+  const totalMrpPrice = products.reduce(
+    (acc, product) => acc + parseFloat(product.mrpPrice || 0),
+    0
+  );
 
-  // Pagination logic
+  // Pagination Logic
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(
@@ -224,21 +252,21 @@ export default function ManageProducts({ store }) {
     indexOfLastProduct
   );
 
-  // Calculate total pages
+  // Calculate Total Pages
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
-  // Handle pagination next and previous
+  // Handle Pagination Next and Previous
   const handleNextPage = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
-  // Handle changing the number of products displayed per page
+  // Handle Changing the Number of Products Displayed per Page
   const handleProductsPerPageChange = (event) => {
     setProductsPerPage(Number(event.target.value));
     setCurrentPage(1); // Reset to page 1 when rows per page changes
   };
 
-  // Pagination numbers logic (only show 3 middle numbers)
+  // Pagination Numbers Logic (Only Show 3 Middle Numbers)
   const getPaginationNumbers = () => {
     const pages = [];
     if (totalPages <= 3) {
@@ -255,10 +283,17 @@ export default function ManageProducts({ store }) {
     return pages;
   };
 
+  // Function to Open Totals Modal
+  const handleViewTotals = () => {
+    setModalType("viewTotals");
+    setModalIsOpen(true);
+  };
+
   return (
     <div className="manage-products">
+      {/* Controls Container */}
       <div className="controls-container">
-        {/* Search box */}
+        {/* Search Box */}
         <div className="search-box">
           <input
             type="text"
@@ -268,7 +303,7 @@ export default function ManageProducts({ store }) {
           />
         </div>
 
-        {/* Products per page combo box */}
+        {/* Products Per Page Combo Box */}
         <div className="rows-per-page">
           <label>Show: </label>
           <select
@@ -283,7 +318,7 @@ export default function ManageProducts({ store }) {
         </div>
       </div>
 
-      {/* Product table */}
+      {/* Product Table */}
       <div className="product-table-product">
         <table>
           <thead>
@@ -303,91 +338,111 @@ export default function ManageProducts({ store }) {
             </tr>
           </thead>
           <tbody>
-            {currentProducts.map((product, index) => (
-              <tr key={product.productId}>
-                {" "}
-                {/* Added key prop here */}
-                {/* No column to display continuous numbering */}
-                <td>{indexOfFirstProduct + index + 1}</td>
-                <td>{product.productId}</td>
-                <td>
-                  <FontAwesomeIcon
-                    icon={faPlusCircle}
+            {currentProducts.length > 0 ? (
+              currentProducts.map((product, index) => (
+                <tr key={product.productId}>
+                  {/* Continuous Numbering */}
+                  <td>{indexOfFirstProduct + index + 1}</td>
+                  <td>{product.productId}</td>
+                  <td>
+                    <FontAwesomeIcon
+                      icon={faPlusCircle}
+                      style={{ cursor: "pointer", marginRight: "5px" }}
+                      onClick={() =>
+                        handleViewProductNameSinhala(product.productId)
+                      }
+                      title="View Sinhala Name"
+                    />
+                    {product.productName}
+                  </td>
+                  <td>{product.selectedSupplier}</td>
+                  <td>{product.selectedCategory}</td>
+                  <td>{product.selectedUnit}</td>
+                  <td>
+                    <FontAwesomeIcon
+                      icon={faPlusCircle}
+                      style={{ cursor: "pointer", marginRight: "5px" }}
+                      onClick={() => handleViewProfitDetails(product.productId)}
+                      title="View Profit Details"
+                    />
+                    {product.costPrice}
+                  </td>
+                  <td>
+                    <FontAwesomeIcon
+                      icon={faPlusCircle}
+                      style={{ cursor: "pointer", marginRight: "5px" }}
+                      onClick={() => handleViewMRPDetails(product.productId)}
+                      title="View MRP Details"
+                    />
+                    {product.mrpPrice}
+                  </td>
+                  <td>
+                    <FontAwesomeIcon
+                      icon={faBell}
+                      style={{ cursor: "pointer", marginRight: "5px" }}
+                      onClick={() => handleViewStockAlert(product.productId)}
+                      title="View Stock Alert"
+                    />
+                    {product.stockQuantity}
+                  </td>
+                  <td
+                    onDoubleClick={() => handleViewLargeImage(product.imageLink)}
                     style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      handleViewProductNameSinhala(product.productId)
-                    }
-                  />{" "}
-                  {product.productName}
-                </td>
-                <td>{product.selectedSupplier}</td>
-                <td>{product.selectedCategory}</td>
-                <td>{product.selectedUnit}</td>
-                <td>
-                  <FontAwesomeIcon
-                    icon={faPlusCircle}
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleViewProfitDetails(product.productId)}
-                  />{" "}
-                  {product.costPrice}
-                </td>
-                <td>
-                  <FontAwesomeIcon
-                    icon={faPlusCircle}
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleViewMRPDetails(product.productId)}
-                  />{" "}
-                  {product.mrpPrice}
-                </td>
-                <td>
-                  <FontAwesomeIcon
-                    icon={faBell}
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleViewStockAlert(product.productId)}
-                  />{" "}
-                  {product.stockQuantity}
-                </td>
-                <td
-                  onDoubleClick={() => handleViewLargeImage(product.imageLink)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <img
-                    src={product.imageLink}
-                    className="product-image"
-                    alt="Product"
-                  />
-                </td>
-                <td
-                  onDoubleClick={() =>
-                    handleStatusToggle(product.productId, product.status)
-                  }
-                  style={{ cursor: "pointer" }}
-                >
-                  <span
-                    className={
-                      product.status === "active"
-                        ? "status-active"
-                        : "status-inactive"
-                    }
                   >
-                    {product.status === "active" ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td className="action-button">
-                  <button className="edit-button" onClick={() => handleEdit(product)}>
-                    Edit
-                  </button>
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDelete(product.productId)}
+                    <img
+                      src={product.imageLink}
+                      className="product-image"
+                      alt="Product"
+                    />
+                  </td>
+                  <td
+                    onDoubleClick={() =>
+                      handleStatusToggle(product.productId, product.status)
+                    }
+                    style={{ cursor: "pointer" }}
                   >
-                    Delete
-                  </button>
+                    <span
+                      className={
+                        product.status === "active"
+                          ? "status-active"
+                          : "status-inactive"
+                      }
+                    >
+                      {product.status === "active" ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td className="action-button">
+                    <button
+                      className="edit-button"
+                      onClick={() => handleEdit(product)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="delete-button"
+                      onClick={() => handleDelete(product.productId)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="12" style={{ textAlign: "center" }}>
+                  No products found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
+      </div>
+
+      {/* Totals Section with Eye Icon */}
+      <div className="totals-section">
+        <button className="view-totals-button" onClick={handleViewTotals}>
+          <FontAwesomeIcon icon={faEye} /> View Totals
+        </button>
       </div>
 
       {/* Pagination */}
@@ -418,9 +473,34 @@ export default function ManageProducts({ store }) {
         />
       )}
 
-      {/* Other modals for displaying details */}
+      {/* Totals Modal */}
       <Modal
-        isOpen={modalIsOpen && modalType !== "editProduct"}
+        isOpen={modalIsOpen && modalType === "viewTotals"}
+        onRequestClose={closeModal}
+        contentLabel="Totals"
+        className="modal-content"
+        overlayClassName="modal-overlay"
+        ariaHideApp={false}
+      >
+        <div className="totals-modal-content">
+          <h2>Totals</h2>
+          <p>
+            <strong>Total MRP Price:</strong>{" "}
+            <span className="totals-value">{totalMrpPrice.toFixed(2)}</span>
+          </p>
+          <p>
+            <strong>Total Cost Price:</strong>{" "}
+            <span className="totals-value">{totalCostPrice.toFixed(2)}</span>
+          </p>
+          <button onClick={closeModal} className="close-modal-button">
+            Close
+          </button>
+        </div>
+      </Modal>
+
+      {/* Other Modals for Displaying Details */}
+      <Modal
+        isOpen={modalIsOpen && modalType !== "editProduct" && modalType !== "viewTotals"}
         onRequestClose={closeModal}
         contentLabel="Product Details"
         className="modal-content"
@@ -429,12 +509,12 @@ export default function ManageProducts({ store }) {
       >
         {selectedProduct && modalType === "productNameSinhala" ? (
           <div>
-            <p>
-              <strong>Product Name (Sinhala):</strong> {selectedProduct.productNameSinhala}
-            </p>
+            <h2>Product Name (Sinhala)</h2>
+            <p>{selectedProduct.productNameSinhala || "N/A"}</p>
           </div>
         ) : selectedProduct && modalType === "mrpDetails" ? (
           <div>
+            <h2>MRP Details</h2>
             <p>
               <strong>MRP Price:</strong> {selectedProduct.mrpPrice}
             </p>
@@ -442,13 +522,15 @@ export default function ManageProducts({ store }) {
               <strong>Discount Price:</strong> {selectedProduct.discountPrice}
             </p>
             <p>
-              <strong>Discount Percentage:</strong> {selectedProduct.discountPercentage}%
+              <strong>Discount Percentage:</strong>{" "}
+              {selectedProduct.discountPercentage}%
             </p>
             <p>
               <strong>Wholesale Price:</strong> {selectedProduct.wholesalePrice}
             </p>
             <p>
-              <strong>Wholesale Percentage:</strong> {selectedProduct.wholesalePercentage}%
+              <strong>Wholesale Percentage:</strong>{" "}
+              {selectedProduct.wholesalePercentage}%
             </p>
             <p>
               <strong>Locked Price:</strong> {selectedProduct.lockedPrice}
@@ -456,21 +538,23 @@ export default function ManageProducts({ store }) {
           </div>
         ) : selectedProduct && modalType === "profitView" ? (
           <div>
+            <h2>Profit Details</h2>
             <p>
               <strong>Profit Price:</strong> {selectedProduct.profitAmount}
             </p>
             <p>
-              <strong>Profit Percentage:</strong> {selectedProduct.profitPercentage}%
+              <strong>Profit Percentage:</strong>{" "}
+              {selectedProduct.profitPercentage}%
             </p>
           </div>
         ) : selectedProduct && modalType === "stockAlert" ? (
           <div>
-            <p>
-              <strong>Stock Alert:</strong> {selectedProduct.stockAlert}
-            </p>
+            <h2>Stock Alert</h2>
+            <p>{selectedProduct.stockAlert}</p>
           </div>
         ) : modalType === "largeImage" && largeImage ? (
           <div>
+            <h2>Product Image</h2>
             <img
               src={largeImage}
               alt="Product"
@@ -480,7 +564,9 @@ export default function ManageProducts({ store }) {
         ) : (
           <p>No product details available.</p>
         )}
-        <button onClick={closeModal}>Close</button>
+        <button onClick={closeModal} className="close-modal-button">
+          Close
+        </button>
       </Modal>
     </div>
   );

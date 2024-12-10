@@ -25,7 +25,7 @@ const Product = () => {
   const { UserName, Store } = location.state || {};
 
   // State to manage active content and access rights
-  const [activeContent, setActiveContent] = useState(null); // Default to null
+  const [activeContent, setActiveContent] = useState("ManageProductsCard"); // Default to null
   const [accessRights, setAccessRights] = useState({
     ProductCard: false,
     ProductList: false,

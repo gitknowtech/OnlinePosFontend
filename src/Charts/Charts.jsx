@@ -10,7 +10,7 @@ import SalesTableChart from "../Sales/SalesTableCharts";
 import CustomerReport from "../CustomerFile/CustomerReport";
 
 const Charts = () => {
-  const [activeContent, setActiveContent] = useState(null); // Default to null
+  const [activeContent, setActiveContent] = useState("SaleChart"); // Default to null
   const [accessRights, setAccessRights] = useState({
     CustomerChart: false,
     StockChart: false,

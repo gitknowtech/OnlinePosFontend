@@ -17,7 +17,7 @@ const Stock = () => {
   const { UserName = "Default User", Store = "Default Store" } = location.state || {};
 
   // State to manage active content and access rights
-  const [activeContent, setActiveContent] = useState(null);
+  const [activeContent, setActiveContent] = useState("StockCategory" );
   const [accessRights, setAccessRights] = useState({
     StockIn: false,
     StockOut: false,

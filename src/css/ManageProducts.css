@@ -179,6 +179,48 @@
   background-color: #b22; /* Darker red on hover */
 }
 
+/* Totals Modal Content */
+.totals-modal-content {
+  text-align: center;
+}
+
+.totals-modal-content h2 {
+  margin-top: 0;
+  font-size: 1.5em;
+  color: #333;
+}
+
+.totals-modal-content p {
+  font-size: 14px; /* 14px font size */
+  margin: 10px 0;
+  color: #555;
+}
+
+.totals-modal-content strong {
+  color: #333;
+}
+
+.totals-value {
+  color: #2196f3; /* Blue color for values */
+  font-weight: bold; /* Bold font weight */
+}
+
+/* Existing styles ... */
+
+/* Ensure responsive design remains intact */
+@media (max-width: 768px) {
+  /* ... existing responsive styles ... */
+
+  /* Adjust Totals Section for Mobile */
+  .totals-section {
+    padding: 8px;
+  }
+
+  .totals-display p {
+    font-size: 1em;
+  }
+}
+
 
 
 
