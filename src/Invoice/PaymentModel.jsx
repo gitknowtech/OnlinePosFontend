@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+// PaymentModel.jsx
+
+import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import "../css1/payment.css";
@@ -10,8 +12,6 @@ import discountPercentageImage from "../assets/icons/discountPer.png";
 import discountPriceImage from "../assets/icons/discounts.png";
 import paymentTypeImage from "../assets/icons/paymentType.png";
 import netAmountImage from "../assets/icons/netAmount.png";
-
-import Bill from "./Bill"; // Import the Bill component
 
 export default function PaymentModel({
   show,
@@ -26,83 +26,78 @@ export default function PaymentModel({
   const [suggestions, setSuggestions] = useState([]);
   const [discountPercent, setDiscountPercent] = useState("0");
   const [discountAmount, setDiscountAmount] = useState("0");
-  const [cashPayment, setCashPayment] = useState("0");
-  const [cardPayment, setCardPayment] = useState("0");
+  const [cashPayment, setCashPayment] = useState(""); // Initialized to ""
+  const [cardPayment, setCardPayment] = useState(""); // Initialized to ""
   const [netAmount, setNetAmount] = useState(totalAmount);
   const [balance, setBalance] = useState(totalAmount);
   const [paymentType, setPaymentType] = useState("Credit Payment");
   const [invoiceId, setInvoiceId] = useState(null);
-  const [isInvoiceDataLoaded, setIsInvoiceDataLoaded] = useState(false);
-  const [printAfterConfirm, setPrintAfterConfirm] = useState(false); // Flag to print after user confirms success message
+  const [invoiceData, setInvoiceData] = useState(null); // State to store fetched invoice data
+  const [isPrinting, setIsPrinting] = useState(false); // Flag to prevent multiple prints
+
+  const printIframeRef = useRef(null); // Reference to the iframe
 
   // Reset values when modal loads
   useEffect(() => {
     if (show) {
-      setDiscountPercent("0");
-      setDiscountAmount("0");
-      setCashPayment("");
-      setCardPayment("");
-      setNetAmount(totalAmount);
-      setBalance(totalAmount);
-
-      if (totalAmount < 0) {
-        setCashPayment("0");
-        setCardPayment("0");
-        setPaymentType("Return Payment");
-      } else {
-        updatePaymentTypeForZeroValues();
-      }
+      resetAllFields();
     }
+
+    // Cleanup on unmount or when show changes
+    return () => {
+      clearTimeout(debounceTimeoutRef.current);
+      if (printIframeRef.current) {
+        document.body.removeChild(printIframeRef.current);
+        printIframeRef.current = null;
+      }
+    };
   }, [show, totalAmount]);
 
-  const updatePaymentTypeForZeroValues = () => {
-    if (
-      parseFloat(netAmount) === 0 &&
-      parseFloat(cashPayment) === 0 &&
-      parseFloat(cardPayment) === 0
-    ) {
-      setPaymentType("Cash Payment");
-    }
-  };
+  // Handle Customer Mobile Input Change with Debounce
+  const debounceTimeoutRef = useRef(null);
 
-  const handleCustomerMobileChange = async (e) => {
+  const handleCustomerMobileChange = (e) => {
     const input = e.target.value;
     setCustomerMobile(input);
 
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
     if (input.length >= 3) {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/api/customer/customers?mobile=${input}`
-        );
-        const data = await response.json();
-        setSuggestions(data);
-      } catch (error) {
-        Swal.fire("Error", "Failed to fetch customer suggestions", "error");
-        console.error("Error fetching customer suggestions:", error);
-      }
+      debounceTimeoutRef.current = setTimeout(async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:5000/api/customer/customers?mobile=${input}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch customer suggestions");
+          }
+          const data = await response.json();
+          setSuggestions(data);
+        } catch (error) {
+          Swal.fire("Error", "Failed to fetch customer suggestions", "error");
+          console.error("Error fetching customer suggestions:", error);
+        }
+      }, 300); // Debounce delay of 300ms
     } else {
       setSuggestions([]);
     }
   };
 
+  // Handle Customer Suggestion Click
   const handleSuggestionClick = (customer) => {
     setCustomerMobile(customer.cusId);
     setSuggestions([]);
   };
 
+  // Handle Back to Edit
   const handleBackToEdit = () => {
-    setCustomerMobile("");
-    setSuggestions([]);
-    setDiscountPercent("0");
-    setDiscountAmount("0");
-    setCashPayment("0");
-    setCardPayment("0");
-    setNetAmount(totalAmount);
-    setBalance(totalAmount);
-    setPaymentType("Credit Payment");
+    resetAllFields();
     onClose();
   };
 
+  // Handle Close Bill
   const handleCloseBill = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -114,42 +109,58 @@ export default function PaymentModel({
       confirmButtonText: "Yes, close it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        resetAfterPrint();
+        resetAllFields();
+        clearInvoiceTable(); // Clear data from the invoice table in the parent
+        onClose();
       }
     });
   };
 
-  const resetAfterPrint = () => {
+  // Reset All Fields
+  const resetAllFields = () => {
     setCustomerMobile("");
     setSuggestions([]);
     setDiscountPercent("0");
     setDiscountAmount("0");
-    setCashPayment("0");
-    setCardPayment("0");
+    setCashPayment(""); // Set to ""
+    setCardPayment(""); // Set to ""
     setNetAmount(totalAmount);
     setBalance(totalAmount);
-    setPaymentType("Credit Payment");
-
-    clearInvoiceTable();
-    onClose();
+    setPaymentType(totalAmount < 0 ? "Return Payment" : "Credit Payment");
+    setInvoiceId(null);
+    setInvoiceData(null);
+    setIsPrinting(false);
   };
 
+  // Calculate Net Amount based on Discount
   const calculateNetAmount = (discountValue) => {
     const net = totalAmount - discountValue;
     setNetAmount(net.toFixed(2));
 
     if (net < 0) {
-      setCashPayment("0");
-      setCardPayment("0");
+      setCashPayment("");
+      setCardPayment("");
       setPaymentType("Return Payment");
     } else {
       setBalance(net.toFixed(2));
       setPaymentType("Credit Payment");
     }
 
-    updatePaymentTypeForZeroValues();
+    updatePaymentTypeForZeroValues(net, cashPayment, cardPayment);
   };
 
+  // Update Payment Type if All Values are Zero
+  const updatePaymentTypeForZeroValues = (net = netAmount, cash = cashPayment, card = cardPayment) => {
+    if (
+      parseFloat(net) === 0 &&
+      parseFloat(cash) === 0 &&
+      parseFloat(card) === 0
+    ) {
+      setPaymentType("Cash Payment");
+    }
+  };
+
+  // Handle Cash Payment Change
   const handleCashPaymentChange = (e) => {
     const inputValue = e.target.value;
     if (!/^\d*\.?\d*$/.test(inputValue)) return;
@@ -167,9 +178,10 @@ export default function PaymentModel({
       setPaymentType("Credit Payment");
     }
 
-    updatePaymentTypeForZeroValues();
+    updatePaymentTypeForZeroValues(net, cash, cardPayment);
   };
 
+  // Handle Card Payment Change
   const handleCardPaymentChange = (e) => {
     const inputValue = e.target.value;
     if (!/^\d*\.?\d*$/.test(inputValue)) return;
@@ -195,10 +207,13 @@ export default function PaymentModel({
       setPaymentType("Credit Payment");
     }
 
-    updatePaymentTypeForZeroValues();
+    updatePaymentTypeForZeroValues(net, cash, card);
   };
 
+  // Handle Complete Payment
   const handlePayment = async () => {
+    // Basic validation can be added here if needed
+
     const paymentData = {
       GrossTotal: parseFloat(totalAmount) || 0,
       CustomerId: customerMobile || "Unknown",
@@ -238,6 +253,8 @@ export default function PaymentModel({
         return;
       }
 
+      console.log("Payment saved successfully.");
+
       // Fetch the latest saved invoice
       const fetchResponse = await fetch("http://localhost:5000/api/invoices/last");
       if (!fetchResponse.ok) {
@@ -245,25 +262,35 @@ export default function PaymentModel({
       }
 
       const lastInvoice = await fetchResponse.json();
+      console.log("Last Invoice fetched:", lastInvoice);
+
       if (!Array.isArray(lastInvoice) || lastInvoice.length === 0) {
         Swal.fire("Error", "No invoice data found!", "error");
         return;
       }
 
-      setInvoiceId(lastInvoice[0].invoiceId);
+      const latestInvoiceId = lastInvoice[0].invoiceId;
+      setInvoiceId(latestInvoiceId);
+
+      // Fetch the invoice data
+      const invoiceDataResponse = await fetch(
+        `http://localhost:5000/api/invoices/fetchInvoiceData?invoiceId=${latestInvoiceId}`
+      );
+      if (!invoiceDataResponse.ok) {
+        throw new Error("Failed to fetch invoice data");
+      }
+
+      const fetchedInvoiceData = await invoiceDataResponse.json();
+      console.log("Fetched Invoice Data:", fetchedInvoiceData);
+
+      setInvoiceData(fetchedInvoiceData);
 
       // Show success message and wait for user to click OK
       Swal.fire("Success", "Invoice saved successfully!", "success").then(
         (result) => {
-          if (result.isConfirmed) {
-            // User clicked OK, now we want to print the invoice
-            // If invoice data is already loaded, print now
-            // If not, set a flag to print after data loads
-            if (isInvoiceDataLoaded) {
-              handlePrintInvoice();
-            } else {
-              setPrintAfterConfirm(true);
-            }
+          if (result.isConfirmed && !isPrinting) {
+            setIsPrinting(true);
+            handlePrintInvoice(fetchedInvoiceData);
           }
         }
       );
@@ -277,261 +304,359 @@ export default function PaymentModel({
     }
   };
 
-  const handlePrintInvoice = () => {
-    const printContent = document.getElementById("printable-receipt");
-    if (!printContent) {
-      Swal.fire("Error", "Unable to find invoice content to print.", "error");
+  
+  
+  // Handle Print Invoice via iframe
+  const handlePrintInvoice = (invoiceDataToPrint) => {
+    if (!invoiceDataToPrint) {
+      Swal.fire("Error", "Invoice data is not available for printing.", "error");
       return;
     }
-
-    const printWindow = window.open("", "_blank", "width=300,height=600");
-    printWindow.document.open();
-    printWindow.document.write(`
+  
+    console.log("Printing Invoice:", invoiceDataToPrint);
+  
+    // Create a hidden iframe for printing
+    let printIframe = printIframeRef.current;
+    if (!printIframe) {
+      printIframe = document.createElement("iframe");
+      printIframeRef.current = printIframe;
+      printIframe.style.position = "absolute";
+      printIframe.style.width = "0";
+      printIframe.style.height = "0";
+      printIframe.style.border = "none";
+      document.body.appendChild(printIframe);
+    }
+  
+    const receiptHTML = `
+      <!DOCTYPE html>
       <html>
-        <head>
-          <title>Receipt</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              width: 80mm;
-              margin: 0;
-              padding: 0;
-            }
-            .receipt-container {
-              width: 80mm;
-              margin: auto;
-              font-size: 12px;
-              line-height: 1.4;
-              color: #000;
-            }
-            .divider {
-              text-align: center;
-              margin: 5px 0;
-              font-size: 10px;
-            }
-            .item-row {
-              display: flex;
-              justify-content: space-between;
-            }
-            .item-row span {
-              font-size: 12px;
-            }
-            .totals-section, .footer {
-              text-align: center;
-              margin-top: 10px;
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-        </body>
+      <head>
+        <title>Receipt</title>
+        <style>
+          /* [Include the updated CSS from above] */
+        </style>
+      </head>
+      <body>
+        <div class="receipt-container">
+          <!-- Header Section -->
+          <div class="header">
+            <img src="${invoiceDataToPrint.company.LogoUrl || 'https://via.placeholder.com/120'}" alt="Company Logo" />
+            <h2>${invoiceDataToPrint.company.Comname || "Store Name"}</h2>
+            <p>${invoiceDataToPrint.company.Location || "Store Address"}</p>
+            <p>Phone: ${invoiceDataToPrint.company.Mobile || "123-456-7890"}</p>
+            <p>Date: ${new Date(invoiceDataToPrint.sales.createdAt).toLocaleString()}</p>
+          </div>
+  
+          <div class="divider"></div>
+  
+          <!-- Invoice Information -->
+          <div class="invoice-details">
+            <div><strong>Invoice #:</strong> ${invoiceDataToPrint.sales.invoiceId}</div>
+            <div><strong>Cashier:</strong> ${invoiceDataToPrint.sales.UserName}</div>
+            <div><strong>Customer ID:</strong> ${invoiceDataToPrint.sales.CustomerId}</div>
+          </div>
+  
+          <div class="divider"></div>
+  
+          <!-- Items Table -->
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Disc</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${invoiceDataToPrint.invoices
+                .map(
+                  (item, index) => `
+                <tr>
+                  <td>${index + 1}. ${item.name}</td>
+                  <td>${item.quantity}</td>
+                  <td>₹ ${parseFloat(item.rate).toFixed(2)}</td>
+                  <td>${item.discount ? `₹ ${parseFloat(item.discount).toFixed(2)}` : "-"}</td>
+                  <td>₹ ${parseFloat(item.amount).toFixed(2)}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
+  
+          <div class="divider"></div>
+  
+          <!-- Totals Section -->
+          <table class="totals">
+            <tbody>
+              <tr>
+                <td class="label"><strong>Gross Total:</strong></td>
+                <td class="value">₹ ${parseFloat(invoiceDataToPrint.sales.GrossTotal).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td class="label"><strong>Discount:</strong></td>
+                <td class="value">- ₹ ${parseFloat(invoiceDataToPrint.sales.discountAmount).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td class="label"><strong>Net Amount:</strong></td>
+                <td class="value">₹ ${parseFloat(invoiceDataToPrint.sales.netAmount).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td class="label"><strong>Payment:</strong></td>
+                <td class="value">₹ ${(
+                  parseFloat(invoiceDataToPrint.sales.CashPay) +
+                  parseFloat(invoiceDataToPrint.sales.CardPay)
+                ).toFixed(2)}</td>.0
+
+                
+              </tr>
+              <tr>
+                <td class="label"><strong>Balance:</strong></td>
+                <td class="value">₹ ${parseFloat(invoiceDataToPrint.sales.Balance).toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+  
+          <div class="divider"></div>
+  
+          <!-- Footer Section -->
+          <div class="footer">
+            <p>Thank you for shopping with us!</p>
+            <p>Visit again!</p>
+          </div>
+  
+          <!-- Cut Line -->
+          <div class="cut-line">
+            ---------------------------------------------
+            <br/>CUT HERE
+            ---------------------------------------------
+          </div>
+        </div>
+      </body>
       </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-
-    // After printing, reset and close Payment Model
-    resetAfterPrint();
+    `;
+  
+    // Write the receipt content to the iframe's document
+    const iframeDoc = printIframe.contentDocument || printIframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(receiptHTML);
+    iframeDoc.close();
+  
+    // Define a handler that prints and cleans up after the print is done
+    const handlePrint = () => {
+      try {
+        printIframe.contentWindow.focus();
+        printIframe.contentWindow.print();
+      } catch (error) {
+        console.error("Error during printing:", error);
+        Swal.fire("Error", "Failed to print the invoice.", "error");
+      } finally {
+        // Clean up: remove the iframe after printing
+        setTimeout(() => {
+          if (printIframe && printIframe.parentNode) {
+            printIframe.parentNode.removeChild(printIframe);
+            printIframeRef.current = null;
+          }
+          resetAllFields();
+          clearInvoiceTable(); // Clear data from the invoice table in the parent
+          onClose();
+        }, 1000); // Delay to ensure print dialog has been triggered
+      }
+    };
+  
+    // Attach the onload event only once
+    if (iframeDoc.readyState === "complete") {
+      handlePrint();
+    } else {
+      // Otherwise, wait for the iframe to load and then print
+      printIframe.onload = handlePrint;
+    }
   };
+  
 
+  // Determine Balance Style
   const getBalanceStyle = () => {
     if (balance < 0) return { backgroundColor: "red", color: "white" };
     if (balance > 0) return { backgroundColor: "yellow", color: "black" };
     return { backgroundColor: "green", color: "white" };
   };
 
-  // When Bill data is loaded, if user already confirmed success message and wants to print, print now
-  useEffect(() => {
-    if (isInvoiceDataLoaded && printAfterConfirm) {
-      handlePrintInvoice();
-    }
-  }, [isInvoiceDataLoaded, printAfterConfirm]);
-
   return (
     show && (
-      <>
-        <div id="payment-modal">
-          <div id="payment-container">
-            <h1 id="total-amount-payment-model">
-              RS: {parseFloat(totalAmount || 0).toFixed(2)}
-            </h1>
+      <div id="payment-modal">
+        <div id="payment-container">
+          <h1 id="total-amount-payment-model">
+            RS: {parseFloat(totalAmount || 0).toFixed(2)}
+          </h1>
 
-            {/* Customer Mobile */}
-            <div id="customer-mobile-group">
-              <label>
-                <img
-                  id="customer-payment-image"
-                  src={customerPaymentImage}
-                  alt="Customer"
-                />
-                Customer Mobile
-              </label>
-              <input
-                type="text"
-                placeholder="Enter Mobile / ID / Name"
-                value={customerMobile}
-                onChange={handleCustomerMobileChange}
+          {/* Customer Mobile */}
+          <div id="customer-mobile-group">
+            <label>
+              <img
+                id="customer-payment-image"
+                src={customerPaymentImage}
+                alt="Customer"
               />
-              {suggestions.length > 0 && (
-                <div id="suggestions-dropdown">
-                  {suggestions.map((customer) => (
-                    <div
-                      key={customer.id}
-                      id="suggestion-item"
-                      onClick={() => handleSuggestionClick(customer)}
-                    >
-                      {customer.cusId} - {customer.cusName} -{" "}
-                      {customer.mobile1 || customer.mobile2}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+              Customer Mobile
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Mobile / ID / Name"
+              value={customerMobile}
+              onChange={handleCustomerMobileChange}
+            />
+            {suggestions.length > 0 && (
+              <div id="suggestions-dropdown">
+                {suggestions.map((customer) => (
+                  <div
+                    key={customer.id}
+                    id="suggestion-item"
+                    onClick={() => handleSuggestionClick(customer)}
+                  >
+                    {customer.cusId} - {customer.cusName} -{" "}
+                    {customer.mobile1 || customer.mobile2}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-            {/* Discount Section */}
-            <div id="discount-percent-group">
-              <label>
-                <img
-                  id="discount-percentage-image"
-                  src={discountPercentageImage}
-                  alt="Discount Percent"
-                />
-                Discount (%)
-              </label>
-              <input
-                type="text"
-                placeholder="Enter Discount (%)"
-                value={discountPercent}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setDiscountPercent(value);
-                  const percent = parseFloat(value);
-                  const discountValue = isNaN(percent)
+          {/* Discount Section */}
+          <div id="discount-percent-group">
+            <label>
+              <img
+                id="discount-percentage-image"
+                src={discountPercentageImage}
+                alt="Discount Percent"
+              />
+              Discount (%)
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Discount (%)"
+              value={discountPercent}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDiscountPercent(value);
+                const percent = parseFloat(value);
+                const discountValue = isNaN(percent)
+                  ? 0
+                  : (totalAmount * percent) / 100;
+                setDiscountAmount(discountValue.toFixed(2));
+                calculateNetAmount(discountValue);
+              }}
+            />
+          </div>
+          <div id="discount-amount-group">
+            <label>
+              <img
+                id="discount-price-image"
+                src={discountPriceImage}
+                alt="Discount Amount"
+              />
+              Discount Amount
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Discount Amount"
+              value={discountAmount}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDiscountAmount(value);
+                const amount = parseFloat(value);
+                const percent =
+                  isNaN(amount) || amount > totalAmount
                     ? 0
-                    : (totalAmount * percent) / 100;
-                  setDiscountAmount(discountValue.toFixed(2));
-                  calculateNetAmount(discountValue);
-                }}
-              />
-            </div>
-            <div id="discount-amount-group">
-              <label>
-                <img
-                  id="discount-price-image"
-                  src={discountPriceImage}
-                  alt="Discount Amount"
-                />
-                Discount Amount
-              </label>
-              <input
-                type="text"
-                placeholder="Enter Discount Amount"
-                value={discountAmount}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setDiscountAmount(value);
-                  const amount = parseFloat(value);
-                  const percent =
-                    isNaN(amount) || amount > totalAmount
-                      ? 0
-                      : (amount / totalAmount) * 100;
-                  setDiscountPercent(percent.toFixed(2));
-                  calculateNetAmount(amount);
-                }}
-              />
-            </div>
+                    : (amount / totalAmount) * 100;
+                setDiscountPercent(percent.toFixed(2));
+                calculateNetAmount(amount);
+              }}
+            />
+          </div>
 
-            {/* Net Amount Section */}
-            <div id="net-amount-group">
-              <label>
-                <img
-                  id="net-amount-image"
-                  src={netAmountImage}
-                  alt="Net Amount"
-                />
-                Net Amount
-              </label>
-              <input type="text" value={netAmount} readOnly />
-            </div>
-
-            {/* Payment Section */}
-            <div id="cash-payment-group">
-              <label>
-                <img
-                  id="cash-payment-image"
-                  src={cashImage}
-                  alt="Cash Payment"
-                />
-                Cash Payment
-              </label>
-              <input
-                type="text"
-                placeholder="Enter Cash Payment"
-                value={cashPayment}
-                onChange={handleCashPaymentChange}
-                disabled={paymentType === "Return Payment"}
+          {/* Net Amount Section */}
+          <div id="net-amount-group">
+            <label>
+              <img
+                id="net-amount-image"
+                src={netAmountImage}
+                alt="Net Amount"
               />
-            </div>
-            <div id="card-payment-group">
-              <label>
-                <img
-                  id="card-payment-image"
-                  src={cardImage}
-                  alt="Card Payment"
-                />
-                Card Payment
-              </label>
-              <input
-                type="text"
-                placeholder="Enter Card Payment"
-                value={cardPayment}
-                onChange={handleCardPaymentChange}
-                disabled={paymentType === "Return Payment"}
+              Net Amount
+            </label>
+            <input type="text" value={netAmount} readOnly />
+          </div>
+
+          {/* Payment Section */}
+          <div id="cash-payment-group">
+            <label>
+              <img
+                id="cash-payment-image"
+                src={cashImage}
+                alt="Cash Payment"
               />
-            </div>
-
-            {/* Payment Type */}
-            <div id="payment-type-group">
-              <label>
-                <img
-                  id="payment-type-image"
-                  src={paymentTypeImage}
-                  alt="Payment Type"
-                />
-                Payment Type
-              </label>
-              <input type="text" value={paymentType} readOnly />
-            </div>
-
-            {/* Balance Section */}
-            <div id="balance-group">
-              <label>Balance</label>
-              <input
-                type="text"
-                value={balance}
-                readOnly
-                style={getBalanceStyle()}
+              Cash Payment
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Cash Payment"
+              value={cashPayment}
+              onChange={handleCashPaymentChange}
+              disabled={paymentType === "Return Payment"}
+            />
+          </div>
+          <div id="card-payment-group">
+            <label>
+              <img
+                id="card-payment-image"
+                src={cardImage}
+                alt="Card Payment"
               />
-            </div>
+              Card Payment
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Card Payment"
+              value={cardPayment}
+              onChange={handleCardPaymentChange}
+              disabled={paymentType === "Return Payment"}
+            />
+          </div>
 
-            {/* Action Buttons */}
-            <div id="action-buttons">
-              <button onClick={handlePayment}>Complete Payment</button>
-              <button onClick={handleBackToEdit}>Back to Edit</button>
-              <button onClick={handleCloseBill}>Close Bill</button>
-            </div>
+          {/* Payment Type */}
+          <div id="payment-type-group">
+            <label>
+              <img
+                id="payment-type-image"
+                src={paymentTypeImage}
+                alt="Payment Type"
+              />
+              Payment Type
+            </label>
+            <input type="text" value={paymentType} readOnly />
+          </div>
+
+          {/* Balance Section */}
+          <div id="balance-group">
+            <label>Balance</label>
+            <input
+              type="text"
+              value={balance}
+              readOnly
+              style={getBalanceStyle()}
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div id="action-buttons">
+            <button onClick={handlePayment}>Complete Payment</button>
+            <button onClick={handleBackToEdit}>Back to Edit</button>
+            <button onClick={handleCloseBill}>Close Bill</button>
           </div>
         </div>
-
-        {/* Conditionally render the Bill component */}
-        {invoiceId && (
-          <div style={{ display: "none" }}>
-            <Bill invoiceId={invoiceId} onDataLoaded={() => setIsInvoiceDataLoaded(true)} />
-          </div>
-        )}
-      </>
+      </div>
     )
   );
 }
