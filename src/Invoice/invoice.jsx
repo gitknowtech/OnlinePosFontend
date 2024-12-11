@@ -816,7 +816,7 @@ export default function Invoice() {
             type="text"
             autoComplete="off"
             placeholder="%"
-            style={{ width: "70px" }}
+            style={{ width: "70px" , padding:"8px", borderRadius:"5px"}}
             className="percentage-input"
             onChange={(e) => handlePercentageChange(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handlePercentageEnter()}

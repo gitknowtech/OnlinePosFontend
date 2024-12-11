@@ -1,6 +1,6 @@
 // src/components/MainDashboard.js
 
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "../css2/maindashboard.css";
 import { Line } from "react-chartjs-2";
@@ -21,6 +21,9 @@ import companyImage from "../assets/images/mainLogo.jpg"; // Add your company im
 import morningImage from "../assets/images/goodmorning.png";
 import eveningImage from "../assets/images/goodevening.png";
 import nightImage from "../assets/images/goodnight.png";
+import afternoonImage from "../assets/images/afternoon.png";
+
+
 
 const MainDashboard = () => {
   const [currentDate, setCurrentDate] = useState("");
@@ -173,7 +176,6 @@ const MainDashboard = () => {
 
 
 
-
   useEffect(() => {
     const updateDateTime = () => {
       const now = new Date();
@@ -192,20 +194,23 @@ const MainDashboard = () => {
       };
       setCurrentDate(now.toLocaleDateString("en-LK", optionsDate));
       setCurrentTime(now.toLocaleTimeString("en-LK", optionsTime));
-
+  
       const hour = now.getHours();
       if (hour < 12) {
         setGreeting("Good Morning");
         setGreetingImage(morningImage);
-      } else if (hour < 18) {
+      } else if (hour >= 12 && hour < 15) { // Afternoon greeting
         setGreeting("Good Afternoon");
+        setGreetingImage(afternoonImage);
+      } else if (hour >= 15 && hour < 18) { // Evening greeting
+        setGreeting("Good Evening");
         setGreetingImage(eveningImage);
       } else {
-        setGreeting("Good Evening");
+        setGreeting("Good Night");
         setGreetingImage(nightImage);
       }
     };
-
+  
     updateDateTime();
     const intervalId = setInterval(updateDateTime, 1000);
     return () => clearInterval(intervalId);
@@ -294,10 +299,10 @@ const MainDashboard = () => {
 
         {/* December Summary Section */}
         <div className="summary-card">
-          <h3>Summary of December, 2024 Sale's</h3>
+          <h3>Summary of December, 2024 Sales</h3>
           <ul className="summary-list" style={{ marginTop: "40px" }}>
             <li>
-              <span className="summary-label">December Sale's:</span>
+              <span className="summary-label">December Sales:</span>
               <span className="summary-value summary-green">26,150.00</span>
             </li>
             <li>
@@ -355,7 +360,7 @@ const MainDashboard = () => {
       {/* Two-column row with Profit Summary and Sales Summary Charts */}
       <section id="charts-row">
         <div className="summary-card">
-          <h3>Today's Sales by Invoice</h3>
+          <h3>Todays Sales by Invoice</h3>
           {chartData ? (
             <Line
               data={chartData}
@@ -366,7 +371,7 @@ const MainDashboard = () => {
           )}
         </div>
         <div className="summary-card">
-          <h3>Today's Net Amount Sales</h3>
+          <h3>Todays Net Amount Sales</h3>
           {netAmountChartData ? (
             <Line
               data={netAmountChartData}

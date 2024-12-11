@@ -23,22 +23,27 @@ export default function ManageProducts({ store }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/products/fetch_products"
-        );
+        const response = await axios.get('http://localhost:5000/api/products/fetch_products', {
+          params: {
+            store, // Pass the store prop here
+            status: null, // Optional: Add other filters if needed
+            searchTerm, // Pass the searchTerm state
+          },
+        });
         setProducts(response.data);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error('Error fetching products:', error);
         Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Error fetching products",
+          icon: 'error',
+          title: 'Error',
+          text: 'Error fetching products',
         });
       }
     };
-
+  
     fetchProducts();
-  }, []);
+  }, [store, searchTerm]); // Add `store` and `searchTerm` as dependencies
+  
 
   // Open Edit Modal and Set Selected Product
   const handleEdit = (product) => {

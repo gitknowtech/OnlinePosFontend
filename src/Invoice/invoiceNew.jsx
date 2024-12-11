@@ -6,13 +6,10 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import "../css1/invoice.css"; // Ensure this path is correct
 
-// Import only necessary images
-import payment from "../assets/images/payment.png";
 import discount from "../assets/images/discount.png";
 import wholesale from "../assets/images/wholesale.png";
 import removeImage from "../assets/images/remove.png";
-
-import PaymentModel from "./PaymentModel";
+import printImage from "../assets/images/print.png"; // Import print image
 
 export default function InvoiceNew() {
   const location = useLocation();
@@ -38,12 +35,17 @@ export default function InvoiceNew() {
   const [costPrice, setCostPrice] = useState(""); // Added state for costPrice
   const [isSelectingSuggestion, setIsSelectingSuggestion] = useState(false); // Flag for suggestion selection
 
+  const [companyInfo, setCompanyInfo] = useState({
+    LogoUrl: "",
+    Comname: "",
+    Location: "",
+    Mobile: "",
+  });
+
   const barcodeInputRef = useRef(null);
   const priceInputRef = useRef(null);
   const qtyInputRef = useRef(null);
   const suggestionsRef = useRef(null); // Ref for suggestions dropdown
-
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   useEffect(() => {
     if (location.state) {
@@ -80,13 +82,8 @@ export default function InvoiceNew() {
           e.preventDefault();
           toggleDiscount();
           break;
-        case "F10":
-          e.preventDefault();
-          handleOpenPaymentModal();
-          break;
         case "Escape":
           e.preventDefault();
-          closeAllModals();
           break;
         default:
           break;
@@ -116,6 +113,20 @@ export default function InvoiceNew() {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchCompanyInfo = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/companies/info");
+        setCompanyInfo(response.data);
+      } catch (error) {
+        Swal.fire("Error", "Failed to fetch company information.", "error");
+        console.error("Error fetching company info:", error);
+      }
+    };
+
+    fetchCompanyInfo();
+  }, []);
+
   const toggleWholesale = () => {
     setIsWholesale((prev) => !prev);
     if (!isWholesale) {
@@ -130,57 +141,173 @@ export default function InvoiceNew() {
     }
   };
 
-  const closeAllModals = () => {
-    setIsPaymentModalOpen(false);
-  };
-
-  const handleAddOtherItem = (item) => {
-    const { productName, productCost, productMRP, productRate, qty, discount } = item;
-    const amount = parseFloat(productRate) * parseFloat(qty); // Calculate amount based on Rate and Quantity
-
-    setTableData((prevData) => [
-      ...prevData,
-      {
-        name: productName,
-        cost: parseFloat(productCost).toFixed(2), // Cost
-        mrp: parseFloat(productMRP).toFixed(2), // MRP
-        discount: parseFloat(discount).toFixed(2), // Discount calculated as MRP - Rate
-        rate: parseFloat(productRate).toFixed(2), // Rate
-        quantity: parseFloat(qty).toFixed(2), // Quantity
-        amount: amount.toFixed(2), // Total amount (Rate * Quantity)
-      },
-    ]);
-  };
-
-  const handleOpenPaymentModal = () => {
+  const handlePrint = () => {
     if (tableData.length === 0) {
-      Swal.fire("Error", "Please add products to the table before proceeding to payment.", "error");
+      Swal.fire("No Items", "Please add items to the invoice before printing.", "warning");
       return;
     }
-    setIsPaymentModalOpen(true);
+  
+    // Prepare the sales data
+    const salesData = {
+      invoiceId: `INV-${Date.now()}`, // Generate a unique invoice ID
+      UserName: user,
+      CustomerId: "CUST-001", // Replace with actual customer ID if available
+      GrossTotal: totalAmount,
+      discountAmount: totalDiscount,
+      netAmount: (parseFloat(totalAmount) - parseFloat(totalDiscount)).toFixed(2),
+      CashPay: 0, // Adjust based on payment method
+      CardPay: 0, // Adjust based on payment method
+      Balance: 0, // Adjust based on payment method
+      createdAt: new Date(),
+    };
+  
+    const invoiceDataToPrint = {
+      company: companyInfo,
+      sales: salesData,
+      invoices: tableData,
+      summary: {
+        itemCount,
+        totalQuantity,
+        totalDiscount,
+        totalAmount,
+      },
+    };
+  
+    const receiptHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Receipt</title>
+        <style>
+          @page {
+            size: 80mm auto; /* Set paper size to 80mm width */
+            margin: 0;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            width: 302px; /* 80mm width in pixels at 96 DPI */
+            box-sizing: border-box;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 10px;
+          }
+          .header img {
+            max-width: 100px;
+            height: auto;
+          }
+          .divider {
+            border-bottom: 1px dashed #000;
+            margin: 10px 0;
+          }
+          table {
+            width: 100%;
+            font-size: 12px;
+            margin-bottom: 10px;
+            border-collapse: collapse;
+          }
+          table th, table td {
+            text-align: center;
+            padding: 4px;
+          }
+          .summary {
+            margin-top: 10px;
+            font-size: 12px;
+          }
+          .summary div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <img src="${invoiceDataToPrint.company.LogoUrl || 'https://via.placeholder.com/100'}" alt="Logo" />
+          <h2>${invoiceDataToPrint.company.Comname || 'Store Name'}</h2>
+          <p>${invoiceDataToPrint.company.Location || 'Store Address'}</p>
+          <p>Phone: ${invoiceDataToPrint.company.Mobile || 'N/A'}</p>
+          <p>Date: ${new Date(invoiceDataToPrint.sales.createdAt).toLocaleString()}</p>
+        </div>
+        <div class="divider"></div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Rate</th>
+              <th>Disc</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${invoiceDataToPrint.invoices
+              .map((item, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>${item.name}</td>
+                  <td>${item.quantity}</td>
+                  <td>₹${parseFloat(item.rate).toFixed(2)}</td>
+                  <td>₹${item.discount || '0.00'}</td>
+                  <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                </tr>
+              `)
+              .join('')}
+          </tbody>
+        </table>
+        <div class="divider"></div>
+        <div class="summary">
+          <div><strong>Items:</strong> <span>${invoiceDataToPrint.summary.itemCount} Item(s)</span></div>
+          <div><strong>Total Quantity:</strong> <span>${invoiceDataToPrint.summary.totalQuantity}</span></div>
+          <div><strong>Discount:</strong> <span>₹ ${parseFloat(invoiceDataToPrint.summary.totalDiscount).toFixed(2)}</span></div>
+          <div><strong>Total Amount:</strong> <span>₹ ${parseFloat(invoiceDataToPrint.summary.totalAmount).toFixed(2)}</span></div>
+        </div>
+        <div class="divider"></div>
+        <p class="footer">Thank you for shopping with us!</p>
+      </body>
+      </html>
+    `;
+  
+    // Open the print window
+    const printWindow = window.open("", "_blank", "width=302,height=auto,scrollbars=no");
+    printWindow.document.open();
+    printWindow.document.write(receiptHTML);
+    printWindow.document.close();
+  
+    // Clear the invoice table after printing
+    const clearInvoice = () => {
+      setTableData([]);
+      setTotalAmount("0.00");
+      setTotalQuantity(0);
+      setTotalDiscount("0.00");
+      setItemCount(0);
+  
+      Swal.fire("Invoice Cleared", "The invoice table has been cleared successfully.", "success");
+    };
+  
+    // Attach an event listener to detect when the print dialog is closed
+    printWindow.onafterprint = () => {
+      clearInvoice(); // Clear the table data
+      printWindow.close(); // Close the print window
+    };
+  
+    // Automatically trigger the print dialog
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+    };
   };
-
-  const handlePaymentModal = () => {
-    handleOpenPaymentModal();
-  };
-
-  const handleClosePaymentModal = () => setIsPaymentModalOpen(false);
-
-  const handleProductSelect = (product) => {
-    if (!product || !product.barcode) {
-      console.error("Invalid product data:", product);
-      Swal.fire("Error", "Invalid product data", "error");
-      return;
-    }
-
-    setBarcode(product.barcode);
-    setPrice(product.salePrice);
-    setSuggestedPrice(product.mrpPrice);
-    setLockedPrice(product.lockedPrice);
-
-    barcodeInputRef.current.focus();
-  };
-
+  
+  
+  
+  
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
@@ -371,15 +498,6 @@ export default function InvoiceNew() {
     barcodeInputRef.current.focus();
   };
 
-  const handleQuantityChange = (e, index) => {
-    const newQuantity = e.target.value;
-    setTableData((prevData) => {
-      const newData = [...prevData];
-      newData[index].quantity = newQuantity;
-      return newData;
-    });
-  };
-
   const handleDeleteRow = (index) => {
     setTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
@@ -441,7 +559,7 @@ export default function InvoiceNew() {
       if (enteredPrice < lockedPrice || enteredPrice > originalPrice) {
         Swal.fire(
           "Invalid Price",
-          `The price should be between the locked price of ${lockedPrice} and the MRP of ${originalPrice}`,
+          `The price should be between the locked price of ₹${lockedPrice} and the MRP of ₹${originalPrice}`,
           "error"
         );
         priceInputRef.current.focus();
@@ -450,30 +568,6 @@ export default function InvoiceNew() {
     }
     setQty("1");
     qtyInputRef.current.focus();
-  };
-
-  const handleVirtualEnter = () => {
-    if (document.activeElement === barcodeInputRef.current) {
-      handleBarcodeEnter();
-    } else if (document.activeElement === priceInputRef.current) {
-      handlePriceEnter();
-    } else if (document.activeElement === qtyInputRef.current) {
-      handleQtyEnter();
-    }
-  };
-
-  const handleNumericInput = (value) => {
-    if (document.activeElement) {
-      document.activeElement.value += value;
-      document.activeElement.dispatchEvent(new Event("input", { bubbles: true }));
-    }
-  };
-
-  const handleClear = () => {
-    if (document.activeElement) {
-      document.activeElement.value = "";
-      document.activeElement.dispatchEvent(new Event("input", { bubbles: true }));
-    }
   };
 
   return (
@@ -661,10 +755,10 @@ export default function InvoiceNew() {
             <span>{totalQuantity} Quantity(s)</span>
           </div>
           <div className="total-discount" style={{ marginRight: "40px" }}>
-            <span>Discount: {totalDiscount}</span>
+            <span>Discount:  {totalDiscount}</span>
           </div>
           <div className="total-amount">
-            <span>{totalAmount}</span>
+            <span> {totalAmount}</span>
           </div>
         </div>
 
@@ -706,17 +800,19 @@ export default function InvoiceNew() {
                 <span>Special (F8)</span>
               </label>
             </div>
-            <div className="option-box" onClick={handlePaymentModal}>
-              <label htmlFor="payment">
-                <img
-                  src={payment}
-                  alt="Payment"
-                  style={{ marginLeft: "20px" }}
-                />
-                <br />
-                <span>Payment (F10)</span>
-              </label>
-            </div>
+            {tableData.length > 0 && (
+              <div className="option-box" onClick={handlePrint}>
+                <label htmlFor="print">
+                  <img
+                    src={printImage}
+                    alt="Print"
+                    style={{ marginLeft: "20px" }}
+                  />
+                  <br />
+                  <span>Print</span>
+                </label>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -725,23 +821,6 @@ export default function InvoiceNew() {
       <div className="right-panel">
         {/* Optional: Implement virtual keyboards if needed */}
       </div>
-
-      {/* Render the PaymentModel */}
-      <PaymentModel
-        show={isPaymentModalOpen}
-        onClose={handleClosePaymentModal}
-        totalAmount={parseFloat(totalAmount || 0)}
-        clearInvoiceTable={() => {
-          setTableData([]);
-          setTotalAmount("0.00");
-          setTotalQuantity(0);
-          setTotalDiscount("0.00");
-          setItemCount(0);
-        }}
-        tableData={tableData} // Pass table data for invoice items
-        user={user} // Pass UserName
-        store={store} // Pass Store
-      />
     </div>
   );
 }
