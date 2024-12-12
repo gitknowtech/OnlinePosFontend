@@ -1,0 +1,104 @@
+// ... (existing code)
+
+// Endpoint to check if startCash table exists and amount is available
+app.get('/api/startCash/check', async (req, res) => {
+  try {
+    const startCash = await db.collection('startCash').findOne();
+    const exists = !!startCash;
+    const amount = exists ? startCash.amount : null;
+    res.json({ exists, amount });
+  } catch (error) {
+    console.error('Error checking startCash:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to create startCash table and store initial amount
+app.post('/api/startCash/create', async (req, res) => {
+  try {
+    const { amount } = req.body;
+    await db.collection('startCash').insertOne({ amount });
+    res.json({ message: 'Start cash created successfully' });
+  } catch (error) {
+    console.error('Error creating startCash:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// ... (rest of the code)
+
+
+
+
+
+
+
+
+
+
+
+// ... (existing code)
+
+// Function to check if startCash table exists and amount is available
+const checkStartCash = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/startCash/check`);
+    if (response.data.exists && response.data.amount) {
+      // Proceed to the invoice file
+      console.log("Proceeding to the invoice file");
+    } else {
+      // Prompt the user to enter the amount
+      const { value: amount } = await Swal.fire({
+        title: 'Enter Start Cash Amount',
+        input: 'number',
+        inputAttributes: {
+          autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Submit',
+        showLoaderOnConfirm: true,
+        preConfirm: (amount) => {
+          if (!amount) {
+            Swal.showValidationMessage(`Please enter a valid amount`);
+          }
+          return amount;
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+      });
+
+      if (amount) {
+        // Create the startCash table and store the amount
+        await axios.post(`${API_BASE_URL}/api/startCash/create`, { amount });
+        // Proceed to the invoice file
+        console.log("Proceeding to the invoice file");
+      } else {
+        // Cancel button clicked or invalid amount entered
+        console.log("Cancelled or invalid amount entered");
+      }
+    }
+  } catch (error) {
+    console.error("Error checking startCash:", error);
+  }
+};
+
+// Initialize User and Store Information
+useEffect(() => {
+  if (location.state) {
+    const { UserName, Store } = location.state;
+    setUser(UserName || "Guest");
+    setStore(Store || "Default Store");
+  }
+
+  const now = new Date();
+  const formattedTime = now.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  setStartTime(formattedTime);
+
+  // Check startCash table and amount
+  checkStartCash();
+}, [location.state]);
+
+// ... (rest of the code)

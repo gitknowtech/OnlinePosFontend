@@ -201,6 +201,13 @@ const Dashboard = () => {
     }
   };
 
+  // Navigate to MainDashboard on component mount
+  useEffect(() => {
+    if (accessRights["Dashboard"]) {
+      handleAccessCheck("Dashboard", "/dashboard/MainDashboard");
+    }
+  }, [accessRights]);
+
   // Render loading or error states
   if (loading || loadingAccess) {
     return <div className="loading">Loading...</div>;
@@ -567,7 +574,6 @@ const Dashboard = () => {
                   </li>
                 )}
 
-              
                 {accessRights["Setting"] && (
                   <li>
                     <div

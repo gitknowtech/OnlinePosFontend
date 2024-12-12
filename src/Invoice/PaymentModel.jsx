@@ -306,255 +306,298 @@ export default function PaymentModel({
 
 
 
-  // Handle Print Invoice via iframe
-  const handlePrintInvoice = (invoiceDataToPrint) => {
-    if (!invoiceDataToPrint) {
-      Swal.fire("Error", "Invoice data is not available for printing.", "error");
-      return;
-    }
+ // Handle Print Invoice via iframe
+const handlePrintInvoice = (invoiceDataToPrint) => {
+  if (!invoiceDataToPrint) {
+    Swal.fire("Error", "Invoice data is not available for printing.", "error");
+    return;
+  }
 
-    console.log("Printing Invoice:", invoiceDataToPrint);
+  console.log("Printing Invoice:", invoiceDataToPrint);
 
-    // Create a hidden iframe for printing
-    let printIframe = printIframeRef.current;
-    if (!printIframe) {
-      printIframe = document.createElement("iframe");
-      printIframeRef.current = printIframe;
-      printIframe.style.position = "absolute";
-      printIframe.style.width = "0";
-      printIframe.style.height = "0";
-      printIframe.style.border = "none";
-      document.body.appendChild(printIframe);
-    }
+  // Create a hidden iframe for printing
+  let printIframe = printIframeRef.current;
+  if (!printIframe) {
+    printIframe = document.createElement("iframe");
+    printIframeRef.current = printIframe;
+    printIframe.style.position = "absolute";
+    printIframe.style.width = "0";
+    printIframe.style.height = "0";
+    printIframe.style.border = "none";
+    document.body.appendChild(printIframe);
+  }
 
-    const receiptHTML = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Receipt</title>
-        <style>
-          <style>
-      @page {
-        size: 80mm auto; /* Set paper size to 80mm width */
-        margin: 0;
-      }
-      body {
-        font-family: Arial, sans-serif;
-        padding: 10px;
-        width: 302px; /* 80mm width in pixels at 96 DPI */
-        box-sizing: border-box;
-      }
-      /* Wrapper for the entire receipt with a light border */
-      .receipt {
-        border: 1px solid #ccc; /* Light gray border around the receipt */
-        padding: 10px; /* Optional padding inside the receipt */
-      }
-      .header {
-        text-align: center;
-        margin-bottom: 10px;
-      }
-      .header img {
-        max-width: 100px;
-        height: auto;
-      }
-      .header h2 {
-        margin: 5px 0;
-        font-size: 16px;
-      }
-      .header p {
-        margin: 2px 0;
-        font-size: 12px;
-      }
-      .divider {
-        border-bottom: 1px dashed #000;
-        margin: 10px 0;
-      }
-      table {
-        width: 100%;
-        font-size: 12px;
-        margin-bottom: 10px;
-        border-collapse: collapse;
-      }
-      table th, table td {
-        text-align: center;
-        padding: 4px;
-        border: none; /* Remove borders from cells */
-      }
-      /* Specific class to left-align Product Name */
-      .product-name {
-        text-align: left;
-        white-space: normal; /* Allows text to wrap */
-        word-wrap: break-word; /* Breaks long words if necessary */
-      }
-      .summary {
-        margin-top: 10px;
-        font-size: 12px;
-      }
-      .summary div {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 4px;
-      }
-      .footer {
-        text-align: center;
-        margin-top: 10px;
-        font-size: 12px;
-      }
-      /* Styling for the first row of each item */
-      .item-header {
-        background-color: #f9f9f9;
-        font-weight: bold;
-      }
-      /* Remove top border for the second row to merge seamlessly */
-      .item-details td {
-        border-top: none;
-        margin-left:  20px;
-      }
-      /* Hide empty cells */
-      .empty-cell {
-        border: none;
-        padding: 0;
-      }
-        </style>
-      </head>
-      <body>
-        <div class="receipt-container">
-          <!-- Header Section -->
-          <div class="header">
-            <img src="${invoiceDataToPrint.company.LogoUrl || 'https://via.placeholder.com/120'}" alt="Company Logo" />
-            <h2>${invoiceDataToPrint.company.Comname || "Store Name"}</h2>
-            <p>${invoiceDataToPrint.company.Location || "Store Address"}</p>
-            <p>Phone: ${invoiceDataToPrint.company.Mobile || "123-456-7890"}</p>
-            <p>Date: ${new Date(invoiceDataToPrint.sales.createdAt).toLocaleString()}</p>
-          </div>
-  
-          <div class="divider"></div>
-  
-          <!-- Invoice Information -->
-          <div class="invoice-details">
-            <div><strong>Invoice #:</strong> ${invoiceDataToPrint.sales.invoiceId}</div>
-            <div><strong>Cashier:</strong> ${invoiceDataToPrint.sales.UserName}</div>
-            <div><strong>Customer ID:</strong> ${invoiceDataToPrint.sales.CustomerId}</div>
-          </div>
-  
-          <div class="divider"></div>
-  
-          <!-- Items Table -->
-          <table>
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th>Qty</th>
-                <th>Rate</th>
-                <th>Disc</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-            ${invoiceDataToPrint.invoices
-              .map(
-                (item, index) => `
-                  <tr>
-                    <td colspan="5" style="text-align: left; font-weight: bold;">${index + 1}. ${item.name}</td>
-                  </tr>
-                  <tr>
-                    <td></td> <!-- Empty cell for alignment -->
-                    <td style="text-align: center;">${item.quantity}</td>
-                    <td style="text-align: center;">${parseFloat(item.rate).toFixed(2)}</td>
-                    <td style="text-align: center;">${item.discount ? ` ${parseFloat(item.discount).toFixed(2)}` : "-"}</td>
-                    <td style="text-align: center;">${parseFloat(item.totalAmount).toFixed(2)}</td>
-                  </tr>
-                `
-              )
-              .join("")}
-            </tbody>
-          </table>
-  
-          <div class="divider"></div>
-  
-          <!-- Totals Section -->
+  const receiptHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Receipt</title>
+      <style>
+        @page {
+          size: 80mm auto;
+          margin: 0;
+        }
+        body {
+          font-family: Arial, sans-serif;
+          padding: 10px;
+          width: 302px;
+          box-sizing: border-box;
+        }
+        .receipt {
+          border: 1px solid #ccc;
+          padding: 10px;
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 10px;
+        }
+        .header img {
+          max-width: 100px;
+          height: auto;
+        }
+        .header h2 {
+          margin: 5px 0;
+          font-size: 16px;
+        }
+        .header p {
+          margin: 2px 0;
+          font-size: 12px;
+        }
+        .divider {
+          border-bottom: 1px dashed #000;
+          margin: 10px 0;
+        }
+        table {
+          width: 100%;
+          font-size: 12px;
+          margin-bottom: 10px;
+          border-collapse: collapse;
+        }
+        table th, table td {
+          text-align: center;
+          padding: 4px;
+          border: none;
+        }
+        .product-name {
+          text-align: left;
+          white-space: normal;
+          word-wrap: break-word;
+        }
+        .summary {
+          margin-top: 10px;
+          font-size: 12px;
+        }
+        .summary div {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 4px;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 10px;
+          font-size: 12px;
+        }
+        .item-header {
+          background-color: #f9f9f9;
+          font-weight: bold;
+        }
+        .item-details td {
+          border-top: none;
+          margin-left: 20px;
+        }
+        .empty-cell {
+          border: none;
+          padding: 0;
+        }
+        .totals-container {
+          margin-top: 20px;
+          text-align: right;
+        }
+        .totals {
+          width: 100%;
+          font-size: 12px;
+          margin-bottom: 10px;
+          border-collapse: collapse;
+        }
+        .totals th,
+        .totals td {
+          text-align: left;
+          padding: 4px;
+          border: none;
+        }
+        .totals .label {
+          font-weight: bold;
+          width: 50%;
+        }
+        .totals .value {
+          text-align: right;
+          width: 50%;
+        }
+        .totals .value strong {
+          font-size: 16px;
+          display: block;
+          margin-bottom: 5px;
+        }
+        .totals .value span {
+          font-size: 12px;
+          display: block;
+          margin-top: 5px;
+        }
+        .qr-code {
+          text-align: center;
+          margin-top: 10px;
+        }
+        .qr-code img {
+          max-width: 100px;
+          height: auto;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="receipt-container">
+        <!-- Header Section -->
+        <div class="header">
+          <img src="${invoiceDataToPrint.company.LogoUrl || 'https://via.placeholder.com/120'}" alt="Company Logo" />
+          <h2>${invoiceDataToPrint.company.Comname || "Store Name"}</h2>
+          <p>${invoiceDataToPrint.company.Location || "Store Address"}</p>
+          <p>Phone: ${invoiceDataToPrint.company.Mobile || "123-456-7890"}</p>
+          <p>Date: ${new Date(invoiceDataToPrint.sales.createdAt).toLocaleString()}</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Invoice Information -->
+        <div class="invoice-details">
+          <div><strong>Invoice #:</strong> ${invoiceDataToPrint.sales.invoiceId}</div>
+          <div><strong>Cashier:</strong> ${invoiceDataToPrint.sales.UserName}</div>
+          <div><strong>Customer ID:</strong> ${invoiceDataToPrint.sales.CustomerId}</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Items Table -->
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Rate</th>
+              <th>Disc</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+          ${invoiceDataToPrint.invoices
+            .map(
+              (item, index) => `
+                <tr>
+                  <td colspan="5" style="text-align: left; font-weight: bold;">${index + 1}. ${item.name}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td style="text-align: center;">${item.quantity}</td>
+                  <td style="text-align: center;">${parseFloat(item.rate).toFixed(2)}</td>
+                  <td style="text-align: center;">${item.discount ? ` ${parseFloat(item.discount).toFixed(2)}` : "-"}</td>
+                  <td style="text-align: center;">${parseFloat(item.totalAmount).toFixed(2)}</td>
+                </tr>
+              `
+            )
+            .join("")}
+          </tbody>
+        </table>
+
+        <div class="divider"></div>
+
+        <!-- Totals Section -->
+        <div class="totals-container">
           <table class="totals">
             <tbody>
               <tr>
                 <td class="label"><strong>Gross Total:</strong></td>
-                <td class="value"> ${parseFloat(invoiceDataToPrint.sales.GrossTotal).toFixed(2)}</td>
+                <td class="value"> ₹ ${parseFloat(invoiceDataToPrint.sales.GrossTotal).toFixed(2)}</td>
               </tr>
               <tr>
                 <td class="label"><strong>Discount:</strong></td>
-                <td class="value">-  ${parseFloat(invoiceDataToPrint.sales.discountAmount).toFixed(2)}</td>
+                <td class="value">- ₹ ${parseFloat(invoiceDataToPrint.sales.discountAmount).toFixed(2)}</td>
               </tr>
               <tr>
                 <td class="label"><strong>Net Amount:</strong></td>
-                <td class="value"> ${parseFloat(invoiceDataToPrint.sales.netAmount).toFixed(2)}</td>
+                <td class="value"> ₹ ${parseFloat(invoiceDataToPrint.sales.netAmount).toFixed(2)}</td>
               </tr>
               <tr>
                 <td class="label"><strong>Payment:</strong></td>
-                <td class="value"> ${(
-        parseFloat(invoiceDataToPrint.sales.CashPay) +
-        parseFloat(invoiceDataToPrint.sales.CardPay)
-      ).toFixed(2)}</td>.0
-
-                
+                <td class="value"> ₹ ${(
+                  parseFloat(invoiceDataToPrint.sales.CashPay) +
+                  parseFloat(invoiceDataToPrint.sales.CardPay)
+                ).toFixed(2)}</td>
               </tr>
               <tr>
                 <td class="label"><strong>Balance:</strong></td>
-                <td class="value">₹ ${parseFloat(invoiceDataToPrint.sales.Balance).toFixed(2)}</td>
+                <td class="value"> ₹ ${parseFloat(invoiceDataToPrint.sales.Balance).toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
-  
-          <div class="divider"></div>
-  
-          <!-- Footer Section -->
-          <div class="footer">
-            <p>Thank you for shopping with us!</p>
-            <p>Visit again!</p>
-          </div>
-  
-          <!-- Cut Line -->
-          <div class="cut-line">
-          </div>
         </div>
-      </body>
-      </html>
-    `;
 
-    // Write the receipt content to the iframe's document
-    const iframeDoc = printIframe.contentDocument || printIframe.contentWindow.document;
-    iframeDoc.open();
-    iframeDoc.write(receiptHTML);
-    iframeDoc.close();
+        <div class="divider"></div>
 
-    // Define a handler that prints and cleans up after the print is done
-    const handlePrint = () => {
-      try {
-        printIframe.contentWindow.focus();
-        printIframe.contentWindow.print();
-      } catch (error) {
-        console.error("Error during printing:", error);
-        Swal.fire("Error", "Failed to print the invoice.", "error");
-      } finally {
-        // Clean up: remove the iframe after printing
-        setTimeout(() => {
-          if (printIframe && printIframe.parentNode) {
-            printIframe.parentNode.removeChild(printIframe);
-            printIframeRef.current = null;
-          }
-          resetAllFields();
-          clearInvoiceTable(); // Clear data from the invoice table in the parent
-          onClose();
-        }, 1000); // Delay to ensure print dialog has been triggered
-      }
-    };
+        <!-- QR Code Section -->
+        <div class="qr-code">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${invoiceDataToPrint.sales.invoiceId}" alt="QR Code" />
+        </div>
 
-    // Attach the onload event only once
-    if (iframeDoc.readyState === "complete") {
-      handlePrint();
-    } else {
-      // Otherwise, wait for the iframe to load and then print
-      printIframe.onload = handlePrint;
+        <!-- Footer Section -->
+        <div class="footer">
+          <p>Thank you for shopping with us!</p>
+          <p>Visit again!</p>
+        </div>
+
+        <!-- Cut Line -->
+        <div class="cut-line">
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  // Write the receipt content to the iframe's document
+  const iframeDoc = printIframe.contentDocument || printIframe.contentWindow.document;
+  iframeDoc.open();
+  iframeDoc.write(receiptHTML);
+  iframeDoc.close();
+
+  // Define a handler that prints and cleans up after the print is done
+  const handlePrint = () => {
+    try {
+      printIframe.contentWindow.focus();
+      printIframe.contentWindow.print();
+    } catch (error) {
+      console.error("Error during printing:", error);
+      Swal.fire("Error", "Failed to print the invoice.", "error");
+    } finally {
+      // Clean up: remove the iframe after printing
+      setTimeout(() => {
+        if (printIframe && printIframe.parentNode) {
+          printIframe.parentNode.removeChild(printIframe);
+          printIframeRef.current = null;
+        }
+        resetAllFields();
+        clearInvoiceTable(); // Clear data from the invoice table in the parent
+        onClose();
+      }, 1000);
     }
   };
+
+  // Attach the onload event only once
+  if (iframeDoc.readyState === "complete") {
+    handlePrint();
+  } else {
+    // Otherwise, wait for the iframe to load and then print
+    printIframe.onload = handlePrint;
+  }
+};
+
+
 
 
   // Determine Balance Style
