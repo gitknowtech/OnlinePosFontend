@@ -297,9 +297,9 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
               <label>Profit Amount</label>
               <input type="number" name="profitAmount" value={formData.profitAmount} readOnly />
             </div>
-            <div className="form-group">
+            <div className="form-group" readOnly>
               <label>Stock Quantity</label>
-              <input type="number" name="stockQuantity" value={formData.stockQuantity} onChange={handleInputChange} />
+              <input type="number" name="stockQuantity" value={formData.stockQuantity} onChange={handleInputChange} readOnly />
             </div>
             <div className="form-group">
               <label>Stock Alert</label>

@@ -146,7 +146,7 @@ export default function InvoiceNew() {
       Swal.fire("No Items", "Please add items to the invoice before printing.", "warning");
       return;
     }
-  
+
     // Prepare the sales data
     const salesData = {
       invoiceId: `INV-${Date.now()}`, // Generate a unique invoice ID
@@ -160,7 +160,7 @@ export default function InvoiceNew() {
       Balance: 0, // Adjust based on payment method
       createdAt: new Date(),
     };
-  
+
     const invoiceDataToPrint = {
       company: companyInfo,
       sales: salesData,
@@ -172,115 +172,162 @@ export default function InvoiceNew() {
         totalAmount,
       },
     };
-  
+
     const receiptHTML = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Receipt</title>
-        <style>
-          @page {
-            size: 80mm auto; /* Set paper size to 80mm width */
-            margin: 0;
-          }
-          body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-            width: 302px; /* 80mm width in pixels at 96 DPI */
-            box-sizing: border-box;
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 10px;
-          }
-          .header img {
-            max-width: 100px;
-            height: auto;
-          }
-          .divider {
-            border-bottom: 1px dashed #000;
-            margin: 10px 0;
-          }
-          table {
-            width: 100%;
-            font-size: 12px;
-            margin-bottom: 10px;
-            border-collapse: collapse;
-          }
-          table th, table td {
-            text-align: center;
-            padding: 4px;
-          }
-          .summary {
-            margin-top: 10px;
-            font-size: 12px;
-          }
-          .summary div {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
-          }
-          .footer {
-            text-align: center;
-            margin-top: 10px;
-            font-size: 12px;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <img src="${invoiceDataToPrint.company.LogoUrl || 'https://via.placeholder.com/100'}" alt="Logo" />
-          <h2>${invoiceDataToPrint.company.Comname || 'Store Name'}</h2>
-          <p>${invoiceDataToPrint.company.Location || 'Store Address'}</p>
-          <p>Phone: ${invoiceDataToPrint.company.Mobile || 'N/A'}</p>
-          <p>Date: ${new Date(invoiceDataToPrint.sales.createdAt).toLocaleString()}</p>
-        </div>
-        <div class="divider"></div>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Description</th>
-              <th>Qty</th>
-              <th>Rate</th>
-              <th>Disc</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${invoiceDataToPrint.invoices
-              .map((item, index) => `
-                <tr>
-                  <td>${index + 1}</td>
-                  <td>${item.name}</td>
-                  <td>${item.quantity}</td>
-                  <td>₹${parseFloat(item.rate).toFixed(2)}</td>
-                  <td>₹${item.discount || '0.00'}</td>
-                  <td>₹${parseFloat(item.amount).toFixed(2)}</td>
-                </tr>
-              `)
-              .join('')}
-          </tbody>
-        </table>
-        <div class="divider"></div>
-        <div class="summary">
-          <div><strong>Items:</strong> <span>${invoiceDataToPrint.summary.itemCount} Item(s)</span></div>
-          <div><strong>Total Quantity:</strong> <span>${invoiceDataToPrint.summary.totalQuantity}</span></div>
-          <div><strong>Discount:</strong> <span>₹ ${parseFloat(invoiceDataToPrint.summary.totalDiscount).toFixed(2)}</span></div>
-          <div><strong>Total Amount:</strong> <span>₹ ${parseFloat(invoiceDataToPrint.summary.totalAmount).toFixed(2)}</span></div>
-        </div>
-        <div class="divider"></div>
-        <p class="footer">Thank you for shopping with us!</p>
-      </body>
-      </html>
-    `;
-  
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Receipt</title>
+    <style>
+      @page {
+        size: 80mm auto; /* Set paper size to 80mm width */
+        margin: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        padding: 10px;
+        width: 302px; /* 80mm width in pixels at 96 DPI */
+        box-sizing: border-box;
+      }
+      /* Wrapper for the entire receipt with a light border */
+      .receipt {
+        border: 1px solid #ccc; /* Light gray border around the receipt */
+        padding: 10px; /* Optional padding inside the receipt */
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .header img {
+        max-width: 100px;
+        height: auto;
+      }
+      .header h2 {
+        margin: 5px 0;
+        font-size: 16px;
+      }
+      .header p {
+        margin: 2px 0;
+        font-size: 12px;
+      }
+      .divider {
+        border-bottom: 1px dashed #000;
+        margin: 10px 0;
+      }
+      table {
+        width: 100%;
+        font-size: 12px;
+        margin-bottom: 10px;
+        border-collapse: collapse;
+      }
+      table th, table td {
+        text-align: center;
+        padding: 4px;
+        border: none; /* Remove borders from cells */
+      }
+      /* Specific class to left-align Product Name */
+      .product-name {
+        text-align: left;
+        white-space: normal; /* Allows text to wrap */
+        word-wrap: break-word; /* Breaks long words if necessary */
+      }
+      .summary {
+        margin-top: 10px;
+        font-size: 12px;
+      }
+      .summary div {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+      /* Styling for the first row of each item */
+      .item-header {
+        background-color: #f9f9f9;
+        font-weight: bold;
+      }
+      /* Remove top border for the second row to merge seamlessly */
+      .item-details td {
+        border-top: none;
+        margin-left:  20px;
+      }
+      /* Hide empty cells */
+      .empty-cell {
+        border: none;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="receipt">
+      <div class="header">
+        <img src="${invoiceDataToPrint.company.LogoUrl || 'https://via.placeholder.com/100'}" alt="Logo" />
+        <h2>${invoiceDataToPrint.company.Comname || 'Store Name'}</h2>
+        <p>${invoiceDataToPrint.company.Location || 'Store Address'}</p>
+        <p>Phone: ${invoiceDataToPrint.company.Mobile || 'N/A'}</p>
+        <p>Date: ${new Date(invoiceDataToPrint.sales.createdAt).toLocaleString()}</p>
+      </div>
+      <div class="divider"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Disc</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${invoiceDataToPrint.invoices
+        .map((item, index) => `
+              <!-- First Row: Index and Product Name -->
+              <tr class="item-header">
+                <td>${index + 1}</td>
+                <td class="product-name" colspan="5">${item.name || 'N/A'}</td>
+              </tr>
+              <!-- Second Row: Quantity, Rate, Discount, and Amount -->
+              <tr class="item-details">
+                <td class="empty-cell"></td>
+                <td class="empty-cell"></td>
+                <td>${item.quantity}</td>
+                <td>${parseFloat(item.rate).toFixed(2)}</td>
+                <td>${item.discount ? parseFloat(item.discount).toFixed(2) : '0.00'}</td>
+                <td>${parseFloat(item.amount).toFixed(2)}</td>
+              </tr>
+            `)
+        .join('')}
+        </tbody>
+      </table>
+      <div class="divider"></div>
+      <div class="summary">
+        <div><strong>Items:</strong> <span>${invoiceDataToPrint.summary.itemCount} Item(s)</span></div>
+        <div><strong>Total Quantity:</strong> <span>${invoiceDataToPrint.summary.totalQuantity}</span></div>
+        <div><strong>Discount:</strong> <span>${parseFloat(invoiceDataToPrint.summary.totalDiscount).toFixed(2)}</span></div>
+        <div><strong>Total Amount:</strong> <span>${parseFloat(invoiceDataToPrint.summary.totalAmount).toFixed(2)}</span></div>
+      </div>
+      <div class="footer">
+        Thank you for your purchase!
+      </div>
+    </div>
+  </body>
+  </html>
+`;
+
+
+
+
     // Open the print window
     const printWindow = window.open("", "_blank", "width=302,height=auto,scrollbars=no");
     printWindow.document.open();
     printWindow.document.write(receiptHTML);
     printWindow.document.close();
-  
+
     // Clear the invoice table after printing
     const clearInvoice = () => {
       setTableData([]);
@@ -288,26 +335,26 @@ export default function InvoiceNew() {
       setTotalQuantity(0);
       setTotalDiscount("0.00");
       setItemCount(0);
-  
+
       Swal.fire("Invoice Cleared", "The invoice table has been cleared successfully.", "success");
     };
-  
+
     // Attach an event listener to detect when the print dialog is closed
     printWindow.onafterprint = () => {
       clearInvoice(); // Clear the table data
       printWindow.close(); // Close the print window
     };
-  
+
     // Automatically trigger the print dialog
     printWindow.onload = () => {
       printWindow.focus();
       printWindow.print();
     };
   };
-  
-  
-  
-  
+
+
+
+
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);
@@ -681,15 +728,15 @@ export default function InvoiceNew() {
                     item.type === "return"
                       ? "return-row"
                       : item.type === "new"
-                      ? "new-row"
-                      : ""
+                        ? "new-row"
+                        : ""
                   }
                   style={
                     item.type === "return"
                       ? { backgroundColor: "#fcd8d8" } // Light red for return
                       : item.type === "new"
-                      ? { backgroundColor: "#d8fcdb" } // Light green for new items
-                      : {}
+                        ? { backgroundColor: "#d8fcdb" } // Light green for new items
+                        : {}
                   }
                 >
                   <td>{item.productId}</td> {/* Render Product ID */}

@@ -304,17 +304,17 @@ export default function PaymentModel({
     }
   };
 
-  
-  
+
+
   // Handle Print Invoice via iframe
   const handlePrintInvoice = (invoiceDataToPrint) => {
     if (!invoiceDataToPrint) {
       Swal.fire("Error", "Invoice data is not available for printing.", "error");
       return;
     }
-  
+
     console.log("Printing Invoice:", invoiceDataToPrint);
-  
+
     // Create a hidden iframe for printing
     let printIframe = printIframeRef.current;
     if (!printIframe) {
@@ -326,14 +326,95 @@ export default function PaymentModel({
       printIframe.style.border = "none";
       document.body.appendChild(printIframe);
     }
-  
+
     const receiptHTML = `
       <!DOCTYPE html>
       <html>
       <head>
         <title>Receipt</title>
         <style>
-          /* [Include the updated CSS from above] */
+          <style>
+      @page {
+        size: 80mm auto; /* Set paper size to 80mm width */
+        margin: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        padding: 10px;
+        width: 302px; /* 80mm width in pixels at 96 DPI */
+        box-sizing: border-box;
+      }
+      /* Wrapper for the entire receipt with a light border */
+      .receipt {
+        border: 1px solid #ccc; /* Light gray border around the receipt */
+        padding: 10px; /* Optional padding inside the receipt */
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .header img {
+        max-width: 100px;
+        height: auto;
+      }
+      .header h2 {
+        margin: 5px 0;
+        font-size: 16px;
+      }
+      .header p {
+        margin: 2px 0;
+        font-size: 12px;
+      }
+      .divider {
+        border-bottom: 1px dashed #000;
+        margin: 10px 0;
+      }
+      table {
+        width: 100%;
+        font-size: 12px;
+        margin-bottom: 10px;
+        border-collapse: collapse;
+      }
+      table th, table td {
+        text-align: center;
+        padding: 4px;
+        border: none; /* Remove borders from cells */
+      }
+      /* Specific class to left-align Product Name */
+      .product-name {
+        text-align: left;
+        white-space: normal; /* Allows text to wrap */
+        word-wrap: break-word; /* Breaks long words if necessary */
+      }
+      .summary {
+        margin-top: 10px;
+        font-size: 12px;
+      }
+      .summary div {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+      /* Styling for the first row of each item */
+      .item-header {
+        background-color: #f9f9f9;
+        font-weight: bold;
+      }
+      /* Remove top border for the second row to merge seamlessly */
+      .item-details td {
+        border-top: none;
+        margin-left:  20px;
+      }
+      /* Hide empty cells */
+      .empty-cell {
+        border: none;
+        padding: 0;
+      }
         </style>
       </head>
       <body>
@@ -370,19 +451,22 @@ export default function PaymentModel({
               </tr>
             </thead>
             <tbody>
-              ${invoiceDataToPrint.invoices
-                .map(
-                  (item, index) => `
-                <tr>
-                  <td>${index + 1}. ${item.name}</td>
-                  <td>${item.quantity}</td>
-                  <td>₹ ${parseFloat(item.rate).toFixed(2)}</td>
-                  <td>${item.discount ? `₹ ${parseFloat(item.discount).toFixed(2)}` : "-"}</td>
-                  <td>₹ ${parseFloat(item.amount).toFixed(2)}</td>
-                </tr>
-              `
-                )
-                .join("")}
+            ${invoiceDataToPrint.invoices
+              .map(
+                (item, index) => `
+                  <tr>
+                    <td colspan="5" style="text-align: left; font-weight: bold;">${index + 1}. ${item.name}</td>
+                  </tr>
+                  <tr>
+                    <td></td> <!-- Empty cell for alignment -->
+                    <td style="text-align: center;">${item.quantity}</td>
+                    <td style="text-align: center;">${parseFloat(item.rate).toFixed(2)}</td>
+                    <td style="text-align: center;">${item.discount ? ` ${parseFloat(item.discount).toFixed(2)}` : "-"}</td>
+                    <td style="text-align: center;">${parseFloat(item.totalAmount).toFixed(2)}</td>
+                  </tr>
+                `
+              )
+              .join("")}
             </tbody>
           </table>
   
@@ -393,22 +477,22 @@ export default function PaymentModel({
             <tbody>
               <tr>
                 <td class="label"><strong>Gross Total:</strong></td>
-                <td class="value">₹ ${parseFloat(invoiceDataToPrint.sales.GrossTotal).toFixed(2)}</td>
+                <td class="value"> ${parseFloat(invoiceDataToPrint.sales.GrossTotal).toFixed(2)}</td>
               </tr>
               <tr>
                 <td class="label"><strong>Discount:</strong></td>
-                <td class="value">- ₹ ${parseFloat(invoiceDataToPrint.sales.discountAmount).toFixed(2)}</td>
+                <td class="value">-  ${parseFloat(invoiceDataToPrint.sales.discountAmount).toFixed(2)}</td>
               </tr>
               <tr>
                 <td class="label"><strong>Net Amount:</strong></td>
-                <td class="value">₹ ${parseFloat(invoiceDataToPrint.sales.netAmount).toFixed(2)}</td>
+                <td class="value"> ${parseFloat(invoiceDataToPrint.sales.netAmount).toFixed(2)}</td>
               </tr>
               <tr>
                 <td class="label"><strong>Payment:</strong></td>
-                <td class="value">₹ ${(
-                  parseFloat(invoiceDataToPrint.sales.CashPay) +
-                  parseFloat(invoiceDataToPrint.sales.CardPay)
-                ).toFixed(2)}</td>.0
+                <td class="value"> ${(
+        parseFloat(invoiceDataToPrint.sales.CashPay) +
+        parseFloat(invoiceDataToPrint.sales.CardPay)
+      ).toFixed(2)}</td>.0
 
                 
               </tr>
@@ -429,21 +513,18 @@ export default function PaymentModel({
   
           <!-- Cut Line -->
           <div class="cut-line">
-            ---------------------------------------------
-            <br/>CUT HERE
-            ---------------------------------------------
           </div>
         </div>
       </body>
       </html>
     `;
-  
+
     // Write the receipt content to the iframe's document
     const iframeDoc = printIframe.contentDocument || printIframe.contentWindow.document;
     iframeDoc.open();
     iframeDoc.write(receiptHTML);
     iframeDoc.close();
-  
+
     // Define a handler that prints and cleans up after the print is done
     const handlePrint = () => {
       try {
@@ -465,7 +546,7 @@ export default function PaymentModel({
         }, 1000); // Delay to ensure print dialog has been triggered
       }
     };
-  
+
     // Attach the onload event only once
     if (iframeDoc.readyState === "complete") {
       handlePrint();
@@ -474,7 +555,7 @@ export default function PaymentModel({
       printIframe.onload = handlePrint;
     }
   };
-  
+
 
   // Determine Balance Style
   const getBalanceStyle = () => {
