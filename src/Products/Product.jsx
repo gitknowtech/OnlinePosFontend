@@ -50,6 +50,7 @@ const Product = () => {
           "ManageUnit",
           "ManageCategory",
           "RemovedProducts",
+          "ManageStore"
         ];
 
         // Fetch access rights for each section

@@ -1,8 +1,8 @@
 {
   "name": "possystem-v1",
-  "homePage": "./",
+  "homePage": "https://DanagaPaints.gitknows.com/CompanySetup",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

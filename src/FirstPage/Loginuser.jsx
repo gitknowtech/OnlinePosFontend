@@ -4,6 +4,9 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import "../css/CompanySetup.css";
 
+
+import posmainimage from "../assets/images/posimage.png";
+
 const UserLogin = () => {
   const [loginData, setLoginData] = useState({
     UserName: "",
@@ -84,7 +87,7 @@ const UserLogin = () => {
   return (
     <div className="container">
       <div className="left-side">
-        <img src="../src/assets/images/posimage.png" alt="POS Logo" className="logo" />
+        <img src={posmainimage} alt="POS Logo" className="logo" />
         <h1 className="pos-title">POS (Point Of Sale System)</h1>
         <h2 className="pos-version">V-1.0</h2>
       </div>
