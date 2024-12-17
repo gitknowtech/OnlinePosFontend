@@ -32,7 +32,7 @@ const StockOutCharts = () => {
         return;
       }
       try {
-        const response = await axios.get('http://localhost:5000/api/products/search_stock_out_chart', {
+        const response = await axios.get('http://154.26.129.243:5000/api/products/search_stock_out_chart', {
           params: { query },
         });
         setSuggestions(response.data);
@@ -61,13 +61,13 @@ const StockOutCharts = () => {
     try {
       // Fetch opening balance using productId
       const balanceResponse = await axios.get(
-        `http://localhost:5000/api/products/product/${product.productId}/opening-balance`
+        `http://154.26.129.243:5000/api/products/product/${product.productId}/opening-balance`
       );
       setOpeningBalance(balanceResponse.data);
 
       // Fetch stock out data using productId and date range
       const stockOutResponse = await axios.get(
-        `http://localhost:5000/api/products/product/${product.productId}/stock-out-get-chart`,
+        `http://154.26.129.243:5000/api/products/product/${product.productId}/stock-out-get-chart`,
         {
           params: {
             startDate: startDate || undefined, // Only include if set

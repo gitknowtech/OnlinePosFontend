@@ -30,7 +30,7 @@ const StockQuantityMovement = () => {
         return;
       }
       try {
-        const response = await axios.get('http://localhost:5000/api/products/search_stock_in_quanity_chart', {
+        const response = await axios.get('http://154.26.129.243:5000/api/products/search_stock_in_quanity_chart', {
           params: { query },
         });
         setSuggestions(response.data);
@@ -60,13 +60,13 @@ const StockQuantityMovement = () => {
     try {
       // Fetch opening balance using productId
       const balanceResponse = await axios.get(
-        `http://localhost:5000/api/products/product/${product.productId}/opening-balance`
+        `http://154.26.129.243:5000/api/products/product/${product.productId}/opening-balance`
       );
       setOpeningBalance(balanceResponse.data);
 
       // Fetch stock in data using productId and date range
       const stockInResponse = await axios.get(
-        `http://localhost:5000/api/products/product/${product.productId}/stock-in-get-chart`,
+        `http://154.26.129.243:5000/api/products/product/${product.productId}/stock-in-get-chart`,
         {
           params: {
             startDate: startDate || undefined, // Only include if set
@@ -77,7 +77,7 @@ const StockQuantityMovement = () => {
 
       // Fetch stock out data using productId and date range
       const stockOutResponse = await axios.get(
-        `http://localhost:5000/api/products/product/${product.productId}/stock-out-get-chart`,
+        `http://154.26.129.243:5000/api/products/product/${product.productId}/stock-out-get-chart`,
         {
           params: {
             startDate: startDate || undefined,

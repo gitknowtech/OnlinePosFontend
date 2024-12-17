@@ -15,7 +15,7 @@ export default function ExpensesModel({ show, onClose, user, store, onAdd }) {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/expenses/addExpenses', {
+      await axios.post('http://154.26.129.243:5000/api/expenses/addExpenses', {
         user,
         store,
         amount,

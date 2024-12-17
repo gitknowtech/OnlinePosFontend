@@ -14,7 +14,7 @@ export default function SupplierStockModel({ supName, onClose }) {
   useEffect(() => {
     const fetchSupplierProducts = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/products/get_supplier_products/${encodeURIComponent(supName)}`);
+        const response = await axios.get(`http://154.26.129.243:5000/api/products/get_supplier_products/${encodeURIComponent(supName)}`);
         setProducts(response.data);
         setFilteredProducts(response.data);
       } catch (error) {

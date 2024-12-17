@@ -23,7 +23,7 @@ export default function ManageProducts({ store }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products/fetch_products', {
+        const response = await axios.get('http://154.26.129.243:5000/api/products/fetch_products', {
           params: {
             store, // Pass the store prop here
             status: null, // Optional: Add other filters if needed
@@ -56,7 +56,7 @@ export default function ManageProducts({ store }) {
   const handleUpdate = async (updatedProduct) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/products/update_product/${updatedProduct.productId}`,
+        `http://154.26.129.243:5000/api/products/update_product/${updatedProduct.productId}`,
         updatedProduct
       );
       if (response.status === 200) {
@@ -87,7 +87,7 @@ export default function ManageProducts({ store }) {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/products/update_status/${productId}`,
+        `http://154.26.129.243:5000/api/products/update_status/${productId}`,
         {
           status: newStatus,
         }
@@ -194,7 +194,7 @@ export default function ManageProducts({ store }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            `http://localhost:5000/api/products/delete_product/${productId}`
+            `http://154.26.129.243:5000/api/products/delete_product/${productId}`
           );
           if (response.status === 200) {
             setProducts(

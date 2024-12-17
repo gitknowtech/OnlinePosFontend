@@ -54,7 +54,7 @@ const AddLoanModal = ({ supplier, onClose }) => {
     }
   
     try {
-      const response = await fetch("http://localhost:5000/api/suppliers/add_loan", {
+      const response = await fetch("http://154.26.129.243:5000/api/suppliers/add_loan", {
         method: "POST",
         body: formData,
       });

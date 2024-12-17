@@ -55,7 +55,7 @@ export default function AddProducts({ UserName, store }) {
     const fetchSuppliers = async () => {
       try {
         const supplierResponse = await axios.get(
-          "http://localhost:5000/api/suppliers/get_suppliers"
+          "http://154.26.129.243:5000/api/suppliers/get_suppliers"
         );
         console.log("Suppliers data:", supplierResponse.data); // Log fetched data
         setSupplierList(supplierResponse.data);
@@ -72,7 +72,7 @@ export default function AddProducts({ UserName, store }) {
     const fetchBatches = async () => {
       try {
         const batchresponse = await axios.get(
-          "http://localhost:5000/api/batches/get_batches"
+          "http://154.26.129.243:5000/api/batches/get_batches"
         );
         console.log("Batch data:", batchresponse.data); // log fetched data
         setBatchList(batchresponse.data);
@@ -89,7 +89,7 @@ export default function AddProducts({ UserName, store }) {
     const fetchCategories = async () => {
       try {
         const categoryResponse = await axios.get(
-          "http://localhost:5000/api/categories/get_categories"
+          "http://154.26.129.243:5000/api/categories/get_categories"
         );
         console.log("Categories data:", categoryResponse.data); // Log fetched data
         setCategoryList(categoryResponse.data);
@@ -106,7 +106,7 @@ export default function AddProducts({ UserName, store }) {
     const fetchUnits = async () => {
       try {
         const unitResponse = await axios.get(
-          "http://localhost:5000/api/units/get_units"
+          "http://154.26.129.243:5000/api/units/get_units"
         );
         console.log("Units data:", unitResponse.data); // Log fetched data
         setUnitList(unitResponse.data);
@@ -344,7 +344,7 @@ export default function AddProducts({ UserName, store }) {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/products/check_product_id/${productId}`
+        `http://154.26.129.243:5000/api/products/check_product_id/${productId}`
       );
 
       if (response.data.exists) {
@@ -424,7 +424,7 @@ export default function AddProducts({ UserName, store }) {
   
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/products/create_product",
+        "http://154.26.129.243:5000/api/products/create_product",
         productData
       );
       if (response.status === 201) {

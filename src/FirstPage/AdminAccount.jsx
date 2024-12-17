@@ -101,7 +101,7 @@ const AdminAccount = () => {
       }
 
       // Check for duplicate email or username by making a GET request
-      const checkResponse = await axios.get("http://localhost:5000/check-duplicate", {
+      const checkResponse = await axios.get("http://154.26.129.243:5000/check-duplicate", {
         params: { Email: adminData.Email, UserName: adminData.UserName },
       });
 
@@ -136,7 +136,7 @@ const AdminAccount = () => {
       formData.append("Image", selectedImage); // Append the image file
 
       // Make a POST request to the backend to save the data
-      const response = await axios.post("http://localhost:5000/create-admin", formData, {
+      const response = await axios.post("http://154.26.129.243:5000/create-admin", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

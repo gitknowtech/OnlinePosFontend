@@ -54,7 +54,7 @@ const UserLogin = () => {
       }
 
       // Make a POST request to the backend for login
-      const response = await axios.post("http://localhost:5000/login", loginData);
+      const response = await axios.post("http://154.26.129.243:5000/login", loginData);
 
       if (response.status === 200 && response.data.success) {
         // Destructure the additional data (Username, Image, Type, Store) from the response

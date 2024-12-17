@@ -22,7 +22,7 @@ export default function ManageSupplier({ store }) {
     const fetchSuppliers = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/suppliers/get_suppliers_removed"
+          "http://154.26.129.243:5000/api/suppliers/get_suppliers_removed"
         );
         setSuppliers(response.data);
       } catch (error) {
@@ -41,7 +41,7 @@ export default function ManageSupplier({ store }) {
   const handleViewBankDetails = async (supId) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/suppliers/get_supplier_bank_details_removed/${supId}`
+        `http://154.26.129.243:5000/api/suppliers/get_supplier_bank_details_removed/${supId}`
       );
       setBankDetails(response.data); // Store bank details in state
       setModalIsOpen(true); // Open modal
@@ -73,7 +73,7 @@ export default function ManageSupplier({ store }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            `http://localhost:5000/api/suppliers/delete_supplier_removed/${supId}`
+            `http://154.26.129.243:5000/api/suppliers/delete_supplier_removed/${supId}`
           );
           if (response.status === 200) {
             // Remove the deleted supplier from the state to update the UI

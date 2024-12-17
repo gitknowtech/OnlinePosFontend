@@ -49,7 +49,7 @@ const CreditSales = ({ store }) => {
   const fetchSales = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/invoices/fetch_sales_new",
+        "http://154.26.129.243:5000/api/invoices/fetch_sales_new",
         {
           params: { Store: store },
         }
@@ -67,7 +67,7 @@ const CreditSales = ({ store }) => {
   // Fetch company information from backend
   const fetchCompanyInfo = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/companies/info");
+      const response = await axios.get("http://154.26.129.243:5000/api/companies/info");
       setCompanyInfo(response.data);
       setCompanyLoading(false);
     } catch (err) {
@@ -81,7 +81,7 @@ const CreditSales = ({ store }) => {
   // Fetch customers from backend
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/customer/fetch_customers", {
+      const response = await axios.get("http://154.26.129.243:5000/api/customer/fetch_customers", {
         params: { Store: store },
       });
       setCustomers(response.data);
@@ -296,7 +296,7 @@ const CreditSales = ({ store }) => {
       }
 
       const response = await axios.put(
-        `http://localhost:5000/api/customer/update_sale/${invoiceId}`,
+        `http://154.26.129.243:5000/api/customer/update_sale/${invoiceId}`,
         {
           CashPay: parseFloat(CashPay) || 0,
           CardPay: parseFloat(CardPay) || 0,
@@ -704,7 +704,7 @@ const CreditSales = ({ store }) => {
     try {
       setSelectedInvoiceId(invoiceId);
       const response = await axios.get(
-        `http://localhost:5000/api/customer/payment_history/${invoiceId}`
+        `http://154.26.129.243:5000/api/customer/payment_history/${invoiceId}`
       );
       setPaymentHistory(response.data);
       setShowHistoryModal(true);
@@ -740,7 +740,7 @@ const CreditSales = ({ store }) => {
 
       if (confirmResult.isConfirmed) {
         const response = await axios.delete(
-          `http://localhost:5000/api/customer/delete_payment/${paymentId}`
+          `http://154.26.129.243:5000/api/customer/delete_payment/${paymentId}`
         );
 
         if (response.status === 200) {

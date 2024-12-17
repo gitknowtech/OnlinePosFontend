@@ -29,7 +29,7 @@ const SalesTable = ({ store }) => {
       try {
         console.log("API Request Parameters:", { Store: store });
         const response = await axios.get(
-          "http://localhost:5000/api/invoices/fetch_sales",
+          "http://154.26.129.243:5000/api/invoices/fetch_sales",
           {
             params: { Store: store },
           }
@@ -99,7 +99,7 @@ const SalesTable = ({ store }) => {
 
       // Step 1: Check if the invoice is linked in customer_loan_payment
       const loanResponse = await axios.get(
-        `http://localhost:5000/api/invoices/check_invoice/${invoiceId}`
+        `http://154.26.129.243:5000/api/invoices/check_invoice/${invoiceId}`
       );
 
       console.log('Loan response data:', loanResponse.data);
@@ -128,7 +128,7 @@ const SalesTable = ({ store }) => {
       if (confirmDelete.isConfirmed) {
         // Step 3: Proceed with deletion
         await axios.delete(
-          `http://localhost:5000/api/invoices/delete_invoice/${invoiceId}`
+          `http://154.26.129.243:5000/api/invoices/delete_invoice/${invoiceId}`
         );
 
         // Remove the deleted sale from the state

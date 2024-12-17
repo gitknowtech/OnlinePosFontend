@@ -17,7 +17,7 @@ const InvoicesTable = ({ store }) => {
     const fetchInvoices = async () => {
       try {
         console.log("API Request Parameters:", { Store: store });
-        const response = await axios.get("http://localhost:5000/api/invoices/fetch_invoices", {
+        const response = await axios.get("http://154.26.129.243:5000/api/invoices/fetch_invoices", {
           params: { Store: store },
         });
         console.log("Fetched invoices:", response.data);

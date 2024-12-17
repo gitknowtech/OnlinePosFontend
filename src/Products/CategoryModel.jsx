@@ -18,7 +18,7 @@ export default function CategoryModel({ UserName, store }) {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/categories/get_categories"
+          "http://154.26.129.243:5000/api/categories/get_categories"
         );
         setCategories(response.data);
       } catch (err) {
@@ -59,7 +59,7 @@ export default function CategoryModel({ UserName, store }) {
       const now = new Date();
       const saveTime = now.toISOString().slice(0, 10); // Extracting date in YYYY-MM-DD format
       const response = await axios.post(
-        "http://localhost:5000/api/categories/create_categories",
+        "http://154.26.129.243:5000/api/categories/create_categories",
         {
           catName: categoryName,
           user: UserName,
@@ -100,7 +100,7 @@ export default function CategoryModel({ UserName, store }) {
   const handleUpdateClick = async (categoryId) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/categories/update_category/${categoryId}`,
+        `http://154.26.129.243:5000/api/categories/update_category/${categoryId}`,
         { catName: editedCategoryName }
       );
 
@@ -139,7 +139,7 @@ export default function CategoryModel({ UserName, store }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            "http://localhost:5000/api/categories/delete_category",
+            "http://154.26.129.243:5000/api/categories/delete_category",
             { data: { catName } }
           );
   

@@ -19,8 +19,8 @@ export default function PurchasingDetails() {
   const [documentLink, setDocumentLink] = useState(""); // New state variable for document link
 
   // Base URL for the backend
-  const BASE_URL = "http://localhost:5000/api/purchases";
-  const BACKEND_URL = "http://localhost:5000"; // Base URL of the backend server
+  const BASE_URL = "http://154.26.129.243:5000/api/purchases";
+  const BACKEND_URL = "http://154.26.129.243:5000"; // Base URL of the backend server
 
   // Handle search
   const handleSearch = async () => {

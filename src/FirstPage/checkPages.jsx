@@ -11,7 +11,7 @@ const CheckPages = () => {
     const checkTables = async () => {
       try {
         // Step 1: Check the companies table
-        const companiesResponse = await axios.get('http://localhost:5000/api/companies/check-companies');
+        const companiesResponse = await axios.get('http://154.26.129.243:5000/api/companies/check-companies');
         const { hasData: hasCompanies } = companiesResponse.data;
 
         if (!hasCompanies) {
@@ -19,7 +19,7 @@ const CheckPages = () => {
           navigate('/company-setup');
         } else {
           // Step 2: If companies table has data, check the users table
-          const usersResponse = await axios.get('http://localhost:5000/check-users');
+          const usersResponse = await axios.get('http://154.26.129.243:5000/check-users');
           const { hasData: hasUsers } = usersResponse.data;
 
           if (hasUsers) {

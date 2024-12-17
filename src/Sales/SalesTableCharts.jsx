@@ -25,7 +25,7 @@ const SalesTableChart = ({ store }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get("http://localhost:5000/api/invoices/fetch_sales_chart_table", {
+        const response = await axios.get("http://154.26.129.243:5000/api/invoices/fetch_sales_chart_table", {
           params: { Store: store, startDate, endDate },
         });
         setSalesData(response.data);

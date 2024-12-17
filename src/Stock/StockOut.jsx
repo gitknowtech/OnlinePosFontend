@@ -25,7 +25,7 @@ export default function StockOut({ store }) {
     useEffect(() => {
         const fetchLast50Records = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/stock/get_last_50_stockout_records");
+                const response = await axios.get("http://154.26.129.243:5000/api/stock/get_last_50_stockout_records");
                 setLast50Records(response.data);
             } catch (err) {
                 console.error("Error fetching last 50 records:", err);
@@ -37,7 +37,7 @@ export default function StockOut({ store }) {
     // Function to fetch product details by search query
     const handleFetchProductDetails = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/stock/fetch_products_barcode", {
+            const response = await axios.get("http://154.26.129.243:5000/api/stock/fetch_products_barcode", {
                 params: {
                     searchTerm: searchQuery,
                     store: store,
@@ -54,7 +54,7 @@ export default function StockOut({ store }) {
                     stockQuantity: product.stockQuantity || "N/A",
                 });
 
-                const relatedRecordsResponse = await axios.get("http://localhost:5000/api/stock/get_last_50_records_by_product_out", {
+                const relatedRecordsResponse = await axios.get("http://154.26.129.243:5000/api/stock/get_last_50_records_by_product_out", {
                     params: { productId: product.productId },
                 });
                 setLast50Records(relatedRecordsResponse.data.records);
@@ -137,7 +137,7 @@ export default function StockOut({ store }) {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/stock/update_stock_out", {
+            const response = await axios.post("http://154.26.129.243:5000/api/stock/update_stock_out", {
                 productId,
                 productName,
                 barcode,
@@ -171,7 +171,7 @@ export default function StockOut({ store }) {
         }
 
         try {
-            const response = await axios.get("http://localhost:5000/api/stock/fetch_products", {
+            const response = await axios.get("http://154.26.129.243:5000/api/stock/fetch_products", {
                 params: {
                     searchTerm: query,
                     store: store,

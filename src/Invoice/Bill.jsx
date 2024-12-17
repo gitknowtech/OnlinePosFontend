@@ -10,7 +10,7 @@ const Bill = ({ invoiceId, onDataLoaded }) => {
     const fetchInvoiceData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/invoices/fetchInvoiceData?invoiceId=${invoiceId}`
+          `http://154.26.129.243:5000/api/invoices/fetchInvoiceData?invoiceId=${invoiceId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch invoice data");

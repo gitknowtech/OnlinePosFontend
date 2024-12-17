@@ -15,7 +15,7 @@ export default function StockCategory() {
     const [searchTerm, setSearchTerm] = useState(""); // Define searchTerm state
     const [isLoading, setIsLoading] = useState(false); // Loading state
 
-    const apiBaseUrl = "http://localhost:5000"; // Define API base URL
+    const apiBaseUrl = "http://154.26.129.243:5000"; // Define API base URL
 
     useEffect(() => {
         fetchCategories(); // Load categories for dropdown on mount
