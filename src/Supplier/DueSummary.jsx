@@ -32,7 +32,7 @@ export default function DueSummary() {
     try {
       let response;
       if (invoiceId) {
-        response = await axios.get(`http://154.26.129.243:5000/api/purchases/get_purchase/${invoiceId}`);
+        response = await axios.get(`http://localhost:5000/api/purchases/get_purchase/${invoiceId}`);
         const data = response.data;
 
         if (!data || !data.summary) {
@@ -46,7 +46,7 @@ export default function DueSummary() {
 
         setSummaries([summary]);
       } else {
-        response = await axios.get(`http://154.26.129.243:5000/api/purchases/get_purchase_summaries`);
+        response = await axios.get(`http://localhost:5000/api/purchases/get_purchase_summaries`);
         const data = response.data;
 
         if (!data || data.length === 0) {
@@ -111,7 +111,7 @@ export default function DueSummary() {
       };
 
       const response = await axios.put(
-        `http://154.26.129.243:5000/api/purchases/update_payment/${paymentGeneratedId}`,
+        `http://localhost:5000/api/purchases/update_payment/${paymentGeneratedId}`,
         updateData
       );
 
@@ -141,7 +141,7 @@ export default function DueSummary() {
       if (!confirm.isConfirmed) return;
   
       const response = await axios.delete(
-        `http://154.26.129.243:5000/api/purchases/delete_whole_data/${generatedId}`
+        `http://localhost:5000/api/purchases/delete_whole_data/${generatedId}`
       );
   
       if (response.status === 200) {
@@ -168,7 +168,7 @@ export default function DueSummary() {
   const handleHistory = async (generatedId) => {
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/purchases/get_payment_history/${generatedId}`
+        `http://localhost:5000/api/purchases/get_payment_history/${generatedId}`
       );
       setPaymentHistory(response.data || []);
       setShowHistoryModal(true);
@@ -193,7 +193,7 @@ export default function DueSummary() {
       if (!confirm.isConfirmed) return;
   
       const response = await axios.delete(
-        `http://154.26.129.243:5000/api/purchases/delete_payment/${historyId}`,
+        `http://localhost:5000/api/purchases/delete_payment/${historyId}`,
         {
           data: { payment }, // Pass `payment` in the request body
         }

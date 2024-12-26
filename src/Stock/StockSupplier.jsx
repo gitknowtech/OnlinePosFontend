@@ -16,7 +16,7 @@ export default function StockSupplier() {
     // Fetch suppliers based on search input
     const fetchSuppliers = async (searchTerm = "") => {
         try {
-            const response = await axios.get("http://154.26.129.243:5000/api/suppliers/get_suppliers_stock", {
+            const response = await axios.get("http://localhost:5000/api/suppliers/get_suppliers_stock", {
                 params: { searchTerm },
             });
             setFilteredSupplierList(response.data);
@@ -37,7 +37,7 @@ export default function StockSupplier() {
     // Fetch products related to the selected supplier only
     const fetchProductsBySupplier = async (supplierName) => {
         try {
-            const response = await axios.get("http://154.26.129.243:5000/api/products/fetch_products_by_supplier", {
+            const response = await axios.get("http://localhost:5000/api/products/fetch_products_by_supplier", {
                 params: { supplier: supplierName },
             });
             setProducts(response.data);

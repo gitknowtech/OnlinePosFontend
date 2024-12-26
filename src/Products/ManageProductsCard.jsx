@@ -11,7 +11,7 @@ export default function ManageProductsCard({ store }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://154.26.129.243:5000/api/products/fetch_products");
+        const response = await axios.get("http://localhost:5000/api/products/fetch_products");
         console.log("Products fetched:", response.data); // Log to check data
         setProducts(response.data);
       } catch (error) {

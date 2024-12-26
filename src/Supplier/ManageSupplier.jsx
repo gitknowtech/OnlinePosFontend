@@ -31,7 +31,7 @@ export default function ManageSupplier({ store }) {
     const fetchSuppliers = async () => {
       try {
         const response = await axios.get(
-          "http://154.26.129.243:5000/api/suppliers/get_suppliers"
+          "http://localhost:5000/api/suppliers/get_suppliers"
         );
         // Log the response data to ensure it includes all fields
         console.log("Fetched Suppliers:", response.data);
@@ -74,7 +74,7 @@ export default function ManageSupplier({ store }) {
     const fetchUpdatedSuppliers = async () => {
       try {
         const response = await axios.get(
-          "http://154.26.129.243:5000/api/suppliers/get_suppliers"
+          "http://localhost:5000/api/suppliers/get_suppliers"
         );
         setSuppliers(response.data);
       } catch (error) {
@@ -87,7 +87,7 @@ export default function ManageSupplier({ store }) {
   const handleAddressClick = async (Supid) => {
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/suppliers/get_supplier_address_details/${Supid}`
+        `http://localhost:5000/api/suppliers/get_supplier_address_details/${Supid}`
       );
       const selectedSupplier = response.data;
       setModalContent(
@@ -117,7 +117,7 @@ export default function ManageSupplier({ store }) {
   const handleEmailClick = async (Supid) => {
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/suppliers/get_supplier_website_details/${Supid}`
+        `http://localhost:5000/api/suppliers/get_supplier_website_details/${Supid}`
       );
       const selectedSupplier = response.data;
       setModalContent(
@@ -144,7 +144,7 @@ export default function ManageSupplier({ store }) {
   const handleMobileClick = async (Supid) => {
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/suppliers/get_supplier_mobile_details/${Supid}`
+        `http://localhost:5000/api/suppliers/get_supplier_mobile_details/${Supid}`
       );
       const selectedSupplier = response.data;
       setModalContent(
@@ -178,7 +178,7 @@ export default function ManageSupplier({ store }) {
   const handleViewBankDetails = async (supId) => {
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/suppliers/get_supplier_bank_details/${supId}`
+        `http://localhost:5000/api/suppliers/get_supplier_bank_details/${supId}`
       );
       const bankDetailsList = response.data;
 
@@ -241,7 +241,7 @@ export default function ManageSupplier({ store }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            `http://154.26.129.243:5000/api/suppliers/delete_supplier/${supId}`
+            `http://localhost:5000/api/suppliers/delete_supplier/${supId}`
           );
           if (response.status === 200) {
             setSuppliers(
@@ -305,7 +305,7 @@ export default function ManageSupplier({ store }) {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     try {
       const response = await axios.put(
-        `http://154.26.129.243:5000/api/suppliers/update_status/${supid}`,
+        `http://localhost:5000/api/suppliers/update_status/${supid}`,
         {
           status: newStatus,
         }

@@ -116,7 +116,7 @@ export default function InvoiceNew() {
   useEffect(() => {
     const fetchCompanyInfo = async () => {
       try {
-        const response = await axios.get("http://154.26.129.243:5000/api/companies/info");
+        const response = await axios.get("http://localhost:5000/api/companies/info");
         setCompanyInfo(response.data);
       } catch (error) {
         Swal.fire("Error", "Failed to fetch company information.", "error");
@@ -367,7 +367,7 @@ export default function InvoiceNew() {
     if (input.length > 1) {
       try {
         const response = await axios.get(
-          `http://154.26.129.243:5000/api/products/search_invoice_by_store`,
+          `http://localhost:5000/api/products/search_invoice_by_store`,
           {
             params: { query: input, store },
           }
@@ -431,7 +431,7 @@ export default function InvoiceNew() {
 
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/products/search_by_barcode`,
+        `http://localhost:5000/api/products/search_by_barcode`,
         {
           params: { query: barcode },
         }

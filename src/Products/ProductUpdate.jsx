@@ -21,7 +21,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const supplierResponse = await axios.get("http://154.26.129.243:5000/api/suppliers/get_suppliers");
+        const supplierResponse = await axios.get("http://localhost:5000/api/suppliers/get_suppliers");
         setSupplierList(supplierResponse.data);
       } catch {
         Swal.fire({
@@ -32,7 +32,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
       }
 
       try {
-        const categoryResponse = await axios.get("http://154.26.129.243:5000/api/categories/get_categories");
+        const categoryResponse = await axios.get("http://localhost:5000/api/categories/get_categories");
         setCategoryList(categoryResponse.data);
       } catch {
         Swal.fire({
@@ -43,7 +43,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
       }
 
       try {
-        const unitResponse = await axios.get("http://154.26.129.243:5000/api/units/get_units");
+        const unitResponse = await axios.get("http://localhost:5000/api/units/get_units");
         setUnitList(unitResponse.data);
       } catch {
         Swal.fire({
@@ -54,7 +54,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
       }
 
       try {
-        const batchResponse = await axios.get("http://154.26.129.243:5000/api/batches/get_batches");
+        const batchResponse = await axios.get("http://localhost:5000/api/batches/get_batches");
         setBatchList(batchResponse.data);
       } catch {
         Swal.fire({
@@ -178,7 +178,7 @@ export default function ProductUpdate({ product, onClose, onUpdate }) {
       };
 
       await axios.put(
-        `http://154.26.129.243:5000/api/products/update_product/${formData.productId}`,
+        `http://localhost:5000/api/products/update_product/${formData.productId}`,
         formattedFormData
       );
 

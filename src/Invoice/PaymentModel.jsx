@@ -68,7 +68,7 @@ export default function PaymentModel({
       debounceTimeoutRef.current = setTimeout(async () => {
         try {
           const response = await fetch(
-            `http://154.26.129.243:5000/api/customer/customers?mobile=${input}`
+            `http://localhost:5000/api/customer/customers?mobile=${input}`
           );
           if (!response.ok) {
             throw new Error("Failed to fetch customer suggestions");
@@ -246,7 +246,7 @@ export default function PaymentModel({
     try {
       // Save invoice data
       const saveResponse = await fetch(
-        "http://154.26.129.243:5000/api/invoices/add_sales",
+        "http://localhost:5000/api/invoices/add_sales",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -264,7 +264,7 @@ export default function PaymentModel({
 
       // Fetch the latest saved invoice
       const fetchResponse = await fetch(
-        "http://154.26.129.243:5000/api/invoices/last"
+        "http://localhost:5000/api/invoices/last"
       );
       if (!fetchResponse.ok) {
         throw new Error("Failed to fetch the last invoice");
@@ -283,7 +283,7 @@ export default function PaymentModel({
 
       // Fetch the invoice data
       const invoiceDataResponse = await fetch(
-        `http://154.26.129.243:5000/api/invoices/fetchInvoiceData?invoiceId=${latestInvoiceId}`
+        `http://localhost:5000/api/invoices/fetchInvoiceData?invoiceId=${latestInvoiceId}`
       );
       if (!invoiceDataResponse.ok) {
         throw new Error("Failed to fetch invoice data");

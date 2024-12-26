@@ -18,7 +18,7 @@ export default function BankModel({ UserName, store }) {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const response = await axios.get('http://154.26.129.243:5000/api/banks/get_banks');
+        const response = await axios.get('http://localhost:5000/api/banks/get_banks');
         setBanks(response.data);
       } catch (err) {
         console.error('Error fetching banks:', err);
@@ -61,7 +61,7 @@ export default function BankModel({ UserName, store }) {
     try {
       const storeValue = saveStoreAsAll ? 'all' : store;
 
-      const response = await axios.post('http://154.26.129.243:5000/api/banks/create_banks', {
+      const response = await axios.post('http://localhost:5000/api/banks/create_banks', {
         bankName: bankName,
         user: UserName,
         store: storeValue,
@@ -119,7 +119,7 @@ export default function BankModel({ UserName, store }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete('http://154.26.129.243:5000/api/banks/delete_bank', {
+          const response = await axios.delete('http://localhost:5000/api/banks/delete_bank', {
             data: { bankName },
           });
 

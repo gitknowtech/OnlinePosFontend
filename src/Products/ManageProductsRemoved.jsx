@@ -14,7 +14,7 @@ export default function ManageProductsRemoved({ store }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://154.26.129.243:5000/api/products/fetch_removed_products"); // Adjust endpoint as needed
+        const response = await axios.get("http://localhost:5000/api/products/fetch_removed_products"); // Adjust endpoint as needed
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching removed products: ", error);
@@ -40,7 +40,7 @@ export default function ManageProductsRemoved({ store }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`http://154.26.129.243:5000/api/products/delete_removed_product/${productId}`);
+          const response = await axios.delete(`http://localhost:5000/api/products/delete_removed_product/${productId}`);
           if (response.status === 200) {
             setProducts(products.filter((product) => product.productId !== productId));
             Swal.fire("Deleted!", `Product "${productId}" has been deleted.`, "success");

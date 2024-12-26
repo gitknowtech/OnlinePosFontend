@@ -28,7 +28,7 @@ export default function StockTransfer({ store }) {
      useEffect(() => {
         const fetchLast50Records = async () => {
             try {
-                const response = await axios.get("http://154.26.129.243:5000/api/stock/get_last_50_stock_records_transfer_up");
+                const response = await axios.get("http://localhost:5000/api/stock/get_last_50_stock_records_transfer_up");
                 setLast50Records(response.data);
             } catch (err) {
                 console.error("Error fetching last 50 records:", err);
@@ -37,7 +37,7 @@ export default function StockTransfer({ store }) {
 
         const fetchStores = async () => {
             try {
-                const response = await axios.get("http://154.26.129.243:5000/api/stores/get_stores");
+                const response = await axios.get("http://localhost:5000/api/stores/get_stores");
                 setStoreOptions(response.data);
             } catch (err) {
                 console.error("Error fetching stores:", err);
@@ -51,7 +51,7 @@ export default function StockTransfer({ store }) {
 
     const handleFetchProductDetails = async () => {
         try {
-            const response = await axios.get("http://154.26.129.243:5000/api/stock/fetch_products_barcode", {
+            const response = await axios.get("http://localhost:5000/api/stock/fetch_products_barcode", {
                 params: {
                     searchTerm: searchQuery,
                     store: store,
@@ -69,7 +69,7 @@ export default function StockTransfer({ store }) {
                 });
 
                 // Fetch related last 50 records for this product
-                const relatedRecordsResponse = await axios.get("http://154.26.129.243:5000/api/stock/get_last_50_records_by_product_transfer_up", {
+                const relatedRecordsResponse = await axios.get("http://localhost:5000/api/stock/get_last_50_records_by_product_transfer_up", {
                     params: {
                         productId: product.productId,
                     },
@@ -154,7 +154,7 @@ export default function StockTransfer({ store }) {
         }
 
         try {
-            const response = await axios.post("http://154.26.129.243:5000/api/stock/update_stock_transfer", {
+            const response = await axios.post("http://localhost:5000/api/stock/update_stock_transfer", {
                 productId,
                 productName,
                 barcode,
@@ -189,7 +189,7 @@ export default function StockTransfer({ store }) {
         }
 
         try {
-            const response = await axios.get("http://154.26.129.243:5000/api/stock/fetch_products", {
+            const response = await axios.get("http://localhost:5000/api/stock/fetch_products", {
                 params: {
                     searchTerm: query,
                     store: store,

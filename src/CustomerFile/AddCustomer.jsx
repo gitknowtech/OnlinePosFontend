@@ -47,7 +47,7 @@ export default function AddCustomer({ UserName, store }) {
   const checkForDuplicates = async () => {
     try {
       const response = await axios.post(
-        "http://154.26.129.243:5000/api/customer/customer_check_duplicate",
+        "http://localhost:5000/api/customer/customer_check_duplicate",
         { cusId, mobile1, mobile2, idNumber }
       );
       if (response.status === 409) {
@@ -91,7 +91,7 @@ export default function AddCustomer({ UserName, store }) {
 
     try {
       const response = await axios.post(
-        "http://154.26.129.243:5000/api/customer/add_customer",
+        "http://localhost:5000/api/customer/add_customer",
         customerData
       );
       if (response.status === 201) {

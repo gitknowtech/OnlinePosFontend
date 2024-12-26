@@ -47,7 +47,7 @@ const Supplier = () => {
         ];
 
         const accessPromises = sections.map((section) =>
-          fetch(`http://154.26.129.243:5000/api/access/${UserName}/${section}`)
+          fetch(`http://localhost:5000/api/access/${UserName}/${section}`)
             .then((res) => {
               if (!res.ok) {
                 throw new Error(`Failed to fetch access for ${section}`);

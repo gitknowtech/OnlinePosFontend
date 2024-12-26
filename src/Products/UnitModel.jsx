@@ -17,7 +17,7 @@ export default function UnitModel({ UserName, store }) {
   useEffect(() => {
     const fetchUnits = async () => {
       try {
-        const response = await axios.get("http://154.26.129.243:5000/api/units/get_units");
+        const response = await axios.get("http://localhost:5000/api/units/get_units");
         setUnits(response.data);
       } catch (err) {
         Swal.fire({
@@ -55,7 +55,7 @@ export default function UnitModel({ UserName, store }) {
 
     try {
       const response = await axios.post(
-        "http://154.26.129.243:5000/api/units/create_units",
+        "http://localhost:5000/api/units/create_units",
         {
           unitName,
           user: UserName,
@@ -97,7 +97,7 @@ export default function UnitModel({ UserName, store }) {
   const handleUpdateClick = async (unitId) => {
     try {
       const response = await axios.put(
-        `http://154.26.129.243:5000/api/units/update_unit/${unitId}`,
+        `http://localhost:5000/api/units/update_unit/${unitId}`,
         { unitName: editedUnitName }
       );
 
@@ -135,7 +135,7 @@ export default function UnitModel({ UserName, store }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            "http://154.26.129.243:5000/api/units/delete_unit",
+            "http://localhost:5000/api/units/delete_unit",
             {
               data: { unitName },
             }

@@ -18,7 +18,7 @@ const CustomerBalance = () => {
     if (query.length >= 2) {
       try {
         const response = await axios.get(
-          "http://154.26.129.243:5000/api/customer/search_customer_balance_jsx",
+          "http://localhost:5000/api/customer/search_customer_balance_jsx",
           { params: { query } }
         );
         setSuggestions(response.data);
@@ -42,7 +42,7 @@ const CustomerBalance = () => {
 
     try {
       const response = await axios.get(
-        "http://154.26.129.243:5000/api/customer/calculate_customer_balance",
+        "http://localhost:5000/api/customer/calculate_customer_balance",
         { params: { customerId: customer.cusId } }
       );
       setCustomerBalance(response.data.totalBalance);

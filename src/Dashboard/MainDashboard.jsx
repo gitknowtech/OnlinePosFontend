@@ -56,10 +56,10 @@ const MainDashboard = () => {
     const fetchCounts = async () => {
       try {
         const [invoiceRes, supplierRes, customerRes, productRes] = await Promise.all([
-          fetch("http://154.26.129.243:5000/api/invoices/today_invoices_count"),
-          fetch("http://154.26.129.243:5000/api/invoices/suppliercount"),
-          fetch("http://154.26.129.243:5000/api/invoices/customercount"),
-          fetch("http://154.26.129.243:5000/api/invoices/productcount"),
+          fetch("http://localhost:5000/api/invoices/today_invoices_count"),
+          fetch("http://localhost:5000/api/invoices/suppliercount"),
+          fetch("http://localhost:5000/api/invoices/customercount"),
+          fetch("http://localhost:5000/api/invoices/productcount"),
         ]);
 
         if (!invoiceRes.ok) throw new Error(`Invoice Count Fetch Error: ${invoiceRes.status}`);
@@ -83,7 +83,7 @@ const MainDashboard = () => {
 
     const fetchLastInvoice = async () => {
       try {
-        const response = await fetch("http://154.26.129.243:5000/api/invoices/lastInvoiceId");
+        const response = await fetch("http://localhost:5000/api/invoices/lastInvoiceId");
         if (!response.ok) throw new Error(`Last Invoice Fetch Error: ${response.status}`);
         const data = await response.json();
         setLastInvoiceId(data.invoiceId || 'N/A');
@@ -95,7 +95,7 @@ const MainDashboard = () => {
 
     const fetchTodaySales = async () => {
       try {
-        const response = await fetch("http://154.26.129.243:5000/api/invoices/CurrentMonthSales");
+        const response = await fetch("http://localhost:5000/api/invoices/CurrentMonthSales");
         if (!response.ok) throw new Error(`Today Sales Fetch Error: ${response.status}`);
         const data = await response.json();
         setTodaySales(data.todaySales || 0.0);
@@ -107,7 +107,7 @@ const MainDashboard = () => {
 
     const fetchInvoiceSalesData = async () => {
       try {
-        const response = await fetch("http://154.26.129.243:5000/api/invoices/sales-summary-chart");
+        const response = await fetch("http://localhost:5000/api/invoices/sales-summary-chart");
         if (!response.ok) throw new Error("Failed to fetch invoice sales data");
         const data = await response.json();
 
@@ -137,7 +137,7 @@ const MainDashboard = () => {
 
     const fetchNetAmountSalesData = async () => {
       try {
-        const response = await fetch("http://154.26.129.243:5000/api/invoices/sales-netamount-summary");
+        const response = await fetch("http://localhost:5000/api/invoices/sales-netamount-summary");
         if (!response.ok) throw new Error("Failed to fetch net amount sales data");
         const data = await response.json();
 
@@ -222,9 +222,9 @@ const MainDashboard = () => {
     const fetchTableData = async () => {
       try {
         const [lastInvoicesRes, topProductsRes, creditSalesRes] = await Promise.all([
-          fetch("http://154.26.129.243:5000/api/invoices/last-5-invoices"),
-          fetch("http://154.26.129.243:5000/api/invoices/top-5-products"),
-          fetch("http://154.26.129.243:5000/api/invoices/last-5-credit-sales"),
+          fetch("http://localhost:5000/api/invoices/last-5-invoices"),
+          fetch("http://localhost:5000/api/invoices/top-5-products"),
+          fetch("http://localhost:5000/api/invoices/last-5-credit-sales"),
         ]);
 
         if (!lastInvoicesRes.ok) throw new Error("Error fetching last 5 invoices");

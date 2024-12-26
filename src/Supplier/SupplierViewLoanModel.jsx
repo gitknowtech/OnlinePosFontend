@@ -35,7 +35,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
   const fetchLoans = async () => {
     try {
       const response = await fetch(
-        `http://154.26.129.243:5000/api/suppliers/get_loans_supplier_loan/${supplierId}`
+        `http://localhost:5000/api/suppliers/get_loans_supplier_loan/${supplierId}`
       );
       const data = await response.json();
 
@@ -72,7 +72,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
 
     try {
       const response = await fetch(
-        `http://154.26.129.243:5000/api/suppliers/get_loans_by_date/${supplierId}?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&settlementStatus=${settlementStatus}`
+        `http://localhost:5000/api/suppliers/get_loans_by_date/${supplierId}?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&settlementStatus=${settlementStatus}`
       );
       const data = await response.json();
 
@@ -98,7 +98,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       return;
     }
 
-    const url = `http://154.26.129.243:5000/api/suppliers/view_file?filePath=${encodeURIComponent(
+    const url = `http://localhost:5000/api/suppliers/view_file?filePath=${encodeURIComponent(
       filePath
     )}`;
     window.open(url, "_blank");
@@ -118,7 +118,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
     if (confirm.isConfirmed) {
       try {
         const response = await fetch(
-          `http://154.26.129.243:5000/api/suppliers/delete_supplier_loan/${id}`,
+          `http://localhost:5000/api/suppliers/delete_supplier_loan/${id}`,
           { method: "DELETE" }
         );
         const data = await response.json();
@@ -151,7 +151,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
   const handleUpdate = async (id) => {
     try {
       const response = await fetch(
-        `http://154.26.129.243:5000/api/suppliers/update_supplier_loan/${id}`,
+        `http://localhost:5000/api/suppliers/update_supplier_loan/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -282,7 +282,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       }
   
       const addPaymentResponse = await fetch(
-        `http://154.26.129.243:5000/api/suppliers/add_supplier_loan_payment`,
+        `http://localhost:5000/api/suppliers/add_supplier_loan_payment`,
         {
           method: "POST",
           body: formData,
@@ -303,7 +303,7 @@ const SupplierViewLoanModel = ({ supplierId, onClose }) => {
       }
   
       const updateLoanResponse = await fetch(
-        `http://154.26.129.243:5000/api/suppliers/update_supplier_loan_new/${paymentGeneratedId}`,
+        `http://localhost:5000/api/suppliers/update_supplier_loan_new/${paymentGeneratedId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

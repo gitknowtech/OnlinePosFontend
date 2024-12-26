@@ -29,7 +29,7 @@ const UserManagement = () => {
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        const response = await axios.get("http://154.26.129.243:5000/api/stores/get_stores");
+        const response = await axios.get("http://localhost:5000/api/stores/get_stores");
         console.log("Fetched Stores:", response.data); // Log the stores
         setStoreList(response.data);
       } catch (error) {
@@ -113,7 +113,7 @@ const UserManagement = () => {
         form.append("Image", formData.Image);
       }
   
-      const response = await axios.post("http://154.26.129.243:5000/create-user", form, {
+      const response = await axios.post("http://localhost:5000/create-user", form, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

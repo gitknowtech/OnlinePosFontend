@@ -17,7 +17,7 @@ export default function StoreModel({ UserName, store }) {
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        const response = await axios.get("http://154.26.129.243:5000/api/stores/get_stores");
+        const response = await axios.get("http://localhost:5000/api/stores/get_stores");
         setStores(response.data);
       } catch (err) {
         Swal.fire({
@@ -55,7 +55,7 @@ export default function StoreModel({ UserName, store }) {
     }
 
     try {
-      const response = await axios.post("http://154.26.129.243:5000/api/stores/create_store", {
+      const response = await axios.post("http://localhost:5000/api/stores/create_store", {
         storeName,
         user: UserName,
         store,
@@ -95,7 +95,7 @@ export default function StoreModel({ UserName, store }) {
   const handleUpdateClick = async (storeId) => {
     try {
       const response = await axios.put(
-        `http://154.26.129.243:5000/api/stores/update_store/${storeId}`,
+        `http://localhost:5000/api/stores/update_store/${storeId}`,
         { storeName: editedStoreName }
       );
 
@@ -140,7 +140,7 @@ export default function StoreModel({ UserName, store }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`http://154.26.129.243:5000/api/stores/delete_store/${storeId}`);
+          const response = await axios.delete(`http://localhost:5000/api/stores/delete_store/${storeId}`);
 
           if (response.status === 200) {
             setStores(stores.filter((store) => store.id !== storeId));

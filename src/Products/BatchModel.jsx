@@ -17,7 +17,7 @@ export default function BatchModel({ UserName, store }) {
   useEffect(() => {
     const fetchBatches = async () => {
       try {
-        const response = await axios.get("http://154.26.129.243:5000/api/batches/get_batches");
+        const response = await axios.get("http://localhost:5000/api/batches/get_batches");
         setBatches(response.data);
       } catch (err) {
         Swal.fire({
@@ -54,7 +54,7 @@ export default function BatchModel({ UserName, store }) {
     }
 
     try {
-      const response = await axios.post("http://154.26.129.243:5000/api/batches/create_batches", {
+      const response = await axios.post("http://localhost:5000/api/batches/create_batches", {
         batchName,
         user: UserName,
         store,
@@ -94,7 +94,7 @@ export default function BatchModel({ UserName, store }) {
   const handleUpdateClick = async (batchId) => {
     try {
       const response = await axios.put(
-        `http://154.26.129.243:5000/api/batches/update_batch/${batchId}`,
+        `http://localhost:5000/api/batches/update_batch/${batchId}`,
         { batchName: editedBatchName }
       );
 
@@ -131,7 +131,7 @@ export default function BatchModel({ UserName, store }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete("http://154.26.129.243:5000/api/batches/delete_batch", {
+          const response = await axios.delete("http://localhost:5000/api/batches/delete_batch", {
             data: { batchName },
           });
 

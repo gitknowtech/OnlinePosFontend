@@ -39,7 +39,7 @@ export default function SupplierPayment({ store }) {
     const fetchSuppliers = async () => {
       try {
         const response = await axios.get(
-          "http://154.26.129.243:5000/api/suppliers/get_suppliers",
+          "http://localhost:5000/api/suppliers/get_suppliers",
           { params: { store } }
         );
         setSuppliers(response.data);
@@ -58,7 +58,7 @@ export default function SupplierPayment({ store }) {
   const handleSaveLoan = async (loanData) => {
     try {
       const response = await axios.post(
-        "http://154.26.129.243:5000/api/supplier_loan/add",
+        "http://localhost:5000/api/supplier_loan/add",
         loanData
       );
       Swal.fire("Success", response.data.message, "success");
@@ -91,7 +91,7 @@ export default function SupplierPayment({ store }) {
 
     try {
       const response = await axios.get(
-        "http://154.26.129.243:5000/api/suppliers/get_total_loan",
+        "http://localhost:5000/api/suppliers/get_total_loan",
         { params: { supplierId } }
       );
       const totalLoan = parseFloat(response.data.totalLoan).toFixed(2);

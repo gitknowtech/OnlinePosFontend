@@ -51,7 +51,7 @@ function StockModel({ show, onClose, onProductSelect }) {
 
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/products/search_stock?query=${encodeURIComponent(searchTerm)}`
+        `http://localhost:5000/api/products/search_stock?query=${encodeURIComponent(searchTerm)}`
       );
       setProductList(response.data);
     } catch (error) {

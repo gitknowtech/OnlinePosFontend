@@ -30,7 +30,7 @@ export default function SupplierUpdate({ supplierId, onClose, onUpdate }) {
     const fetchSupplierData = async () => {
       if (supplierId) {
         try {
-          const response = await axios.get(`http://154.26.129.243:5000/api/suppliers/get_supplier/${supplierId}`);
+          const response = await axios.get(`http://localhost:5000/api/suppliers/get_supplier/${supplierId}`);
           setSupplierData(response.data);
         } catch (error) {
           console.error("Error fetching supplier details:", error);
@@ -45,7 +45,7 @@ export default function SupplierUpdate({ supplierId, onClose, onUpdate }) {
 
     const fetchBanks = async () => {
       try {
-        const response = await axios.get("http://154.26.129.243:5000/api/banks/get_banks");
+        const response = await axios.get("http://localhost:5000/api/banks/get_banks");
         setBankList(response.data);
       } catch (error) {
         console.error("Error fetching banks:", error);
@@ -67,7 +67,7 @@ export default function SupplierUpdate({ supplierId, onClose, onUpdate }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`http://154.26.129.243:5000/api/suppliers/update_supplier/${supplierId}`, supplierData);
+      const response = await axios.put(`http://localhost:5000/api/suppliers/update_supplier/${supplierId}`, supplierData);
       if (response.status === 200) {
         Swal.fire({
           icon: "success",

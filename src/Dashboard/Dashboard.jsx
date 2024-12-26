@@ -137,7 +137,7 @@ const Dashboard = () => {
         ];
 
         const accessPromises = sections.map((section) =>
-          fetch(`http://154.26.129.243:5000/api/access/${username}/${section}`)
+          fetch(`http://localhost:5000/api/access/${username}/${section}`)
             .then((res) => {
               if (!res.ok) {
                 throw new Error(`Failed to fetch access for ${section}`);
@@ -175,7 +175,7 @@ const Dashboard = () => {
   const handleAccessCheck = async (section, route) => {
     try {
       const response = await fetch(
-        `http://154.26.129.243:5000/api/access/${username}/${section}`
+        `http://localhost:5000/api/access/${username}/${section}`
       );
       if (!response.ok) {
         throw new Error(`Failed to fetch access for ${section}`);

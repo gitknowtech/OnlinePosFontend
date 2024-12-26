@@ -21,7 +21,7 @@ const ManageUser = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://154.26.129.243:5000/api/users/get_users_new");
+      const response = await axios.get("http://localhost:5000/api/users/get_users_new");
       setUsers(response.data.filter(user => user.Type !== "admin")); // Exclude admin users
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -51,7 +51,7 @@ const ManageUser = () => {
   const togglePasswordVisibility = async (user) => {
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/users/get_password/${user.UserName}`
+        `http://localhost:5000/api/users/get_password/${user.UserName}`
       );
       Swal.fire({
         title: "Decrypted Password",
@@ -75,7 +75,7 @@ const ManageUser = () => {
     e.preventDefault();
     try {
       const response = await axios.put(
-        `http://154.26.129.243:5000/api/users/update_user/${editUser.UserName}`,
+        `http://localhost:5000/api/users/update_user/${editUser.UserName}`,
         updatedData
       );
 
@@ -113,7 +113,7 @@ const ManageUser = () => {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            `http://154.26.129.243:5000/delete_user/${userName}`
+            `http://localhost:5000/delete_user/${userName}`
           );
   
           if (response.status === 200) {

@@ -17,7 +17,7 @@ const UserSetting = () => {
       setLoading(true);
       setError("");
       try {
-        const response = await axios.get("http://154.26.129.243:5000/api/users");
+        const response = await axios.get("http://localhost:5000/api/users");
         // Extract the 'users' array from the response
         setUsernames(response.data.users);
       } catch (error) {
@@ -36,7 +36,7 @@ const UserSetting = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.get(`http://154.26.129.243:5000/api/settings/${username}`);
+      const response = await axios.get(`http://localhost:5000/api/settings/${username}`);
       setUserSettings(response.data);
     } catch (error) {
       console.error("Error fetching user settings:", error);
@@ -65,7 +65,7 @@ const UserSetting = () => {
     try {
       // Send PUT request to update the value in the backend
       const response = await axios.put(
-        `http://154.26.129.243:5000/api/settings/${selectedUser}/${id}`,
+        `http://localhost:5000/api/settings/${selectedUser}/${id}`,
         {
           value: newValue,
         }

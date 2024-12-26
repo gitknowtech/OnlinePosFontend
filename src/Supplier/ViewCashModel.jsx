@@ -18,7 +18,7 @@ const ViewCashModel = ({ supplierId, onClose }) => {
   const fetchLoans = async () => {
     try {
       const response = await fetch(
-        `http://154.26.129.243:5000/api/suppliers/get_loans_supplier_loan/${supplierId}`
+        `http://localhost:5000/api/suppliers/get_loans_supplier_loan/${supplierId}`
       );
       const data = await response.json();
 
@@ -37,7 +37,7 @@ const ViewCashModel = ({ supplierId, onClose }) => {
   const fetchHistory = async (generatedId) => {
     try {
       const response = await fetch(
-        `http://154.26.129.243:5000/api/suppliers/get_loan_payment_history/${generatedId}`
+        `http://localhost:5000/api/suppliers/get_loan_payment_history/${generatedId}`
       );
       const data = await response.json();
 
@@ -69,7 +69,7 @@ const ViewCashModel = ({ supplierId, onClose }) => {
     if (confirm.isConfirmed) {
       try {
         const response = await fetch(
-          `http://154.26.129.243:5000/api/suppliers/delete_supplier_payment/${paymentId}`,
+          `http://localhost:5000/api/suppliers/delete_supplier_payment/${paymentId}`,
           {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -104,7 +104,7 @@ const ViewCashModel = ({ supplierId, onClose }) => {
       return;
     }
 
-    const url = `http://154.26.129.243:5000/api/suppliers/view_file?filePath=${encodeURIComponent(
+    const url = `http://localhost:5000/api/suppliers/view_file?filePath=${encodeURIComponent(
       filePath
     )}`;
     window.open(url, "_blank");
@@ -118,7 +118,7 @@ const ViewCashModel = ({ supplierId, onClose }) => {
       return;
     }
 
-    const url = `http://154.26.129.243:5000/api/suppliers/view_file_new?filePath=${encodeURIComponent(
+    const url = `http://localhost:5000/api/suppliers/view_file_new?filePath=${encodeURIComponent(
       filePath
     )}`;
     window.open(url, "_blank");

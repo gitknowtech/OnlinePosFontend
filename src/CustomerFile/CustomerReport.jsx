@@ -20,7 +20,7 @@ const CustomerReport = () => {
   const fetchCustomerReport = async () => {
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/customer/report`,
+        `http://localhost:5000/api/customer/report`,
         {
           params: { query: searchQuery, startDate, endDate },
         }
@@ -59,7 +59,7 @@ const CustomerReport = () => {
   const fetchLoanPayments = async () => {
     try {
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/customer/fetch_loan_payments`,
+        `http://localhost:5000/api/customer/fetch_loan_payments`,
         {
           params: {
             invoiceId: invoiceSearch,

@@ -28,7 +28,7 @@ function ReturnModel({ show, onClose, onAdd }) {
     if (input.length > 1) {
       try {
         const response = await axios.get(
-          `http://154.26.129.243:5000/api/products/search?query=${input}`
+          `http://localhost:5000/api/products/search?query=${input}`
         );
         if (response.data.length > 0) {
           const product = response.data[0];

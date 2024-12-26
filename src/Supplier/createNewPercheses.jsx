@@ -29,14 +29,14 @@ export default function CreateNewPurchases({ store }) {
   const fileInputRef = useRef(null); // Reference for the file input
 
   // Base URL for the backend
-  const BASE_URL = "http://154.26.129.243:5000/api/purchases";
+  const BASE_URL = "http://localhost:5000/api/purchases";
 
   // Fetch suppliers from API on mount
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
         const response = await axios.get(
-          "http://154.26.129.243:5000/api/suppliers/get_suppliers"
+          "http://localhost:5000/api/suppliers/get_suppliers"
         );
         setSuppliers(response.data);
       } catch (error) {

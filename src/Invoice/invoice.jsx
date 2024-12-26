@@ -35,7 +35,7 @@ import removeImage from "../assets/images/remove.png";
 import calculatorImage from "../assets/icons/calculator.png";
 
 // Define the base URL for the backend API
-const API_BASE_URL = "http://154.26.129.243:5000"; // Adjust this if your backend runs on a different URL or port
+const API_BASE_URL = "http://localhost:5000"; // Adjust this if your backend runs on a different URL or port
 
 export default function Invoice() {
   const location = useLocation();

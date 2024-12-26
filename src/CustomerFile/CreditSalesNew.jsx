@@ -31,7 +31,7 @@ const fetchSales = async (params = {}) => {
 
   try {
     const response = await axios.get(
-      "http://154.26.129.243:5000/api/invoices/fetch_sales_store_removed",
+      "http://localhost:5000/api/invoices/fetch_sales_store_removed",
       { params } // Pass dynamic parameters here
     );
     setSales(response.data);
@@ -208,7 +208,7 @@ useEffect(() => {
       }
 
       const response = await axios.put(
-        `http://154.26.129.243:5000/api/customer/update_sale/${invoiceId}`,
+        `http://localhost:5000/api/customer/update_sale/${invoiceId}`,
         {
           CashPay: parseFloat(CashPay) || 0,
           CardPay: parseFloat(CardPay) || 0,
@@ -267,7 +267,7 @@ useEffect(() => {
     try {
       setSelectedInvoiceId(invoiceId);
       const response = await axios.get(
-        `http://154.26.129.243:5000/api/customer/payment_history/${invoiceId}`
+        `http://localhost:5000/api/customer/payment_history/${invoiceId}`
       );
       setPaymentHistory(response.data);
       setShowHistoryModal(true);
@@ -300,7 +300,7 @@ useEffect(() => {
 
       if (confirmResult.isConfirmed) {
         const response = await axios.delete(
-          `http://154.26.129.243:5000/api/customer/delete_payment/${paymentId}`
+          `http://localhost:5000/api/customer/delete_payment/${paymentId}`
         );
 
         if (response.status === 200) {

@@ -21,7 +21,7 @@ export default function ManageCustomer({ store }) {
   const fetchCustomers = async () => {
     try {
       const response = await axios.get(
-        "http://154.26.129.243:5000/api/customer/fetch_customers"
+        "http://localhost:5000/api/customer/fetch_customers"
       );
       setCustomers(response.data);
     } catch (error) {
@@ -47,7 +47,7 @@ export default function ManageCustomer({ store }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            `http://154.26.129.243:5000/api/customer/delete_customer/${customerId}`
+            `http://localhost:5000/api/customer/delete_customer/${customerId}`
           );
           if (response.status === 200) {
             setCustomers(
@@ -151,7 +151,7 @@ export default function ManageCustomer({ store }) {
   const updateCustomer = async (updatedData) => {
     try {
       const response = await axios.put(
-        `http://154.26.129.243:5000/api/customer/update_customer/${updatedData.cusId}`,
+        `http://localhost:5000/api/customer/update_customer/${updatedData.cusId}`,
         updatedData
       );
       if (response.status === 200) {
