@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import { useRef } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import imageCompression from 'browser-image-compression'; // Import image compression
 import "../css/AddProducts.css"; // Assuming a separate CSS file for AddProducts
 
 export default function AddProducts({ UserName, store }) {
@@ -49,6 +50,18 @@ export default function AddProducts({ UserName, store }) {
   const [isCategoryDropDownVisible, setCategoryDropDownVisible] =
     useState(false);
   const [isUnitDropDownVisible, setUnitDropDownVisible] = useState(false);
+
+  const [imageFile, setImageFile] = useState(null); // New state for image file
+  const [imagePreview, setImagePreview] = useState(null); // For image preview
+
+
+
+
+
+
+
+
+
 
   // Fetch supplier, category, and unit data when the component mounts
   useEffect(() => {
@@ -383,6 +396,53 @@ export default function AddProducts({ UserName, store }) {
     }
   };
 
+
+
+
+  // Handle image file selection and compression
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid File Type",
+          text: "Only JPG, JPEG, and PNG formats are allowed.",
+        });
+        return;
+      }
+
+      // Compress the image
+      const options = {
+        maxSizeMB: 1,          // Maximum size in MB
+        maxWidthOrHeight: 800, // Max width or height
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(file, options);
+        setImageFile(compressedFile);
+
+        // Preview the compressed image
+        const reader = new FileReader();
+        reader.readAsDataURL(compressedFile);
+        reader.onloadend = () => {
+          setImagePreview(reader.result);
+        };
+      } catch (error) {
+        console.error("Error compressing image:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Image Compression Failed",
+          text: "There was an error compressing the image. Please try a different image.",
+        });
+      }
+    }
+  };
+
+
   const handleSave = async () => {
     if (!productId || !productName || !costPrice || !mrpPrice) {
       Swal.fire({
@@ -392,40 +452,48 @@ export default function AddProducts({ UserName, store }) {
       });
       return;
     }
-  
-    // Prepare the product data to be saved, using real prices for wholesalePrice and discountPrice
-    const productData = {
-      productId,
-      productName,
-      productNameSinhala,
-      barcode,
-      batchNumber,
-      selectedSupplier,
-      selectedCategory,
-      selectedUnit,
-      manufacturingDate,
-      expiringDate,
-      costPrice,
-      mrpPrice,
-      profitPercentage,
-      profitAmount,
-      discountPrice: realPrice, // Save realPrice as discountPrice
-      discountPercentage,
-      wholesalePrice: realWholesalePrice, // Save realWholesalePrice as wholesalePrice
-      wholesalePercentage,
-      lockedPrice,
-      openingBalance,
-      stockAlert,
-      user: UserName,
-      store,
-      imageLink,
-      status: isActive ? "Active" : "Inactive",
-    };
-  
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('productId', productId);
+    formData.append('productName', productName);
+    formData.append('productNameSinhala', productNameSinhala);
+    formData.append('barcode', barcode);
+    formData.append('batchNumber', batchNumber);
+    formData.append('selectedSupplier', selectedSupplier);
+    formData.append('selectedCategory', selectedCategory);
+    formData.append('selectedUnit', selectedUnit);
+    formData.append('manufacturingDate', manufacturingDate.toISOString().split('T')[0]); // Format as YYYY-MM-DD
+    formData.append('expiringDate', expiringDate.toISOString().split('T')[0]); // Format as YYYY-MM-DD
+    formData.append('costPrice', costPrice);
+    formData.append('mrpPrice', mrpPrice);
+    formData.append('profitPercentage', profitPercentage);
+    formData.append('profitAmount', profitAmount);
+    formData.append('discountPrice', realPrice); // Save realPrice as discountPrice
+    formData.append('discountPercentage', discountPercentage);
+    formData.append('wholesalePrice', realWholesalePrice); // Save realWholesalePrice as wholesalePrice
+    formData.append('wholesalePercentage', wholesalePercentage);
+    formData.append('lockedPrice', lockedPrice);
+    formData.append('openingBalance', openingBalance);
+    formData.append('stockAlert', stockAlert);
+    formData.append('store', store);
+    formData.append('user', UserName);
+    formData.append('status', isActive ? "Active" : "Inactive");
+
+    // Append image file if exists
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+
     try {
       const response = await axios.post(
         "http://localhost:5000/api/products/create_product",
-        productData
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       );
       if (response.status === 201) {
         resetFormFields();
@@ -438,14 +506,14 @@ export default function AddProducts({ UserName, store }) {
         throw new Error("Failed to save product");
       }
     } catch (error) {
+      console.error("Error saving product:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: `Error saving product: ${error.message}`,
+        text: `Error saving product: ${error.response?.data?.message || error.message}`,
       });
     }
   };
-  
 
   const resetFormFields = () => {
     setProductId("");
@@ -469,8 +537,12 @@ export default function AddProducts({ UserName, store }) {
     setLockedPrice("");
     setOpeningBalance("");
     setStockAlert("");
-    setImageLink("");
+    setImageFile(null);
+    setImagePreview(null);
   };
+
+
+
 
   return (
     <div className="add-product-model">
@@ -693,7 +765,7 @@ export default function AddProducts({ UserName, store }) {
             <label htmlFor="costPrice">Cost Price</label>
             <input
               type="number"
-            autoComplete="off"
+              autoComplete="off"
               id="costPrice"
               value={costPrice}
               onChange={(e) => setCostPrice(e.target.value)}
@@ -705,7 +777,7 @@ export default function AddProducts({ UserName, store }) {
             <label htmlFor="mrpPrice">MRP Price</label>
             <input
               type="number"
-            autoComplete="off"
+              autoComplete="off"
               id="mrpPrice"
               value={mrpPrice}
               onChange={(e) => setMrpPrice(e.target.value)}
@@ -718,7 +790,7 @@ export default function AddProducts({ UserName, store }) {
             <label htmlFor="profitPercentage">Profit Percentage</label>
             <input
               type="number"
-            autoComplete="off"
+              autoComplete="off"
               id="profitPercentage"
               value={profitPercentage}
               readOnly="ture"
@@ -732,7 +804,7 @@ export default function AddProducts({ UserName, store }) {
             <input
               type="number"
               id="profitAmount"
-            autoComplete="off"
+              autoComplete="off"
               value={profitAmount}
               readOnly="true"
               onChange={(e) => setProfitAmount(e.target.value)}
@@ -746,7 +818,7 @@ export default function AddProducts({ UserName, store }) {
             <label htmlFor="discountPercentage">Discount Percentage</label>
             <input
               type="number"
-            autoComplete="off"
+              autoComplete="off"
               id="discountPercentage"
               value={discountPercentage}
               onChange={(e) => setDiscountPercentage(e.target.value)}
@@ -760,7 +832,7 @@ export default function AddProducts({ UserName, store }) {
             <input
               type="number"
               id="discountPrice"
-            autoComplete="off"
+              autoComplete="off"
               value={discountPrice}
               onChange={(e) => setDiscountPrice(e.target.value)}
               onBlur={handleDiscountBlur}
@@ -776,7 +848,7 @@ export default function AddProducts({ UserName, store }) {
             <input
               type="number"
               id="wholesalePercentage"
-            autoComplete="off"
+              autoComplete="off"
               value={wholesalePercentage}
               onChange={(e) => setWholesalePercentage(e.target.value)}
               onBlur={calculateWholesaleFromPercentage}
@@ -789,7 +861,7 @@ export default function AddProducts({ UserName, store }) {
             <input
               type="number"
               id="wholesalePrice"
-            autoComplete="off"
+              autoComplete="off"
               value={wholesalePrice}
               onChange={(e) => setWholesalePrice(e.target.value)}
               onBlur={handleWholesaleBlur}
@@ -875,15 +947,16 @@ export default function AddProducts({ UserName, store }) {
         <h2>Product Image Details</h2>
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="imageLink">Image Link</label>
+            <label htmlFor="image">Upload Image</label>
             <input
-              type="text"
-              id="imageLink"
-            autoComplete="off"
-              value={imageLink}
-              onChange={(e) => setImageLink(e.target.value)}
-              placeholder="Enter Image Link"
+              type="file"
+              id="image"
+              accept="image/jpeg, image/jpg, image/png" // Restrict file types
+              onChange={handleImageChange}
             />
+            {imagePreview && (
+              <img src={imagePreview} alt="Preview" style={{ width: '200px', marginTop: '10px' }} />
+            )}
           </div>
         </div>
 

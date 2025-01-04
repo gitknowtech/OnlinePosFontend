@@ -487,7 +487,7 @@ export default function Invoice() {
         }
       } catch (error) {
         Swal.fire("Error", "Failed to fetch product suggestions.", "error");
-        console.error("Error fetching product suggestions:", error);
+        console.error("Error fetching product suggestions:"    , error);
       }
     } else {
       setSuggestions([]);
