@@ -467,6 +467,7 @@ export default function Invoice() {
   };
 
   // Function to Handle Barcode Input Change and Fetch Suggestions
+  // Function to Handle Barcode Input Change and Fetch Suggestions
   const handleBarcodeChange = async (e) => {
     const input = e.target.value;
     setBarcode(input);

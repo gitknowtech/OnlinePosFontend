@@ -95,7 +95,12 @@ const Bill = ({ invoiceId, onDataLoaded }) => {
       <div className="footer">
         <p>Thank you for shopping with us!</p>
         <p>Visit again!</p>
+        <p>...............................................</p>
+        <p>Software by GitknowTechnologies</p>
+        <p>Contatc  074 334 7776</p>
       </div>
+
+
     </div>
   );
 };
